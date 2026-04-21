@@ -14963,7 +14963,7 @@
 											"font": "Arial;13;0",
 											"parentStyle": true,
 											"left": 24.72998046875,
-											"top": 29,
+											"top": 8,
 											"width": 175.119140625,
 											"height": 13,
 											"text": "Validation QR code par le staff"
@@ -14977,7 +14977,7 @@
 											"font": "Arial;13;1",
 											"parentStyle": true,
 											"left": 5,
-											"top": 29,
+											"top": 8,
 											"width": 13.72998046875,
 											"height": 13,
 											"text": "sd"
@@ -14985,7 +14985,7 @@
 									],
 									"font": "Arial;13;0",
 									"parentStyle": false,
-									"top": 24,
+									"top": 3,
 									"width": 936,
 									"height": 800,
 									"nameLabel": {
