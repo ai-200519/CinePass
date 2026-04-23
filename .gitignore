@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Python tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Packaging
+build/
+dist/
+*.egg-info/
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# OS junk (Windows/macOS)
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Generated renders / exports
+rendered/
+ppt.md
+diagrammes
