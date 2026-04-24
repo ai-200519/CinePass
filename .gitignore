@@ -25,6 +25,23 @@ dist/
 .vscode/
 *.code-workspace
 
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build outputs
+dist/
+front/dist/
+api/dist/
+
+# Env files
+.env
+.env.*
+!.env.example
+
 # OS junk (Windows/macOS)
 Thumbs.db
 Desktop.ini
