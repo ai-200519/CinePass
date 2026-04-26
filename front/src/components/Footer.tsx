@@ -5,7 +5,7 @@ export default function Footer() {
     <footer className="border-t border-white/10 bg-zinc-900">
       <div className="mx-auto grid w-full max-w-7xl gap-8 px-4 py-12 sm:px-6 lg:grid-cols-4 lg:px-8">
         <div className="lg:col-span-1">
-          <Logo showText={false} size="lg" />
+          <Logo asset="logo" showText={false} size="lg" />
           <p className="mt-4 text-sm text-zinc-400">
             Réservez vos places de cinéma en quelques clics.
           </p>

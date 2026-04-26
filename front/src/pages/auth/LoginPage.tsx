@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import iconPng from '../assets/icon.png';
+import iconPng from '../../assets/icon.png';
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -86,6 +86,15 @@ export default function LoginPage() {
                   )}
                 </button>
               </div>
+            </div>
+
+            <div className="flex justify-end">
+              <Link
+                to="/forgot-password"
+                className="text-sm font-medium text-zinc-400 transition hover:text-red-400"
+              >
+                Mot de passe oublié ?
+              </Link>
             </div>
 
             <button
