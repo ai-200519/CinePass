@@ -1,7 +1,7 @@
 import { Euro, Film, Plus, Ticket, TrendingUp, Users } from 'lucide-react';
 import type { ReactNode } from 'react';
 import {
-    Bar,
+    Bar ,
     BarChart,
     CartesianGrid,
     Cell,
