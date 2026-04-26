@@ -41,14 +41,7 @@ export default function HomePage() {
       <header className="border-b border-white/10 bg-zinc-950/95 backdrop-blur">
         <div className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-4">
-            <Logo />
-            <div className="hidden items-center gap-3 text-sm text-zinc-400 md:flex">
-              <span className="uppercase tracking-wide">Votre cinéma</span>
-              <span className="font-semibold text-white">CinePass Rabat</span>
-              <button className="rounded-full border border-white/10 bg-white/5 px-4 py-1 text-xs font-semibold text-zinc-200 transition hover:bg-white/10">
-                Choisir son cinéma
-              </button>
-            </div>
+            <Logo showText={false} size="md" />
           </div>
 
           <div className="flex items-center gap-3">
@@ -115,7 +108,7 @@ export default function HomePage() {
 
       <section className="border-y border-white/10 bg-zinc-950">
         <div className="mx-auto w-full max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
-          <h2 className="mb-10 text-center text-4xl font-bold">Pourquoi CinePass ?</h2>
+          <h2 className="mb-10 text-center text-4xl font-bold">Pourquoi nous ?</h2>
           <div className="grid gap-6 lg:grid-cols-3">
             <article className="rounded-2xl border border-white/10 bg-zinc-900 p-8 text-center">
               <h3 className="text-2xl font-bold">Réservation rapide</h3>
