@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import Logo from '../components/Logo';
+import iconPng from '../assets/icon.png';
 
 export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -17,14 +17,11 @@ export default function RegisterPage() {
           <div className="flex flex-col items-center text-center">
             <div className="rounded-2xl border border-white/10 bg-zinc-900 p-4 shadow-lg">
               <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-red-600 text-2xl font-black">
-                C
+                <img src={iconPng} alt="" className="h-10 w-10 object-contain" />
               </span>
             </div>
-            <div className="mt-4">
-              <Logo />
-            </div>
             <h1 className="mt-6 text-3xl font-extrabold tracking-tight">Inscription</h1>
-            <p className="mt-2 text-zinc-300">Créez votre compte CinePass.</p>
+            <p className="mt-2 text-zinc-300">Créez votre compte.</p>
           </div>
 
           <form className="mt-10 space-y-5" onSubmit={(event) => event.preventDefault()}>

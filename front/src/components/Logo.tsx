@@ -1,21 +1,32 @@
 import { Link } from 'react-router-dom';
+import iconPng from '../assets/icon.png';
 
 type LogoProps = {
   to?: string;
   variant?: 'dark' | 'light';
+  showText?: boolean;
+  size?: 'sm' | 'md' | 'lg';
 };
 
-export default function Logo({ to = '/', variant = 'dark' }: LogoProps) {
-  const textClass = variant === 'light' ? 'text-zinc-900' : 'text-white';
+export default function Logo({
+  to = '/',
+  size = 'sm',
+}: LogoProps) {
+  const imageSizeClass =
+    size === 'lg' ? 'h-16 w-16' : size === 'md' ? 'h-12 w-12' : 'h-9 w-9';
 
   return (
-    <Link to={to} className="inline-flex items-center gap-2" aria-label="CinePass">
-      <span className="flex h-8 w-8 items-center justify-center rounded-md bg-red-600 text-sm font-black text-white">
-        C
-      </span>
-      <span className={`text-2xl font-extrabold leading-none ${textClass}`}>
-        Cine<span className="text-red-600">Pass</span>
-      </span>
+    <Link
+      to={to}
+      aria-label="CinePass"
+      className="inline-flex items-center"
+    >
+      <img
+        src={iconPng}
+        alt=""
+        className={`${imageSizeClass} rounded-md object-contain`}
+        loading="eager"
+      />
     </Link>
   );
 }
