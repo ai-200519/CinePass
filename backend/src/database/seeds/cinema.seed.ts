@@ -15,13 +15,13 @@ export async function seedCinema(dataSource: DataSource): Promise<void> {
 
   const cinema = repo.create({
     nom:       'CinePass',
-    adresse:   'Rue Hassan II',
-    ville:     'Safi',
+    adresse:   'Hda Fste_yes SIIR',
+    ville:     'Errachidia',
     telephone: '+212 5XX-XXXXXX',
-    latitude:  32.2994,
-    longitude: -9.2372,
+    latitude:  31.9329,
+    longitude: -4.4231,
   });
 
   await repo.save(cinema);
-  console.log('✅ Cinema seeded : CinePass Safi');
+  console.log('✅ Cinema seeded : CinePass Errachidia');
 }

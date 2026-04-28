@@ -3,8 +3,8 @@ import {
   ManyToOne, OneToMany, JoinColumn
 } from 'typeorm';
 import { Cinema } from '../../cinema/entities/cinema.entity';
-import { Seance } from 'src/seance/entities/seance.entity';
-import { Siege } from 'src/siege/entities/siege.entity';
+import { Seance } from '../../seance/entities/seance.entity';
+import { Siege } from '../../siege/entities/siege.entity';
 
 @Entity('salle')
 export class Salle {

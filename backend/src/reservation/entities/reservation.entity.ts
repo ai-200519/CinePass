@@ -6,9 +6,9 @@ import {
 import { StatutReservation } from '../../common/enums/statut-reservation.enum';
 import { Utilisateur } from '../../utilisateur/entities/utilisateur.entity';
 import { Seance } from '../../seance/entities/seance.entity';
-import { Paiement } from 'src/paiement/entities/paiement.entity';
+import { Paiement } from '../../paiement/entities/paiement.entity';
 import { ReservationSiege } from './reservation-siege.entity';
-import { Notification } from 'src/notification/entities/notification.entity';
+import { Notification } from '../../notification/entities/notification.entity';
 
 @Entity('reservation')
 export class Reservation {

@@ -2,7 +2,7 @@ import {
   Entity, PrimaryGeneratedColumn, Column, OneToMany
 } from 'typeorm';
 import { StatutFilm } from '../../common/enums/statut-film.enum';
-import { Seance } from 'src/seance/entities/seance.entity';
+import { Seance } from '../../seance/entities/seance.entity';
 
 @Entity('film')
 export class Film {

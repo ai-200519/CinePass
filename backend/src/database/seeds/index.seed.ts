@@ -1,4 +1,4 @@
-import { AppDataSource } from 'data-source';
+import { AppDataSource } from '../../../data-source';
 import { seedAdmin } from './admin.seed';
 import { seedCinema } from './cinema.seed';
 

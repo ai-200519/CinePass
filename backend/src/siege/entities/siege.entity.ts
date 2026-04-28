@@ -5,7 +5,7 @@ import {
 import { CategorieSiege } from '../../common/enums/categorie-siege.enum';
 import { StatutSiege } from '../../common/enums/statut-siege.enum';
 import { Salle } from '../../salle/entities/salle.entity';
-import { ReservationSiege } from 'src/reservation/entities/reservation-siege.entity';
+import { ReservationSiege } from '../../reservation/entities/reservation-siege.entity';
 
 @Entity('siege')
 export class Siege {

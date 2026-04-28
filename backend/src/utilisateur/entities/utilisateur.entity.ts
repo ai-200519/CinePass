@@ -4,8 +4,8 @@ import {
 } from 'typeorm';
 import { Role } from '../../common/enums/role.enum';
 import { StatutUtilisateur } from '../../common/enums/statut-utilisateur.enum';
-import { Reservation } from 'src/reservation/entities/reservation.entity';
-import { Notification } from 'src/notification/entities/notification.entity';
+import { Notification } from '../../notification/entities/notification.entity';
+import { Reservation } from '../../reservation/entities/reservation.entity';
 
 @Entity('utilisateur')
 export class Utilisateur {
