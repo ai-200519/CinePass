@@ -16,6 +16,9 @@ import { ReservationSiege } from './reservation/entities/reservation-siege.entit
 import { Paiement }         from './paiement/entities/paiement.entity';
 import { Notification }     from './notification/entities/notification.entity';
 
+import { UtilisateurModule } from './utilisateur/utilisateur.module';
+import { AuthModule } from './auth/auth.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -39,6 +42,8 @@ import { Notification }     from './notification/entities/notification.entity';
         ],
       }),
     }),
+    UtilisateurModule,
+    AuthModule,
   ],
 })
 export class AppModule {}
