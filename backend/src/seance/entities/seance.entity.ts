@@ -6,8 +6,8 @@ import { TechnologieSeance } from '../../common/enums/technologie-seance.enum';
 import { StatutSeance } from '../../common/enums/statut-seance.enum';
 import { Film } from '../../film/entities/film.entity';
 import { Salle } from '../../salle/entities/salle.entity';
-import { Reservation } from 'src/reservation/entities/reservation.entity';
-import { Tarif } from 'src/tarif/entities/tarif.entity';
+import { Reservation } from '../../reservation/entities/reservation.entity';
+import { Tarif } from '../../tarif/entities/tarif.entity';
 
 @Entity('seance')
 export class Seance {

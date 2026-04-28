@@ -1,5 +1,5 @@
 
-import { Salle } from 'src/salle/entities/salle.entity';
+import { Salle } from '../../salle/entities/salle.entity';
 import {
   Entity, PrimaryGeneratedColumn, Column, OneToMany
 } from 'typeorm';

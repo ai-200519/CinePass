@@ -1,26 +1,88 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { UtilisateurService } from '../utilisateur/utilisateur.service';
+import { RegisterDto } from './dto/register.dto';
+import { LoginDto } from './dto/login.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
+
+  constructor(
+    private readonly utilisateurService: UtilisateurService,
+    private readonly jwtService: JwtService,
+  ) {}
+
+  // ── Validate user credentials ───────────────────────────────────────────────
+  async validateUser(email: string, motDePasse: string) {
+
+    const user = await this.utilisateurService.findByEmail(email);
+
+    if (!user) return null;
+
+    const passwordMatch = await bcrypt.compare(motDePasse, user.motDePasse);
+
+    if (!passwordMatch) return null;
+
+    return user;
   }
 
-  findAll() {
-    return `This action returns all auth`;
+  // ── Login ───────────────────────────────────────────────────────────────────
+  async login(loginDto: LoginDto) {
+
+    const user = await this.validateUser(
+      loginDto.email,
+      loginDto.motDePasse,
+    );
+
+    if (!user) {
+      throw new UnauthorizedException('Email ou mot de passe incorrect');
+    }
+
+    if (user.statut === 'BANNI') {
+      throw new UnauthorizedException('Votre compte a été banni');
+    }
+
+    // Generate JWT
+    const payload = {
+      sub:   user.id_utilisateur,
+      email: user.email,
+      role:  user.role,
+    };
+
+    return {
+      access_token: this.jwtService.sign(payload),
+      user: {
+        id:     user.id_utilisateur,
+        nom:    user.nom,
+        prenom: user.prenom,
+        email:  user.email,
+        role:   user.role,
+      },
+    };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
+  // ── Register ────────────────────────────────────────────────────────────────
+  async register(registerDto: RegisterDto) {
 
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
+    const user = await this.utilisateurService.create(registerDto);
 
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+    // Auto login after register
+    const payload = {
+      sub:   user.id_utilisateur,
+      email: user.email,
+      role:  user.role,
+    };
+
+    return {
+      access_token: this.jwtService.sign(payload),
+      user: {
+        id:     user.id_utilisateur,
+        nom:    user.nom,
+        prenom: user.prenom,
+        email:  user.email,
+        role:   user.role,
+      },
+    };
   }
 }
