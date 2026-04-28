@@ -51,3 +51,24 @@ Desktop.ini
 rendered/
 ppt.md
 diagrammes
+
+node_modules/
+.expo/
+dist/
+npm-debug.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+web-build/
+
+# If using EAS secret file injection, keep google-services.json out of git
+# Uncomment the next line if you will supply it via GOOGLE_SERVICES_JSON environment variable
+# google-services.json
+
+# macOS
+.DS_Store
+push.sh
+*.apk
