@@ -18,6 +18,6 @@ export const getDatabaseConfig = (
 
   // Safe pattern — use env variable to control it
   synchronize: config.get('NODE_ENV') === 'development',
-  migrationsRun: true,   // auto-run on startup
+  migrationsRun: false,   
   logging: true,
 });

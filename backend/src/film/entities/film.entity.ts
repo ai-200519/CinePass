@@ -8,34 +8,39 @@ import { Seance } from 'src/seance/entities/seance.entity';
 export class Film {
 
   @PrimaryGeneratedColumn()
-  id_film: number;
+  id: number;
 
-  @Column({ length: 255 })
-  titre: string;
+  @Column({ nullable: true })
+  title: string;
 
-  @Column({ type: 'text', nullable: true })
-  synopsis: string;
+  @Column({ nullable: true })
+  description: string;
 
-  @Column()
-  duree: number;
+  @Column({ nullable: true })
+  duration: number;
 
-  @Column({ nullable: true, length: 100 })
+  @Column({ nullable: true })
+  releaseDate: Date;
+
+  @Column({ nullable: true })
+  director: string;
+
+  @Column("text", { array: true, nullable: true })
+  actors: string[];
+
+  @Column({ nullable: true })
   genre: string;
 
-  @Column({ nullable: true, length: 50 })
-  langue: string;
+  @Column({ nullable: true })
+  poster: string;
 
-  @Column({ nullable: true, length: 50 })
-  classification: string;
+  @Column({ nullable: true })
+  trailer: string;
 
-  @Column({ type: 'date', nullable: true })
-  dateSortie: Date;
-
-  @Column({ nullable: true, length: 500 })
-  affiche: string;
-
-  @Column({ nullable: true, length: 500 })
-  bandeAnnonce: string;
+  @Column('decimal', { precision: 3, scale: 1, default: 0, nullable: true })
+  note: number;
+  @Column({ nullable: true })
+  isShowing: boolean;
 
   @Column({
     type: 'enum',
