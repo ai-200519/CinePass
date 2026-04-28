@@ -7,7 +7,9 @@ import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Auth') 
 @Controller('auth')
 export class AuthController {
 
@@ -30,6 +32,7 @@ export class AuthController {
   // ── GET /auth/me — get current user ────────────────────────────────────────
   @Get('me')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   async me(@CurrentUser() user: any) {
     return user;
   }
