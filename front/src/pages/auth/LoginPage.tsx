@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import Logo from '../components/Logo';
+import iconPng from '../../assets/icon.png';
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -16,11 +16,8 @@ export default function LoginPage() {
           <div className="flex flex-col items-center text-center">
             <div className="rounded-2xl border border-white/10 bg-zinc-900 p-4 shadow-lg">
               <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-red-600 text-2xl font-black">
-                C
+                <img src={iconPng} alt="" className="h-10 w-10 object-contain" />
               </span>
-            </div>
-            <div className="mt-4">
-              <Logo />
             </div>
             <h1 className="mt-6 text-3xl font-extrabold tracking-tight">Bienvenue</h1>
             <p className="mt-2 text-zinc-300">Connectez-vous pour accéder à votre espace.</p>
@@ -89,6 +86,15 @@ export default function LoginPage() {
                   )}
                 </button>
               </div>
+            </div>
+
+            <div className="flex justify-end">
+              <Link
+                to="/forgot-password"
+                className="text-sm font-medium text-zinc-400 transition hover:text-red-400"
+              >
+                Mot de passe oublié ?
+              </Link>
             </div>
 
             <button

@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import Logo from '../components/Logo';
 
 export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -15,16 +14,8 @@ export default function RegisterPage() {
       <div className="relative mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-5xl items-center justify-center">
         <div className="w-full max-w-xl rounded-3xl border border-white/10 bg-zinc-900/70 p-8 shadow-2xl backdrop-blur sm:p-10">
           <div className="flex flex-col items-center text-center">
-            <div className="rounded-2xl border border-white/10 bg-zinc-900 p-4 shadow-lg">
-              <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-red-600 text-2xl font-black">
-                C
-              </span>
-            </div>
-            <div className="mt-4">
-              <Logo />
-            </div>
-            <h1 className="mt-6 text-3xl font-extrabold tracking-tight">Inscription</h1>
-            <p className="mt-2 text-zinc-300">Créez votre compte CinePass.</p>
+            <h1 className="text-3xl font-extrabold tracking-tight">Inscription</h1>
+            <p className="mt-2 text-zinc-300">Créez votre compte.</p>
           </div>
 
           <form className="mt-10 space-y-5" onSubmit={(event) => event.preventDefault()}>
