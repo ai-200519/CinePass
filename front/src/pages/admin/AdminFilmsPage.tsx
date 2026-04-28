@@ -15,7 +15,7 @@ interface FilmData {
   note: number;
 }
 
-const GENRES = ['Action', 'Animation', 'Aventure', 'Comédie', 'Documentaire', 'Drame', 'Horreur', 'Romance', 'Sci-Fi', 'Thriller'];
+const GENRES = ['Action', 'Animation', 'Aventure', 'Comédie', 'Documentaire', 'Drame', 'Horreur', 'Romance', 'Thriller'];
 
 const MOCK_FILMS: FilmData[] = [
   { id: 1, titre: 'Apocalypse Stellaire', genre: 'Sci-Fi', duree: 138, realisateur: 'Luc Martin', annee: 2024, synopsis: 'Une expédition spatiale tourne au cauchemar aux confins de la galaxie.', affiche: 'https://images.unsplash.com/photo-1504386106331-3e4e71712b38?auto=format&fit=crop&w=300&q=80', statut: 'actif', note: 8.4 },
