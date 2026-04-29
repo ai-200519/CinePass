@@ -44,7 +44,14 @@
       "policy": "sdkVersion"
     },
     "plugins": [
-      "expo-font"
+      "expo-font",
+      "expo-system-ui",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Autoriser CinePass à accéder à la caméra pour scanner les QR codes."
+        }
+      ]
     ]
   }
 }

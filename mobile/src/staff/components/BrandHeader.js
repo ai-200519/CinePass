@@ -1,39 +1,27 @@
-import { StatusBar, Text, View } from 'react-native';
+import { Image, StatusBar, StyleSheet, View } from 'react-native';
 import { staffTheme } from '../theme';
 
-export default function BrandHeader({ title, subtitle }) {
+export default function BrandHeader() {
   return (
-    <View style={{ paddingHorizontal: staffTheme.spacing.screenPadH }}>
+    <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={staffTheme.colors.bg} />
-
-         <View style={{ flexDirection: 'row', alignItems: 'center', paddingTop: 8 }}>
-        <Text style={{ color: staffTheme.colors.accent, fontSize: 16, fontWeight: '700' }}>🎬</Text>
-           <View style={{ width: 10 }} />
-        <Text style={{ fontSize: 18, fontWeight: '800', color: staffTheme.colors.text }}>
-          Cine
-          <Text style={{ color: staffTheme.colors.accent }}>Pass</Text>
-        </Text>
-      </View>
-
-      {title ? (
-        <Text
-          style={{
-            marginTop: 14,
-            fontSize: 30,
-            fontWeight: '800',
-            color: staffTheme.colors.text,
-            lineHeight: 36,
-          }}
-        >
-          {title}
-        </Text>
-      ) : null}
-
-      {subtitle ? (
-        <Text style={{ marginTop: 6, color: staffTheme.colors.textSecondary, fontSize: 14 }}>
-          {subtitle}
-        </Text>
-      ) : null}
+      <Image source={require('../../../assets/logo.png')} style={styles.logo} />
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: staffTheme.colors.bg,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 10,
+    paddingBottom: 6,
+    paddingHorizontal: staffTheme.spacing.screenPadH,
+  },
+  logo: {
+    width: 240,
+    height: 80,
+    resizeMode: 'contain',
+  },
+});
