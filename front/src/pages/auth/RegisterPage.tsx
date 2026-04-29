@@ -1,9 +1,47 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import { selectRegisterError, selectRegisterStatus } from '../../features/auth/authSelectors';
+import { authActions } from '../../features/auth/authSlice';
 
 export default function RegisterPage() {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
+  const registerStatus = useAppSelector(selectRegisterStatus);
+  const registerError = useAppSelector(selectRegisterError);
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const [prenom, setPrenom] = useState('');
+  const [nom, setNom] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [localError, setLocalError] = useState<string | null>(null);
+
+  useEffect(() => {
+    dispatch(authActions.clearRegisterState());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (registerStatus === 'succeeded') {
+      dispatch(authActions.clearRegisterState());
+      navigate('/admin', { replace: true });
+    }
+  }, [dispatch, navigate, registerStatus]);
+
+  const canSubmit = useMemo(() => {
+    return (
+      prenom.trim().length > 0 &&
+      nom.trim().length > 0 &&
+      email.trim().length > 0 &&
+      password.length > 0 &&
+      confirmPassword.length > 0
+    );
+  }, [confirmPassword.length, email, nom, password.length, prenom]);
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-zinc-950 px-4 py-10 text-white">
@@ -18,7 +56,33 @@ export default function RegisterPage() {
             <p className="mt-2 text-zinc-300">Créez votre compte.</p>
           </div>
 
-          <form className="mt-10 space-y-5" onSubmit={(event) => event.preventDefault()}>
+          <form
+            className="mt-10 space-y-5"
+            onSubmit={(event) => {
+              event.preventDefault();
+              setLocalError(null);
+
+              if (password !== confirmPassword) {
+                setLocalError('Les mots de passe ne correspondent pas.');
+                return;
+              }
+
+              if (!prenom.trim() || !nom.trim()) {
+                setLocalError('Veuillez renseigner votre prénom et votre nom.');
+                return;
+              }
+
+              dispatch(
+                authActions.registerRequested({
+                  email,
+                  password,
+                  nom: nom.trim(),
+                  prenom: prenom.trim(),
+                  telephone: phone.trim() || undefined,
+                }),
+              );
+            }}
+          >
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <label htmlFor="firstName" className="mb-2 block text-sm font-medium text-zinc-200">
@@ -27,6 +91,8 @@ export default function RegisterPage() {
                 <input
                   id="firstName"
                   type="text"
+                  value={prenom}
+                  onChange={(e) => setPrenom(e.target.value)}
                   placeholder="Votre prénom"
                   autoComplete="given-name"
                   className="w-full rounded-2xl border border-white/10 bg-zinc-800/70 px-4 py-3 text-white placeholder:text-zinc-500 outline-none ring-red-500/60 transition focus:ring-2"
@@ -40,6 +106,8 @@ export default function RegisterPage() {
                 <input
                   id="lastName"
                   type="text"
+                  value={nom}
+                  onChange={(e) => setNom(e.target.value)}
                   placeholder="Votre nom"
                   autoComplete="family-name"
                   className="w-full rounded-2xl border border-white/10 bg-zinc-800/70 px-4 py-3 text-white placeholder:text-zinc-500 outline-none ring-red-500/60 transition focus:ring-2"
@@ -54,6 +122,8 @@ export default function RegisterPage() {
               <input
                 id="phone"
                 type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
                 placeholder="06..."
                 autoComplete="tel"
                 className="w-full rounded-2xl border border-white/10 bg-zinc-800/70 px-4 py-3 text-white placeholder:text-zinc-500 outline-none ring-red-500/60 transition focus:ring-2"
@@ -67,6 +137,8 @@ export default function RegisterPage() {
               <input
                 id="email"
                 type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="votre@email.com"
                 autoComplete="email"
                 className="w-full rounded-2xl border border-white/10 bg-zinc-800/70 px-4 py-3 text-white placeholder:text-zinc-500 outline-none ring-red-500/60 transition focus:ring-2"
@@ -82,6 +154,8 @@ export default function RegisterPage() {
                   <input
                     id="password"
                     type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
                     autoComplete="new-password"
                     className="w-full rounded-2xl border border-white/10 bg-zinc-800/70 px-4 py-3 pr-12 text-white placeholder:text-zinc-500 outline-none ring-red-500/60 transition focus:ring-2"
@@ -133,6 +207,8 @@ export default function RegisterPage() {
                   <input
                     id="confirmPassword"
                     type={showConfirmPassword ? 'text' : 'password'}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="••••••••"
                     autoComplete="new-password"
                     className="w-full rounded-2xl border border-white/10 bg-zinc-800/70 px-4 py-3 pr-12 text-white placeholder:text-zinc-500 outline-none ring-red-500/60 transition focus:ring-2"
@@ -186,10 +262,14 @@ export default function RegisterPage() {
 
             <button
               type="submit"
+              disabled={!canSubmit || registerStatus === 'loading'}
               className="w-full rounded-2xl bg-gradient-to-r from-red-600 to-red-500 py-3 font-semibold text-white shadow-lg shadow-red-600/20 transition hover:from-red-500 hover:to-red-500"
             >
-              Créer un compte
+              {registerStatus === 'loading' ? 'Création…' : 'Créer un compte'}
             </button>
+
+            {localError ? <p className="text-sm font-medium text-red-300">{localError}</p> : null}
+            {registerError ? <p className="text-sm font-medium text-red-300">{registerError}</p> : null}
           </form>
 
           <p className="mt-6 text-center text-sm text-zinc-400">

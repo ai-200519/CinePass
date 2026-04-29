@@ -1,9 +1,31 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import iconPng from '../../assets/icon.png';
+import { selectIsAuthenticated, selectLoginError, selectLoginStatus } from '../../features/auth/authSelectors';
+import { authActions } from '../../features/auth/authSlice';
 
 export default function LoginPage() {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
+  const loginStatus = useAppSelector(selectLoginStatus);
+  const loginError = useAppSelector(selectLoginError);
+
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  useEffect(() => {
+    dispatch(authActions.clearLoginState());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/admin', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-zinc-950 px-4 py-10 text-white">
@@ -23,7 +45,13 @@ export default function LoginPage() {
             <p className="mt-2 text-zinc-300">Connectez-vous pour accéder à votre espace.</p>
           </div>
 
-          <form className="mt-10 space-y-5" onSubmit={(event) => event.preventDefault()}>
+          <form
+            className="mt-10 space-y-5"
+            onSubmit={(event) => {
+              event.preventDefault();
+              dispatch(authActions.loginRequested({ email, password }));
+            }}
+          >
             <div>
               <label htmlFor="email" className="mb-2 block text-sm font-medium text-zinc-200">
                 Email
@@ -31,6 +59,8 @@ export default function LoginPage() {
               <input
                 id="email"
                 type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="votre@email.com"
                 autoComplete="email"
                 className="w-full rounded-2xl border border-white/10 bg-zinc-800/70 px-4 py-3 text-white placeholder:text-zinc-500 outline-none ring-red-500/60 transition focus:ring-2"
@@ -45,6 +75,8 @@ export default function LoginPage() {
                 <input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   autoComplete="current-password"
                   className="w-full rounded-2xl border border-white/10 bg-zinc-800/70 px-4 py-3 pr-12 text-white placeholder:text-zinc-500 outline-none ring-red-500/60 transition focus:ring-2"
@@ -99,10 +131,15 @@ export default function LoginPage() {
 
             <button
               type="submit"
+              disabled={loginStatus === 'loading'}
               className="w-full rounded-2xl bg-gradient-to-r from-red-600 to-red-500 py-3 font-semibold text-white shadow-lg shadow-red-600/20 transition hover:from-red-500 hover:to-red-500"
             >
-              Se connecter
+              {loginStatus === 'loading' ? 'Connexion…' : 'Se connecter'}
             </button>
+
+            {loginError ? (
+              <p className="text-sm font-medium text-red-300">{loginError}</p>
+            ) : null}
           </form>
 
           <p className="mt-6 text-center text-sm text-zinc-400">
