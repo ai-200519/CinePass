@@ -1,4 +1,4 @@
-rootProject.name = 'CinePass Staff'
+rootProject.name = 'CinePass'
 
 dependencyResolutionManagement {
   versionCatalogs {
