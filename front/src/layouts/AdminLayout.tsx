@@ -1,14 +1,14 @@
 import type { LucideIcon } from 'lucide-react';
 import {
-  BarChart3,
-  CalendarDays,
-  Clapperboard,
-  DoorOpen,
-  Film,
-  LayoutDashboard,
-  LogOut,
-  Settings,
-  Ticket,
+    BarChart3,
+    CalendarDays,
+    Clapperboard,
+    DoorOpen,
+    Film,
+    LayoutDashboard,
+    LogOut,
+    Settings,
+    Ticket,
 } from 'lucide-react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../app/hooks';
