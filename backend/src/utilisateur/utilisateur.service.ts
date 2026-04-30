@@ -1,26 +1,82 @@
-import { Injectable } from '@nestjs/common';
-import { CreateUtilisateurDto } from './dto/create-utilisateur.dto';
-import { UpdateUtilisateurDto } from './dto/update-utilisateur.dto';
+import { Injectable, ConflictException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Utilisateur } from './entities/utilisateur.entity';
+import { Role } from '../common/enums/role.enum';
+import { RegisterDto } from '../auth/dto/register.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UtilisateurService {
-  create(createUtilisateurDto: CreateUtilisateurDto) {
-    return 'This action adds a new utilisateur';
+  constructor(
+    @InjectRepository(Utilisateur)
+    private readonly utilisateurRepository: Repository<Utilisateur>,
+  ) {}
+
+  // ── Find by email ───────────────────────────────────────────────────────────
+  async findByEmail(email: string): Promise<Utilisateur | null> {
+    return this.utilisateurRepository.findOne({
+      where: { email },
+    });
   }
 
-  findAll() {
-    return `This action returns all utilisateur`;
+  // ── Find by ID ──────────────────────────────────────────────────────────────
+  async findById(id: number): Promise<Utilisateur | null> {
+    return this.utilisateurRepository.findOne({
+      where: { id_utilisateur: id },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} utilisateur`;
+  // ── Create new client ───────────────────────────────────────────────────────
+  async create(registerDto: RegisterDto): Promise<Utilisateur> {
+    // Check email uniqueness
+    const existing = await this.findByEmail(registerDto.email);
+    if (existing) {
+      throw new ConflictException('Cet email est déjà utilisé');
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(registerDto.motDePasse, 10);
+
+    // Create entity
+    const utilisateur = this.utilisateurRepository.create({
+      nom: registerDto.nom,
+      prenom: registerDto.prenom,
+      email: registerDto.email,
+      motDePasse: hashedPassword,
+      telephone: registerDto.telephone,
+      langue: registerDto.langue || 'FR',
+      role: Role.CLIENT, // always CLIENT on register
+    });
+
+    return this.utilisateurRepository.save(utilisateur);
   }
 
-  update(id: number, updateUtilisateurDto: UpdateUtilisateurDto) {
-    return `This action updates a #${id} utilisateur`;
+  // Save OTP to utilisateur table
+  async saveOtp(id: number, otp: string, expiresAt: Date): Promise<void> {
+    await this.utilisateurRepository.update(
+      { id_utilisateur: id },
+      {
+        otpCode: otp,
+        otpExpiresAt: expiresAt,
+        otpUsed: false,
+      },
+    );
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} utilisateur`;
+  // Reset password and clear OTP fields
+  async resetPasswordAndClearOtp(
+    id: number,
+    hashedPassword: string,
+  ): Promise<void> {
+    await this.utilisateurRepository.update(
+      { id_utilisateur: id },
+      {
+        motDePasse: hashedPassword,
+        otpCode: null,
+        otpExpiresAt: null,
+        otpUsed: true, // mark as used before nullifying
+      },
+    );
   }
 }
