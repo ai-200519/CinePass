@@ -9,10 +9,10 @@ import { EmailProvider } from 'src/common/providers/email.provider';
 
 @Injectable()
 export class AuthService {  
-  emailProvider: EmailProvider;
   constructor(
     private readonly utilisateurService: UtilisateurService,
     private readonly jwtService: JwtService,
+    private readonly emailProvider: EmailProvider,
   ) {}
 
   // ── Validate user credentials ───────────────────────────────────────────────
