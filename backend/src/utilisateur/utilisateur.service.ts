@@ -8,7 +8,6 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UtilisateurService {
-
   constructor(
     @InjectRepository(Utilisateur)
     private readonly utilisateurRepository: Repository<Utilisateur>,
@@ -30,7 +29,6 @@ export class UtilisateurService {
 
   // ── Create new client ───────────────────────────────────────────────────────
   async create(registerDto: RegisterDto): Promise<Utilisateur> {
-
     // Check email uniqueness
     const existing = await this.findByEmail(registerDto.email);
     if (existing) {
@@ -42,15 +40,43 @@ export class UtilisateurService {
 
     // Create entity
     const utilisateur = this.utilisateurRepository.create({
-      nom:        registerDto.nom,
-      prenom:     registerDto.prenom,
-      email:      registerDto.email,
+      nom: registerDto.nom,
+      prenom: registerDto.prenom,
+      email: registerDto.email,
       motDePasse: hashedPassword,
-      telephone:  registerDto.telephone,
-      langue:     registerDto.langue || 'FR',
-      role:       Role.CLIENT,   // always CLIENT on register
+      telephone: registerDto.telephone,
+      langue: registerDto.langue || 'FR',
+      role: Role.CLIENT, // always CLIENT on register
     });
 
     return this.utilisateurRepository.save(utilisateur);
+  }
+
+  // Save OTP to utilisateur table
+  async saveOtp(id: number, otp: string, expiresAt: Date): Promise<void> {
+    await this.utilisateurRepository.update(
+      { id_utilisateur: id },
+      {
+        otpCode: otp,
+        otpExpiresAt: expiresAt,
+        otpUsed: false,
+      },
+    );
+  }
+
+  // Reset password and clear OTP fields
+  async resetPasswordAndClearOtp(
+    id: number,
+    hashedPassword: string,
+  ): Promise<void> {
+    await this.utilisateurRepository.update(
+      { id_utilisateur: id },
+      {
+        motDePasse: hashedPassword,
+        otpCode: null,
+        otpExpiresAt: null,
+        otpUsed: true, // mark as used before nullifying
+      },
+    );
   }
 }
