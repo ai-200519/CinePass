@@ -28,6 +28,15 @@ export class Utilisateur {
   @Column({ length: 255 })
   motDePasse: string;
 
+  @Column({ nullable: true, length: 6 })
+  otpCode: string;              // the 6-digit code
+
+  @Column({ type: 'timestamp', nullable: true })
+  otpExpiresAt: Date;           // expiry times
+
+  @Column({ default: false, nullable: true })
+  otpUsed: boolean;             // prevent reuse
+
   @Column({
     type: 'enum',
     enum: Role,
