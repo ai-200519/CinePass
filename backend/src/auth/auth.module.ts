@@ -7,6 +7,7 @@ import { AuthController } from './auth.controller';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
 import { UtilisateurModule } from '../utilisateur/utilisateur.module';
+import { EmailProvider } from 'src/common/providers/email.provider';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { UtilisateurModule } from '../utilisateur/utilisateur.module';
     AuthService,
     JwtStrategy,
     LocalStrategy,
+    EmailProvider
   ],
   controllers: [AuthController],
   exports: [AuthService],
