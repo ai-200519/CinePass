@@ -1,16 +1,16 @@
 services:
   backend:
     build:
-      context: .
+      context: ./backend
     container_name: cinepass-backend
     env_file:
-      - ./.env
+      - ./backend/.env
     ports:
       - "3000:3000"
 
   front:
     build:
-      context: ../front
+      context: ./front
     container_name: cinepass-front
     ports:
       - "8081:80"

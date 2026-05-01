@@ -1,12 +1,8 @@
 import { configureStore } from '@reduxjs/toolkit';
 import createSagaMiddleware from 'redux-saga';
 import { authActions, authReducer } from '../features/auth/authSlice';
-<<<<<<< HEAD
 import { filmsReducer } from '../features/films/filmsSlice';
 import { seancesReducer } from '../features/seances/seancesSlice';
-=======
-import { filmsActions, filmsReducer } from '../features/films/filmsSlice';
->>>>>>> 9100a56f4bf3c6c915e15b17f74b3caaf25caa4c
 import { tokenStorage } from '../services/tokenStorage';
 import { rootSaga } from './rootSaga';
 
@@ -16,10 +12,7 @@ export const store = configureStore({
   reducer: {
     auth: authReducer,
     films: filmsReducer,
-<<<<<<< HEAD
     seances: seancesReducer,
-=======
->>>>>>> 9100a56f4bf3c6c915e15b17f74b3caaf25caa4c
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
