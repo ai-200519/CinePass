@@ -16,13 +16,13 @@ export class Salle {
   numero: number;
 
   @Column({ nullable: true, length: 100 })
-  nom: string;
+  name: string;
 
   @Column()
-  capaciteTotale: number;
+  totalCapacity: number;
 
   @Column({ nullable: true, length: 255 })
-  equipements: string;
+  equipments: string;
 
   // Relations
   @ManyToOne(() => Cinema, c => c.salles, { onDelete: 'CASCADE' })
@@ -30,8 +30,8 @@ export class Salle {
   cinema: Cinema;
 
   @OneToMany(() => Siege, s => s.salle)
-  sieges: Siege[];
+  seats: Siege[];
 
   @OneToMany(() => Seance, s => s.salle)
-  seances: Seance[];
+  sessions: Seance[];
 }
