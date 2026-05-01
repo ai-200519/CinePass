@@ -5,6 +5,7 @@ import { Utilisateur } from './entities/utilisateur.entity';
 import { Role } from '../common/enums/role.enum';
 import { RegisterDto } from '../auth/dto/register.dto';
 import * as bcrypt from 'bcrypt';
+import { StatutUtilisateur } from 'src/common/enums/statut-utilisateur.enum';
 
 @Injectable()
 export class UtilisateurService {
@@ -53,14 +54,18 @@ export class UtilisateurService {
   }
 
   // Save OTP to utilisateur table
-  async saveOtp(id: number, otp: string, expiresAt: Date): Promise<void> {
+  async saveOtp(id: number, otp: string, expiresAt: Date, purpose: string): Promise<void> {
     await this.utilisateurRepository.update(
       { id_utilisateur: id },
-      {
-        otpCode: otp,
-        otpExpiresAt: expiresAt,
-        otpUsed: false,
-      },
+      { otpCode: otp, otpExpiresAt: expiresAt, otpUsed: false, otpPurpose: purpose },
+    );
+  }
+
+  // activate account after email verification
+  async activateAccount(id: number): Promise<void> {
+    await this.utilisateurRepository.update(
+      { id_utilisateur: id },
+      { statut: StatutUtilisateur.ACTIF, otpCode: null, otpExpiresAt: null, otpUsed: true },
     );
   }
 
