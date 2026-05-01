@@ -1,26 +1,53 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateFilmDto } from './dto/create-film.dto';
 import { UpdateFilmDto } from './dto/update-film.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Film } from './entities/film.entity';
 
 @Injectable()
 export class FilmService {
+
+  constructor(
+    @InjectRepository(Film)
+    private filmRepository: Repository<Film>, // TypeORM automatically provides this
+  ) { }
+
   create(createFilmDto: CreateFilmDto) {
-    return 'This action adds a new film';
+    return this.filmRepository.save(createFilmDto);
   }
 
   findAll() {
-    return `This action returns all film`;
+    return this.filmRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} film`;
+  async findOne(id: number) {
+    const film = await this.filmRepository.findOne({ where: { id } });
+
+    if (!film) {
+      throw new NotFoundException(`Film with ID ${id} not found`);
+    }
+
+    return film;
   }
 
-  update(id: number, updateFilmDto: UpdateFilmDto) {
-    return `This action updates a #${id} film`;
+  async update(id: number, updateFilmDto: UpdateFilmDto) {
+    const film = await this.filmRepository.findOne({ where: { id } });
+
+    if (!film) {
+      throw new NotFoundException(`Film with ID ${id} not found`);
+    }
+
+    return this.filmRepository.update(id, updateFilmDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} film`;
+  async remove(id: number) {
+    const film = await this.filmRepository.findOne({ where: { id } });
+
+    if (!film) {
+      throw new NotFoundException(`Film with ID ${id} not found`);
+    }
+
+    return this.filmRepository.delete(id);
   }
 }

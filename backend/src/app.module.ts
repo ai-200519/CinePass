@@ -1,49 +1,48 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { getDatabaseConfig } from './config/database.config';
 
 // Entities
-import { Utilisateur }      from './utilisateur/entities/utilisateur.entity';
-import { Cinema }           from './cinema/entities/cinema.entity';
-import { Salle }            from './salle/entities/salle.entity';
-import { Siege }            from './siege/entities/siege.entity';
-import { Film }             from './film/entities/film.entity';
-import { Seance }           from './seance/entities/seance.entity';
-import { Tarif }            from './tarif/entities/tarif.entity';
-import { Reservation }      from './reservation/entities/reservation.entity';
-import { ReservationSiege } from './reservation/entities/reservation-siege.entity';
-import { Paiement }         from './paiement/entities/paiement.entity';
-import { Notification }     from './notification/entities/notification.entity';
-
+import { AuthModule } from './auth/auth.module'
 import { UtilisateurModule } from './utilisateur/utilisateur.module';
-import { AuthModule } from './auth/auth.module';
+import { CinemaModule } from './cinema/cinema.module';
+import { SalleModule } from './salle/salle.module';
+import { SiegeModule } from './siege/siege.module';
+import { FilmModule } from './film/film.module';
+import { SeanceModule } from './seance/seance.module';
+import { TarifModule } from './tarif/tarif.module';
+import { ReservationModule } from './reservation/reservation.module';
+import { PaiementModule } from './paiement/paiement.module';
+import { NotificationModule } from './notification/notification.module';
+import { AdminModule } from './admin/admin.module';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { AppService } from './app.service';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
-
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+    }),
     TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        ...getDatabaseConfig(config),
-        entities: [
-          Utilisateur,
-          Cinema,
-          Salle,
-          Siege,
-          Film,
-          Seance,
-          Tarif,
-          Reservation,
-          ReservationSiege,
-          Paiement,
-          Notification,
-        ],
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        host: configService.get<string>('DB_HOST'),
+        port: configService.get<number>('DB_PORT'),
+        username: configService.get<string>('DB_USERNAME'),
+        password: configService.get<string>('DB_PASSWORD'),
+        database: configService.get<string>('DB_NAME'),
+        entities: [__dirname + '/**/*.entity{.ts,.js}'],
+        synchronize: configService.get<string>('NODE_ENV') !== 'production',
+        ssl: configService.get<string>('DB_SSL') === 'true',
       }),
     }),
-    UtilisateurModule,
-    AuthModule,
-  ],
+    AuthModule, UtilisateurModule, CinemaModule, SalleModule, SiegeModule, FilmModule, SeanceModule, TarifModule, ReservationModule, PaiementModule, NotificationModule, AdminModule],
+  controllers: [AppController],
+  providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }
+
