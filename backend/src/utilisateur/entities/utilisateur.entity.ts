@@ -37,6 +37,9 @@ export class Utilisateur {
   @Column({ default: false, nullable: true })
   otpUsed: boolean;             // prevent reuse
 
+  @Column({ nullable: true })
+  otpPurpose: string;   // 'register' | 'reset_password'
+
   @Column({
     type: 'enum',
     enum: Role,
@@ -47,7 +50,7 @@ export class Utilisateur {
   @Column({
     type: 'enum',
     enum: StatutUtilisateur,
-    default: StatutUtilisateur.ACTIF,
+    default: StatutUtilisateur.PENDING,
   })
   statut: StatutUtilisateur;
 
