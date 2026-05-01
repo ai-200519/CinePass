@@ -1,16 +1,46 @@
-import { useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import iconPng from '../../assets/icon.png';
+import {
+    selectResetPasswordError,
+    selectResetPasswordStatus,
+} from '../../features/auth/authSelectors';
+import { authActions } from '../../features/auth/authSlice';
 
 export default function ResetPasswordPage() {
-  const [searchParams] = useSearchParams();
-  const token = searchParams.get('token') ?? '';
-
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const status = useAppSelector(selectResetPasswordStatus);
+  const apiError = useAppSelector(selectResetPasswordError);
+  const savedEmail =
+    localStorage.getItem('cinepass_reset_email') ??
+    sessionStorage.getItem('cinepass_reset_email') ??
+    '';
+  const savedOtp =
+    localStorage.getItem('cinepass_reset_otp') ??
+    sessionStorage.getItem('cinepass_reset_otp') ??
+    '';
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    dispatch(authActions.clearResetPasswordState());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (submitted && status === 'succeeded') {
+      sessionStorage.removeItem('cinepass_reset_email');
+      sessionStorage.removeItem('cinepass_reset_otp');
+      localStorage.removeItem('cinepass_reset_email');
+      localStorage.removeItem('cinepass_reset_otp');
+      navigate('/login');
+    }
+  }, [navigate, status, submitted]);
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-zinc-950 px-4 py-10 text-white">
@@ -30,7 +60,7 @@ export default function ResetPasswordPage() {
             <p className="mt-2 text-zinc-300">Choisissez un nouveau mot de passe pour votre compte.</p>
           </div>
 
-          {!token ? (
+          {!savedEmail || !savedOtp ? (
             <div className="mt-10 space-y-4">
               <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-zinc-200">
                 Lien invalide ou expiré.
@@ -47,6 +77,31 @@ export default function ResetPasswordPage() {
               className="mt-10 space-y-5"
               onSubmit={(event) => {
                 event.preventDefault();
+                setError(null);
+
+                const otpDigits = savedOtp.replace(/\D/g, '');
+                if (!savedEmail || otpDigits.length !== 6) {
+                  setError('Lien invalide ou expiré.');
+                  return;
+                }
+
+                if (!password || password.length < 6) {
+                  setError('Le mot de passe doit contenir au moins 6 caracteres.');
+                  return;
+                }
+
+                if (password !== confirmPassword) {
+                  setError('Les mots de passe ne correspondent pas.');
+                  return;
+                }
+
+                dispatch(
+                  authActions.resetPasswordRequested({
+                    email: savedEmail,
+                    otp: otpDigits,
+                    newPassword: password,
+                  }),
+                );
                 setSubmitted(true);
               }}
             >
@@ -161,7 +216,19 @@ export default function ResetPasswordPage() {
                 </div>
               </div>
 
-              {submitted ? (
+              {error ? (
+                <div className="rounded-2xl border border-red-500/30 bg-red-600/10 px-4 py-3 text-sm text-red-100">
+                  {error}
+                </div>
+              ) : null}
+
+              {apiError ? (
+                <div className="rounded-2xl border border-red-500/30 bg-red-600/10 px-4 py-3 text-sm text-red-100">
+                  {apiError}
+                </div>
+              ) : null}
+
+              {submitted && status === 'succeeded' ? (
                 <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-zinc-200">
                   Mot de passe mis à jour.
                 </div>
@@ -169,9 +236,10 @@ export default function ResetPasswordPage() {
 
               <button
                 type="submit"
+                disabled={status === 'loading'}
                 className="w-full rounded-2xl bg-gradient-to-r from-red-600 to-red-500 py-3 font-semibold text-white shadow-lg shadow-red-600/20 transition hover:from-red-500 hover:to-red-500"
               >
-                Enregistrer
+                {status === 'loading' ? 'Enregistrement...' : 'Enregistrer'}
               </button>
             </form>
           )}

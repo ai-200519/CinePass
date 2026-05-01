@@ -1,14 +1,29 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import iconPng from '../../assets/icon.png';
+import {
+    selectForgotPasswordError,
+    selectForgotPasswordStatus,
+} from '../../features/auth/authSelectors';
+import { authActions } from '../../features/auth/authSlice';
 
 export default function ForgotPasswordPage() {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const status = useAppSelector(selectForgotPasswordStatus);
+  const apiError = useAppSelector(selectForgotPasswordError);
   const [email, setEmail] = useState('');
   const [step, setStep] = useState<'email' | 'code'>('email');
-  const [generatedCode, setGeneratedCode] = useState<string>('');
   const [code, setCode] = useState('');
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (status === 'succeeded' && step === 'email') {
+      setStep('code');
+      setCode('');
+    }
+  }, [status, step]);
 
   const normalizedCode = useMemo(() => code.replace(/\D/g, '').slice(0, 6), [code]);
 
@@ -41,10 +56,11 @@ export default function ForgotPasswordPage() {
               setError(null);
 
               if (step === 'email') {
-                const nextCode = String(Math.floor(100000 + Math.random() * 900000));
-                setGeneratedCode(nextCode);
-                setStep('code');
-                setCode('');
+                if (!email) {
+                  setError('Veuillez saisir votre email.');
+                  return;
+                }
+                dispatch(authActions.forgotPasswordRequested({ email }));
                 return;
               }
 
@@ -53,12 +69,12 @@ export default function ForgotPasswordPage() {
                 return;
               }
 
-              if (normalizedCode !== generatedCode) {
-                setError('Code incorrect.');
-                return;
-              }
-
-              navigate(`/reset-password?token=${generatedCode}`);
+              sessionStorage.setItem('cinepass_reset_email', email);
+              sessionStorage.setItem('cinepass_reset_otp', normalizedCode);
+              localStorage.setItem('cinepass_reset_email', email);
+              localStorage.setItem('cinepass_reset_otp', normalizedCode);
+              dispatch(authActions.clearForgotPasswordState());
+              navigate('/reset-password');
             }}
           >
             {step === 'email' ? (
@@ -79,7 +95,7 @@ export default function ForgotPasswordPage() {
             ) : (
               <>
                 <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-zinc-200">
-                  Code envoyé : <span className="font-semibold tracking-widest">{generatedCode}</span>
+                  Un code OTP a été envoyé à votre email.
                 </div>
                 <div>
                   <label htmlFor="code" className="mb-2 block text-sm font-medium text-zinc-200">
@@ -103,12 +119,22 @@ export default function ForgotPasswordPage() {
                 {error}
               </div>
             ) : null}
+            {apiError ? (
+              <div className="rounded-2xl border border-red-500/30 bg-red-600/10 px-4 py-3 text-sm text-red-100">
+                {apiError}
+              </div>
+            ) : null}
 
             <button
               type="submit"
+              disabled={status === 'loading'}
               className="w-full rounded-2xl bg-gradient-to-r from-red-600 to-red-500 py-3 font-semibold text-white shadow-lg shadow-red-600/20 transition hover:from-red-500 hover:to-red-500"
             >
-              {step === 'email' ? 'Envoyer le code' : 'Valider le code'}
+              {status === 'loading'
+                ? 'Envoi en cours...'
+                : step === 'email'
+                  ? 'Envoyer le code'
+                  : 'Valider le code'}
             </button>
           </form>
 
