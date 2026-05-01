@@ -40,6 +40,10 @@ export class AuthService {
       throw new UnauthorizedException('Email ou mot de passe incorrect');
     }
 
+    if (user.statut === 'PENDING') {
+      throw new UnauthorizedException('Veuillez vérifier votre email');
+    }
+
     if (user.statut === 'BANNI') {
       throw new UnauthorizedException('Votre compte a été banni');
     }
