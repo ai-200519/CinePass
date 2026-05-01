@@ -1,5 +1,5 @@
 export enum StatutSiege {
   DISPONIBLE = 'DISPONIBLE',
-  OCCUPE     = 'OCCUPE',
-  BLOQUE     = 'BLOQUE',
+  OCCUPE = 'OCCUPE',
+  BLOQUE = 'BLOQUE',
 }

@@ -34,7 +34,7 @@ export class Siege {
   statut: StatutSiege;
 
   // Relations
-  @ManyToOne(() => Salle, s => s.sieges, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Salle, s => s.seats, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'id_salle' })
   salle: Salle;
 
