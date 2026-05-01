@@ -47,7 +47,7 @@ export class FilmController {
   @Patch(':id')
   @ApiOperation({ summary: 'Update a film by ID' })
   @ApiParam({ name: 'id', description: 'Film ID', type: Number })
-  @ApiBody({ type: UpdateFilmDto })
+  @ApiBody({ type: CreateFilmDto })
   @ApiResponse({ status: 200, description: 'Film updated successfully' })
   @ApiResponse({ status: 404, description: 'Film not found' })
   update(@Param('id') id: string, @Body() updateFilmDto: UpdateFilmDto) {
