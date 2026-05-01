@@ -1,7 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { selectRegisterError, selectRegisterStatus } from '../../features/auth/authSelectors';
+import {
+    selectRegisterError,
+    selectRegisterOtpError,
+    selectRegisterOtpStatus,
+    selectRegisterRequiresOtp,
+    selectRegisterStatus,
+} from '../../features/auth/authSelectors';
 import { authActions } from '../../features/auth/authSlice';
 
 export default function RegisterPage() {
@@ -10,6 +16,9 @@ export default function RegisterPage() {
 
   const registerStatus = useAppSelector(selectRegisterStatus);
   const registerError = useAppSelector(selectRegisterError);
+  const registerRequiresOtp = useAppSelector(selectRegisterRequiresOtp);
+  const registerOtpStatus = useAppSelector(selectRegisterOtpStatus);
+  const registerOtpError = useAppSelector(selectRegisterOtpError);
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -20,18 +29,33 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [otp, setOtp] = useState('');
+  const [step, setStep] = useState<'form' | 'otp'>('form');
   const [localError, setLocalError] = useState<string | null>(null);
 
   useEffect(() => {
     dispatch(authActions.clearRegisterState());
+    dispatch(authActions.clearRegisterOtpState());
   }, [dispatch]);
 
   useEffect(() => {
     if (registerStatus === 'succeeded') {
+      if (registerRequiresOtp) {
+        setStep('otp');
+      } else {
+        dispatch(authActions.clearRegisterState());
+        navigate('/admin', { replace: true });
+      }
+    }
+  }, [dispatch, navigate, registerRequiresOtp, registerStatus]);
+
+  useEffect(() => {
+    if (registerOtpStatus === 'succeeded') {
       dispatch(authActions.clearRegisterState());
+      dispatch(authActions.clearRegisterOtpState());
       navigate('/admin', { replace: true });
     }
-  }, [dispatch, navigate, registerStatus]);
+  }, [dispatch, navigate, registerOtpStatus]);
 
   const canSubmit = useMemo(() => {
     return (
@@ -42,6 +66,8 @@ export default function RegisterPage() {
       confirmPassword.length > 0
     );
   }, [confirmPassword.length, email, nom, password.length, prenom]);
+
+  const normalizedOtp = useMemo(() => otp.replace(/\D/g, '').slice(0, 6), [otp]);
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-zinc-950 px-4 py-10 text-white">
@@ -62,28 +88,60 @@ export default function RegisterPage() {
               event.preventDefault();
               setLocalError(null);
 
-              if (password !== confirmPassword) {
-                setLocalError('Les mots de passe ne correspondent pas.');
+              if (step === 'form') {
+                if (password !== confirmPassword) {
+                  setLocalError('Les mots de passe ne correspondent pas.');
+                  return;
+                }
+
+                if (!prenom.trim() || !nom.trim()) {
+                  setLocalError('Veuillez renseigner votre prénom et votre nom.');
+                  return;
+                }
+
+                dispatch(
+                  authActions.registerRequested({
+                    email,
+                    password,
+                    nom: nom.trim(),
+                    prenom: prenom.trim(),
+                    telephone: phone.trim() || undefined,
+                  }),
+                );
                 return;
               }
 
-              if (!prenom.trim() || !nom.trim()) {
-                setLocalError('Veuillez renseigner votre prénom et votre nom.');
+              if (normalizedOtp.length !== 6) {
+                setLocalError('Veuillez saisir les 6 chiffres du code OTP.');
                 return;
               }
 
-              dispatch(
-                authActions.registerRequested({
-                  email,
-                  password,
-                  nom: nom.trim(),
-                  prenom: prenom.trim(),
-                  telephone: phone.trim() || undefined,
-                }),
-              );
+              dispatch(authActions.registerOtpRequested({ email, otp: normalizedOtp }));
             }}
           >
-            <div className="grid gap-4 sm:grid-cols-2">
+            {step === 'otp' ? (
+              <>
+                <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-zinc-200">
+                  Un code OTP a ete envoye a votre email.
+                </div>
+                <div>
+                  <label htmlFor="otp" className="mb-2 block text-sm font-medium text-zinc-200">
+                    Code OTP (6 chiffres)
+                  </label>
+                  <input
+                    id="otp"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    placeholder="123456"
+                    value={normalizedOtp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    className="w-full rounded-2xl border border-white/10 bg-zinc-800/70 px-4 py-3 text-white placeholder:text-zinc-500 outline-none ring-red-500/60 transition focus:ring-2"
+                  />
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <label htmlFor="firstName" className="mb-2 block text-sm font-medium text-zinc-200">
                   Prénom
@@ -253,23 +311,32 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            <label className="flex cursor-pointer items-start gap-3 text-sm text-zinc-300">
-              <input type="checkbox" className="mt-1 h-4 w-4 rounded border-zinc-500 bg-zinc-900 text-red-600" />
-              <span>
-                J'accepte les conditions d'utilisation et la politique de confidentialité.
-              </span>
-            </label>
+              </>
+            )}
 
             <button
               type="submit"
-              disabled={!canSubmit || registerStatus === 'loading'}
+              disabled={
+                step === 'form'
+                  ? !canSubmit || registerStatus === 'loading'
+                  : registerOtpStatus === 'loading'
+              }
               className="w-full rounded-2xl bg-gradient-to-r from-red-600 to-red-500 py-3 font-semibold text-white shadow-lg shadow-red-600/20 transition hover:from-red-500 hover:to-red-500"
             >
-              {registerStatus === 'loading' ? 'Création…' : 'Créer un compte'}
+              {step === 'form'
+                ? registerStatus === 'loading'
+                  ? 'Création…'
+                  : 'Créer un compte'
+                : registerOtpStatus === 'loading'
+                  ? 'Vérification…'
+                  : 'Valider le code'}
             </button>
 
             {localError ? <p className="text-sm font-medium text-red-300">{localError}</p> : null}
             {registerError ? <p className="text-sm font-medium text-red-300">{registerError}</p> : null}
+            {registerOtpError ? (
+              <p className="text-sm font-medium text-red-300">{registerOtpError}</p>
+            ) : null}
           </form>
 
           <p className="mt-6 text-center text-sm text-zinc-400">
