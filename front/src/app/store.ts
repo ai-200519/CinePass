@@ -3,6 +3,7 @@ import createSagaMiddleware from 'redux-saga';
 import { authActions, authReducer } from '../features/auth/authSlice';
 import { filmsReducer } from '../features/films/filmsSlice';
 import { seancesReducer } from '../features/seances/seancesSlice';
+import { sallesReducer } from '../features/salles/sallesSlice';
 import { tokenStorage } from '../services/tokenStorage';
 import { rootSaga } from './rootSaga';
 
@@ -13,10 +14,10 @@ export const store = configureStore({
     auth: authReducer,
     films: filmsReducer,
     seances: seancesReducer,
+    salles: sallesReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      thunk: false,
       serializableCheck: false,
     }).concat(sagaMiddleware),
 });
