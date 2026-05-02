@@ -5,7 +5,7 @@ export type Film = {
   title: string;
   description: string;
   duration: number;
-  releaseDate: string; // ISO date string
+  releaseDate: string;
   director: string;
   actors: string[];
   genre: string;
@@ -16,28 +16,51 @@ export type Film = {
   statut: 'EN_COURS' | 'A_VENIR';
 };
 
-export type CreateFilmDto = Omit<Film, 'id'>;
+export type CreateFilmDto = {
+  title: string;
+  description: string;
+  duration: number;
+  releaseDate: Date;
+  director: string;
+  actors: string[];
+  genre: string;
+  poster: string;
+  trailer: string;
+  note: number;
+  isShowing: boolean;
+};
+
 export type UpdateFilmDto = Partial<CreateFilmDto>;
+
+const normalizeFilm = (film: any): Film => ({
+  ...film,
+  note: typeof film.note === 'string' ? parseFloat(film.note) : film.note,
+  duration: typeof film.duration === 'string' ? parseInt(film.duration, 10) : film.duration,
+  isShowing: typeof film.isShowing === 'string' ? film.isShowing === 'true' : film.isShowing,
+  actors: Array.isArray(film.actors) ? film.actors : [],
+});
 
 export const filmsApi = {
   async getAll() {
-    const res = await http.get<Film[]>('/film');
-    return res.data;
+    const res = await http.get<Film[]>('/film/all');
+    return res.data.map(normalizeFilm);
   },
 
   async getById(id: number) {
     const res = await http.get<Film>(`/film/${id}`);
-    return res.data;
+    return normalizeFilm(res.data);
   },
 
   async create(dto: CreateFilmDto) {
-    const res = await http.post<Film>('/film', dto);
-    return res.data;
+    await http.post('/film/create', dto);
+    // Le backend retourne { message } pas le film, on refetch la liste
+    return filmsApi.getAll();
   },
 
   async update(id: number, dto: UpdateFilmDto) {
-    const res = await http.patch<Film>(`/film/${id}`, dto);
-    return res.data;
+    // repository.update() retourne UpdateResult, on refetch après
+    await http.patch(`/film/${id}`, dto);
+    return filmsApi.getById(id);
   },
 
   async delete(id: number) {
