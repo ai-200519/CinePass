@@ -80,7 +80,6 @@ describe('AuthController', () => {
       const result = await controller.verifyEmail({
         email: 'youssef@cinepass.ma',
         otp: '483721',
-        newPassword: ''
       });
 
       expect(result).toHaveProperty('access_token');

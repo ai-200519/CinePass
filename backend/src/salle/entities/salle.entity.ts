@@ -18,7 +18,7 @@ export class Salle {
   @Column({ nullable: true, length: 100 })
   nom: string;
 
-  @Column()
+  @Column({ nullable: true })
   capaciteTotale: number;
 
   @Column({ nullable: true, length: 255 })
