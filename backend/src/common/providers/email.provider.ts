@@ -1,23 +1,37 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import * as fs from 'fs';
 import * as nodemailer from 'nodemailer';
 import * as path from 'path';
-import * as fs from 'fs';
 
 @Injectable()
 export class EmailProvider {
-  private transporter: nodemailer.Transporter;
+  private transporter: nodemailer.Transporter | null = null;
   private readonly logger = new Logger(EmailProvider.name);
 
   constructor(private readonly config: ConfigService) {
+    const gmailUser = this.config.get<string>('GMAIL_USER');
+    const gmailAppPassword = this.config.get<string>('GMAIL_APP_PASSWORD');
+    const nodeEnv = this.config.get<string>('NODE_ENV') || 'development';
+
+    if (!gmailUser || !gmailAppPassword) {
+      this.logger.warn(
+        'Email transport is not configured (missing GMAIL_USER / GMAIL_APP_PASSWORD). ' +
+          (nodeEnv === 'production'
+            ? 'OTP emails will fail in production.'
+            : 'In development, OTP will be logged in the backend console.'),
+      );
+      return;
+    }
+
     this.transporter = nodemailer.createTransport({
       host: 'smtp.gmail.com',
       port: 587,
       secure: false,
       service: 'gmail',
       auth: {
-        user: this.config.get('GMAIL_USER'),
-        pass: this.config.get('GMAIL_APP_PASSWORD'),
+        user: gmailUser,
+        pass: gmailAppPassword,
       },
     });
   }
@@ -217,6 +231,22 @@ export class EmailProvider {
     expiresAt: Date,
     purpose: 'register' | 'reset_password',
   ): Promise<void> {
+    const nodeEnv = this.config.get<string>('NODE_ENV') || 'development';
+
+    // If email is not configured, fall back to backend console in non-production.
+    if (!this.transporter) {
+      if (nodeEnv === 'production') {
+        throw new Error(
+          'Email transport is not configured. Set GMAIL_USER and GMAIL_APP_PASSWORD.',
+        );
+      }
+
+      this.logger.warn(
+        `[DEV ONLY] OTP for ${email} (purpose=${purpose}) = ${otp} (expiresAt=${expiresAt.toISOString()})`,
+      );
+      return;
+    }
+
     const subjects = {
       register: '🎬 CinePass — Confirmez votre email',
       reset_password: '🎬 CinePass — Réinitialisation de mot de passe',
@@ -247,14 +277,30 @@ export class EmailProvider {
       });
     }
 
-    await this.transporter.sendMail({
-      from: `"CinePass" <${this.config.get('GMAIL_USER')}>`,
-      to: email,
-      subject: subjects[purpose],
-      html: this.buildOtpHtml(nom, otp, expiresAt, purpose),
-      attachments,
-    });
+    try {
+      await this.transporter.sendMail({
+        from: `"CinePass" <${this.config.get('GMAIL_USER')}>`,
+        to: email,
+        subject: subjects[purpose],
+        html: this.buildOtpHtml(nom, otp, expiresAt, purpose),
+        attachments,
+      });
 
-    this.logger.log(`✅ OTP email sent to ${email} — purpose: ${purpose}`);
+      this.logger.log(`✅ OTP email sent to ${email} — purpose: ${purpose}`);
+    } catch (error) {
+      this.logger.error(
+        `❌ Failed to send OTP email to ${email} — purpose: ${purpose}`,
+        error instanceof Error ? error.stack : String(error),
+      );
+
+      if (nodeEnv !== 'production') {
+        this.logger.warn(
+          `[DEV ONLY] OTP for ${email} (purpose=${purpose}) = ${otp} (expiresAt=${expiresAt.toISOString()})`,
+        );
+        return;
+      }
+
+      throw error;
+    }
   }
 }

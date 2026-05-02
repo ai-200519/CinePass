@@ -30,18 +30,34 @@ function* loginWorker(action: ReturnType<typeof authActions.loginRequested>): Ge
 
 function* registerWorker(action: ReturnType<typeof authActions.registerRequested>): Generator {
   try {
-    const data: Awaited<ReturnType<typeof authApi.register>> = yield call(authApi.register, {
+    yield call(authApi.register, {
       nom: action.payload.nom,
       prenom: action.payload.prenom,
       email: action.payload.email,
       motDePasse: action.payload.password,
       telephone: action.payload.telephone || undefined,
     });
-    tokenStorage.set(data.access_token);
-    yield put(authActions.loginSucceeded({ token: data.access_token }));
-    yield put(authActions.registerSucceeded());
+    yield put(authActions.registerSucceeded({ requiresOtp: true }));
   } catch (err) {
     yield put(authActions.registerFailed({ error: getErrorMessage(err) }));
+  }
+}
+
+function* registerOtpWorker(
+  action: ReturnType<typeof authActions.registerOtpRequested>,
+): Generator {
+  try {
+    const data: Awaited<ReturnType<typeof authApi.verifyOtp>> = yield call(authApi.verifyOtp, {
+      email: action.payload.email,
+      otp: action.payload.otp,
+    });
+    if (data?.access_token) {
+      tokenStorage.set(data.access_token);
+      yield put(authActions.loginSucceeded({ token: data.access_token }));
+    }
+    yield put(authActions.registerOtpSucceeded());
+  } catch (err) {
+    yield put(authActions.registerOtpFailed({ error: getErrorMessage(err) }));
   }
 }
 
@@ -49,8 +65,37 @@ function* logoutWorker(): Generator {
   tokenStorage.clear();
 }
 
+function* forgotPasswordWorker(
+  action: ReturnType<typeof authActions.forgotPasswordRequested>,
+): Generator {
+  try {
+    yield call(authApi.forgotPassword, { email: action.payload.email });
+    yield put(authActions.forgotPasswordSucceeded());
+  } catch (err) {
+    yield put(authActions.forgotPasswordFailed({ error: getErrorMessage(err) }));
+  }
+}
+
+function* resetPasswordWorker(
+  action: ReturnType<typeof authActions.resetPasswordRequested>,
+): Generator {
+  try {
+    yield call(authApi.resetPassword, {
+      email: action.payload.email,
+      otp: action.payload.otp,
+      newPassword: action.payload.newPassword,
+    });
+    yield put(authActions.resetPasswordSucceeded());
+  } catch (err) {
+    yield put(authActions.resetPasswordFailed({ error: getErrorMessage(err) }));
+  }
+}
+
 export function* authSaga(): Generator {
   yield takeLatest(authActions.loginRequested.type, loginWorker);
   yield takeLatest(authActions.registerRequested.type, registerWorker);
+  yield takeLatest(authActions.registerOtpRequested.type, registerOtpWorker);
   yield takeLatest(authActions.logout.type, logoutWorker);
+  yield takeLatest(authActions.forgotPasswordRequested.type, forgotPasswordWorker);
+  yield takeLatest(authActions.resetPasswordRequested.type, resetPasswordWorker);
 }
