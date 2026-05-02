@@ -80,7 +80,7 @@ describe('SalleController', () => {
   describe('update', () => {
     it('should call salleService.update with correct parameters', async () => {
       const id = '1';
-      const updateSalleDto: UpdateSalleDto = { name: 'Salle 1 updated' };
+      const updateSalleDto: UpdateSalleDto = { nom: 'Salle 1 updated' };
       const result = { affected: 1 };
       mockSalleService.update.mockResolvedValue(result);
 
