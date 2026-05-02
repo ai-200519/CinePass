@@ -23,10 +23,10 @@ export class SalleService {
       throw new NotFoundException(`Cinema with ID ${createSalleDto.id_cinema} not found`);
     }
     const salle = this.salleRepository.create({
-      name: createSalleDto.name,
+      nom: createSalleDto.nom,
       numero: createSalleDto.numero,
-      totalCapacity: createSalleDto.totalCapacity,
-      equipments: createSalleDto.equipments,
+      capaciteTotale: createSalleDto.capaciteTotale,
+      equipements: createSalleDto.equipements,
       cinema: cinema,
     });
     return this.salleRepository.save(salle);

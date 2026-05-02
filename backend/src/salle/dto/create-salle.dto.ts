@@ -9,15 +9,15 @@ export class CreateSalleDto {
 
     @ApiProperty()
     @IsString()
-    name: string
+    nom: string
 
     @ApiProperty()
     @IsNumber()
-    totalCapacity: number
+    capaciteTotale: number
 
     @ApiProperty()
     @IsString()
-    equipments: string
+    equipements: string
 
     @ApiProperty()
     @IsNumber()
