@@ -2,11 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { Film } from './filmsApi';
 
 export type AsyncStatus = 'idle' | 'loading' | 'succeeded' | 'failed';
-
-export type AsyncState = {
-  status: AsyncStatus;
-  error: string | null;
-};
+export type AsyncState = { status: AsyncStatus; error: string | null };
 
 export type FilmsState = {
   films: Film[];
@@ -35,38 +31,35 @@ const filmsSlice = createSlice({
     fetchFilmsSucceeded(state, action: PayloadAction<Film[]>) {
       state.films = action.payload;
       state.fetchFilms.status = 'succeeded';
-      state.fetchFilms.error = null;
     },
     fetchFilmsFailed(state, action: PayloadAction<{ error: string }>) {
       state.fetchFilms.status = 'failed';
       state.fetchFilms.error = action.payload.error;
     },
 
-    createFilmRequested(state, _action: PayloadAction<Film>) {
+    createFilmRequested(state, _action: PayloadAction<any>) {
       state.createFilm.status = 'loading';
       state.createFilm.error = null;
     },
-    createFilmSucceeded(state, action: PayloadAction<Film>) {
-      state.films.push(action.payload);
+    // Après create on refetch toute la liste
+    createFilmSucceeded(state, action: PayloadAction<Film[]>) {
+      state.films = action.payload;
       state.createFilm.status = 'succeeded';
-      state.createFilm.error = null;
     },
     createFilmFailed(state, action: PayloadAction<{ error: string }>) {
       state.createFilm.status = 'failed';
       state.createFilm.error = action.payload.error;
     },
 
-    updateFilmRequested(state, _action: PayloadAction<{ id: number; film: Film }>) {
+    updateFilmRequested(state, _action: PayloadAction<{ id: number; film: any }>) {
       state.updateFilm.status = 'loading';
       state.updateFilm.error = null;
     },
+    // Après update on reçoit le film mis à jour via getById
     updateFilmSucceeded(state, action: PayloadAction<Film>) {
-      const index = state.films.findIndex(f => f.id === action.payload.id);
-      if (index !== -1) {
-        state.films[index] = action.payload;
-      }
+      const index = state.films.findIndex((f) => f.id === action.payload.id);
+      if (index !== -1) state.films[index] = action.payload;
       state.updateFilm.status = 'succeeded';
-      state.updateFilm.error = null;
     },
     updateFilmFailed(state, action: PayloadAction<{ error: string }>) {
       state.updateFilm.status = 'failed';
@@ -78,9 +71,8 @@ const filmsSlice = createSlice({
       state.deleteFilm.error = null;
     },
     deleteFilmSucceeded(state, action: PayloadAction<number>) {
-      state.films = state.films.filter(f => f.id !== action.payload);
+      state.films = state.films.filter((f) => f.id !== action.payload);
       state.deleteFilm.status = 'succeeded';
-      state.deleteFilm.error = null;
     },
     deleteFilmFailed(state, action: PayloadAction<{ error: string }>) {
       state.deleteFilm.status = 'failed';
