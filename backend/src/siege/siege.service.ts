@@ -1,26 +1,67 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSiegeDto } from './dto/create-siege.dto';
 import { UpdateSiegeDto } from './dto/update-siege.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Siege } from './entities/siege.entity';
+import { Repository } from 'typeorm';
+import { Salle } from '../salle/entities/salle.entity';
 
 @Injectable()
 export class SiegeService {
-  create(createSiegeDto: CreateSiegeDto) {
-    return 'This action adds a new siege';
+  constructor(
+    @InjectRepository(Siege)
+    private readonly siegeRepository: Repository<Siege>,
+    @InjectRepository(Salle)
+    private readonly salleRepository: Repository<Salle>,
+  ) { }
+
+  async create(createSiegeDto: CreateSiegeDto) {
+    const salle = await this.salleRepository.findOne({ where: { id_salle: createSiegeDto.id_salle } });
+    if (!salle) {
+      throw new NotFoundException(`Salle with ID ${createSiegeDto.id_salle} not found`);
+    }
+    const siege = this.siegeRepository.create({
+      rangee: createSiegeDto.rangee,
+      numero: createSiegeDto.numero,
+      categorie: createSiegeDto.categorie,
+      statut: createSiegeDto.statut,
+      salle: salle,
+    });
+    return this.siegeRepository.save(siege);
   }
 
-  findAll() {
-    return `This action returns all siege`;
+  async findAll() {
+    return this.siegeRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} siege`;
+  async findOne(id: number) {
+    const siege = await this.siegeRepository.findOne({ where: { id_siege: id } });
+    if (!siege) {
+      throw new NotFoundException(`Siege with ID ${id} not found`);
+    }
+    return siege;
   }
 
-  update(id: number, updateSiegeDto: UpdateSiegeDto) {
-    return `This action updates a #${id} siege`;
+  async update(id: number, updateSiegeDto: UpdateSiegeDto) {
+    const siege = await this.siegeRepository.findOne({ where: { id_siege: id } });
+    if (!siege) {
+      throw new NotFoundException(`Siege with ID ${id} not found`);
+    }
+    if (updateSiegeDto.id_salle) {
+      const salle = await this.salleRepository.findOne({ where: { id_salle: updateSiegeDto.id_salle } });
+      if (!salle) {
+        throw new NotFoundException(`Salle with ID ${updateSiegeDto.id_salle} not found`);
+      }
+      siege.salle = salle;
+    }
+    return this.siegeRepository.update(id, updateSiegeDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} siege`;
+  async remove(id: number) {
+    const siege = await this.siegeRepository.findOne({ where: { id_siege: id } });
+    if (!siege) {
+      throw new NotFoundException(`Siege with ID ${id} not found`);
+    }
+    return this.siegeRepository.delete(id);
   }
 }
