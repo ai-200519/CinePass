@@ -1,13 +1,22 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { SalleService } from './salle.service';
 import { CreateSalleDto } from './dto/create-salle.dto';
 import { UpdateSalleDto } from './dto/update-salle.dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody } from '@nestjs/swagger';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { Role } from 'src/common/enums/role.enum';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+import { ApiBearerAuth } from '@nestjs/swagger';
+
 
 @ApiTags('Salle')
 @Controller('salle')
+@ApiBearerAuth('JWT-auth')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(Role.ADMIN)
 export class SalleController {
-  constructor(private readonly salleService: SalleService) {}
+  constructor(private readonly salleService: SalleService) { }
 
 
   @ApiOperation({ summary: 'Create a new salle' })
