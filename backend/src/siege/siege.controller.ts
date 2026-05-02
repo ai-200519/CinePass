@@ -1,9 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { SiegeService } from './siege.service';
 import { CreateSiegeDto } from './dto/create-siege.dto';
 import { UpdateSiegeDto } from './dto/update-siege.dto';
-import { ApiOperation, ApiTags, ApiResponse, ApiBody } from '@nestjs/swagger';
+import { ApiOperation, ApiTags, ApiResponse, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
+import { Role } from 'src/common/enums/role.enum';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { Roles } from 'src/common/decorators/roles.decorator';
 
+@ApiBearerAuth('JWT-auth')
 @ApiTags('Siege')
 @Controller('siege')
 export class SiegeController {
@@ -42,6 +46,8 @@ export class SiegeController {
     description: 'No sieges found',
   })
   @Get()
+  @UseGuards(JwtAuthGuard)
+  @Roles(Role.ADMIN, Role.CLIENT, Role.STAFF)
   findAll() {
     return this.siegeService.findAll();
   }
@@ -59,6 +65,8 @@ export class SiegeController {
     description: 'No siege found',
   })
   @Get(':id')
+  @UseGuards(JwtAuthGuard)
+  @Roles(Role.ADMIN, Role.CLIENT, Role.STAFF)
   findOne(@Param('id') id: string) {
     return this.siegeService.findOne(+id);
   }
@@ -79,6 +87,8 @@ export class SiegeController {
   @ApiBody({
     type: CreateSiegeDto,
   })
+  @UseGuards(JwtAuthGuard)
+  @Roles(Role.ADMIN)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateSiegeDto: UpdateSiegeDto) {
     return this.siegeService.update(+id, updateSiegeDto);
@@ -97,6 +107,8 @@ export class SiegeController {
     status: 404,
     description: 'No siege found',
   })
+  @UseGuards(JwtAuthGuard)
+  @Roles(Role.ADMIN)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.siegeService.remove(+id);
