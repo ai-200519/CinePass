@@ -28,7 +28,7 @@ async function bootstrap() {
     .addTag('Cinema',       'Informations du cinéma')
     .addTag('Salle',        'Gestion des salles')
     .addTag('Siege',        'Gestion des sièges')
-    .addTag('Film',         'Catalogue des films')
+    .addTag('films',         'Catalogue des films')
     .addTag('Seance',       'Programmation des séances')
     .addTag('Tarif',        'Grille tarifaire')
     .addTag('Reservation',  'Réservation des places')
