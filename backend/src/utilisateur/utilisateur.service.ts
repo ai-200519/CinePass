@@ -18,6 +18,7 @@ export class UtilisateurService {
   async findByEmail(email: string): Promise<Utilisateur | null> {
     return this.utilisateurRepository.findOne({
       where: { email },
+      relations: ['cinema'], // ← include cinema relation for STAFF users
     });
   }
 
@@ -25,6 +26,7 @@ export class UtilisateurService {
   async findById(id: number): Promise<Utilisateur | null> {
     return this.utilisateurRepository.findOne({
       where: { id_utilisateur: id },
+      relations: ['cinema'], // ← include cinema relation for STAFF users
     });
   }
 

@@ -11,6 +11,7 @@ import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { EmailProvider } from 'src/common/providers/email.provider';
 import { StatutUtilisateur } from 'src/common/enums/statut-utilisateur.enum';
+import { Role } from 'src/common/enums/role.enum';
 
 @Injectable()
 export class AuthService {
@@ -50,11 +51,16 @@ export class AuthService {
     }
 
     // Generate JWT
-    const payload = {
+    const payload: any = {
       sub: user.id_utilisateur,
       email: user.email,
       role: user.role,
     };
+
+    // Add id_cinema only for STAFF
+    if (user.role === Role.STAFF && user.cinema) {
+      payload.id_cinema = user.cinema.id_cinema; // ← add cinema to payload
+    }
 
     return {
       access_token: this.jwtService.sign(payload),
@@ -64,6 +70,7 @@ export class AuthService {
         prenom: user.prenom,
         email: user.email,
         role: user.role,
+        id_cinema: user.cinema?.id_cinema || null, // ← include cinema in response
       },
     };
   }
@@ -110,7 +117,7 @@ export class AuthService {
     await this.utilisateurService.activateAccount(user.id_utilisateur);
 
     // Now return JWT
-    const payload = {
+    const payload: any = {
       sub: user.id_utilisateur,
       email: user.email,
       role: user.role,
