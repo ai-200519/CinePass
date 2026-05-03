@@ -10,6 +10,7 @@ import { LoginDto } from './dto/login.dto';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { EmailProvider } from 'src/common/providers/email.provider';
+import { StatutUtilisateur } from 'src/common/enums/statut-utilisateur.enum';
 
 @Injectable()
 export class AuthService {
@@ -192,5 +193,50 @@ export class AuthService {
       throw new BadRequestException('Code OTP incorrect');
 
     return user;
+  }
+
+  async resendOtp(
+    email: string,
+    purpose: 'register' | 'reset_password',
+  ): Promise<void> {
+    const user = await this.utilisateurService.findByEmail(email);
+
+    if (!user) {
+      throw new BadRequestException('Email introuvable');
+    }
+
+    // Cannot resend register OTP if account already active
+    if (purpose === 'register' && user.statut === StatutUtilisateur.ACTIF) {
+      throw new BadRequestException('Ce compte est déjà activé');
+    }
+
+    // Cannot resend reset OTP if account is PENDING
+    if (
+      purpose === 'reset_password' &&
+      user.statut === StatutUtilisateur.PENDING
+    ) {
+      throw new BadRequestException("Veuillez d'abord vérifier votre email");
+    }
+
+    // Generate new OTP
+    const otp = this.generateOTP();
+    const expiresAt = this.getOtpExpiry();
+
+    // Overwrite existing OTP
+    await this.utilisateurService.saveOtp(
+      user.id_utilisateur,
+      otp,
+      expiresAt,
+      purpose,
+    );
+
+    // Resend email
+    await this.emailProvider.sendOtp(
+      user.email,
+      user.nom,
+      otp,
+      expiresAt,
+      purpose,
+    );
   }
 }
