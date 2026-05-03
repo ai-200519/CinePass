@@ -4,6 +4,7 @@ import { authActions, authReducer } from '../features/auth/authSlice';
 import { filmsReducer } from '../features/films/filmsSlice';
 import { seancesReducer } from '../features/seances/seancesSlice';
 import { sallesReducer } from '../features/salles/sallesSlice';
+import { cinemasReducer } from '../features/cinemas/cinemasSlice';
 import { tokenStorage } from '../services/tokenStorage';
 import { rootSaga } from './rootSaga';
 
@@ -15,6 +16,7 @@ export const store = configureStore({
     films: filmsReducer,
     seances: seancesReducer,
     salles: sallesReducer,
+    cinemas: cinemasReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

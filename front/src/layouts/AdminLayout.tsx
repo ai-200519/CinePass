@@ -1,6 +1,7 @@
 import type { LucideIcon } from 'lucide-react';
 import {
     BarChart3,
+    Building2,
     CalendarDays,
     Clapperboard,
     DoorOpen,
@@ -10,10 +11,11 @@ import {
     Settings,
     Ticket,
 } from 'lucide-react';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { useAppDispatch } from '../app/hooks';
+import { NavLink, Outlet, useNavigate, Navigate } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '../app/hooks';
 import Logo from '../components/Logo';
 import { authActions } from '../features/auth/authSlice';
+import { selectIsAuthenticated } from '../features/auth/authSelectors';
 
 type AdminNavItem = {
   to: string;
@@ -25,6 +27,7 @@ type AdminNavItem = {
 const navItems: AdminNavItem[] = [
   { to: '/admin', label: 'Tableau de bord', icon: LayoutDashboard, end: true },
   { to: '/admin/films', label: 'Films', icon: Film },
+  { to: '/admin/cinemas', label: 'Cinémas', icon: Building2 },
   { to: '/admin/seances', label: 'Séances', icon: CalendarDays },
   { to: '/admin/salles', label: 'Salles', icon: DoorOpen },
   { to: '/admin/reservations', label: 'Réservations', icon: Ticket },
@@ -35,6 +38,12 @@ const navItems: AdminNavItem[] = [
 export default function AdminLayout() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
+
+  // Redirige vers /login si pas connecté
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
