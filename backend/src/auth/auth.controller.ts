@@ -24,6 +24,7 @@ import { ResetPasswordDto } from './dto/reset-password.dto'; // ← new import
 
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { ResendOtpDto } from './dto/resend-otp.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -212,11 +213,37 @@ export class AuthController {
     description: 'OTP invalide, expiré ou déjà utilisé',
   })
   async resetPassword(@Body() dto: ResetPasswordDto) {
-    await this.authService.resetPassword(
-      dto.email,
-      dto.otp,
-      dto.newPassword,
-    );
+    await this.authService.resetPassword(dto.email, dto.otp, dto.newPassword);
     return { message: 'Mot de passe réinitialisé avec succès.' };
+  }
+  // ── POST /auth/resend-otp ─────────────────────────────────────────────────
+  // Resends OTP for expired or lost codes
+  @Post('resend-otp')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Renvoyer le code OTP',
+    description:
+      'Génère un nouveau code OTP et le renvoie par email. ' +
+      "Utilisable si le code précédent a expiré ou n'a pas été reçu. " +
+      'Fonctionne pour register et reset_password.',
+  })
+  @ApiBody({ type: ResendOtpDto })
+  @ApiResponse({
+    status: 200,
+    schema: {
+      example: {
+        message: 'Un nouveau code OTP a été envoyé à youssef@cinepass.ma',
+      },
+    },
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Email invalide ou compte déjà actif',
+  })
+  async resendOtp(@Body() dto: ResendOtpDto) {
+    await this.authService.resendOtp(dto.email, dto.purpose);
+    return {
+      message: `Un nouveau code OTP a été envoyé à ${dto.email}`,
+    };
   }
 }
