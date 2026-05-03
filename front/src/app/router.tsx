@@ -13,6 +13,7 @@ import AdminRapportsPage from '../pages/admin/AdminRapportsPage';
 import AdminReservationsPage from '../pages/admin/AdminReservationsPage';
 import AdminSallesPage from '../pages/admin/AdminSallesPage';
 import AdminSeancesPage from '../pages/admin/AdminSeancesPage';
+import AdminCinemasPage from '../pages/admin/AdminCinemasPage';
 
 export const router = createBrowserRouter([
   {
@@ -32,6 +33,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <AdminDashboardPage /> },
       { path: 'films', element: <AdminFilmsPage /> },
+      { path: 'cinemas', element: <AdminCinemasPage /> },
       { path: 'seances', element: <AdminSeancesPage /> },
       { path: 'salles', element: <AdminSallesPage /> },
       { path: 'reservations', element: <AdminReservationsPage /> },
