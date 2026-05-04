@@ -1,9 +1,10 @@
 import {
-    AUTH_FORGOT_PASSWORD_PATH,
-    AUTH_LOGIN_PATH,
-    AUTH_REGISTER_PATH,
-    AUTH_RESET_PASSWORD_PATH,
-    AUTH_VERIFY_OTP_PATH,
+  AUTH_FORGOT_PASSWORD_PATH,
+  AUTH_LOGIN_PATH,
+  AUTH_REGISTER_PATH,
+  AUTH_RESEND_OTP_PATH,
+  AUTH_RESET_PASSWORD_PATH,
+  AUTH_VERIFY_OTP_PATH,
 } from '../config';
 import { http } from './http';
 
@@ -35,6 +36,11 @@ export type VerifyOtpDto = {
   otp: string;
 };
 
+export type ResendOtpDto = {
+  email: string;
+  purpose: 'register' | 'reset_password';
+};
+
 // Adjust if your backend returns a different token key.
 export type LoginResponse = {
   access_token: string;
@@ -55,6 +61,11 @@ export const authApi = {
   async verifyOtp(dto: VerifyOtpDto) {
     const res = await http.post<LoginResponse>(AUTH_VERIFY_OTP_PATH, dto);
     return res.data;
+  },
+
+  async resendOtp(dto: ResendOtpDto) {
+    const res = await http.post(AUTH_RESEND_OTP_PATH, dto);
+    return res.data as { message: string };
   },
 
   async forgotPassword(dto: ForgotPasswordDto) {

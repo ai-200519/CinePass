@@ -13,6 +13,8 @@ export type AuthState = {
   register: AsyncState;
   registerOtp: AsyncState;
   registerRequiresOtp: boolean;
+  resendOtp: AsyncState;
+  resendOtpMessage: string | null;
   forgotPassword: AsyncState;
   resetPassword: AsyncState;
 };
@@ -23,6 +25,8 @@ const initialState: AuthState = {
   register: { status: 'idle', error: null },
   registerOtp: { status: 'idle', error: null },
   registerRequiresOtp: false,
+  resendOtp: { status: 'idle', error: null },
+  resendOtpMessage: null,
   forgotPassword: { status: 'idle', error: null },
   resetPassword: { status: 'idle', error: null },
 };
@@ -86,6 +90,25 @@ const authSlice = createSlice({
       state.registerOtp.error = action.payload.error;
     },
 
+    resendOtpRequested(
+      state,
+      _action: PayloadAction<{ email: string; purpose: 'register' | 'reset_password' }>,
+    ) {
+      state.resendOtp.status = 'loading';
+      state.resendOtp.error = null;
+      state.resendOtpMessage = null;
+    },
+    resendOtpSucceeded(state, action: PayloadAction<{ message: string }>) {
+      state.resendOtp.status = 'succeeded';
+      state.resendOtp.error = null;
+      state.resendOtpMessage = action.payload.message;
+    },
+    resendOtpFailed(state, action: PayloadAction<{ error: string }>) {
+      state.resendOtp.status = 'failed';
+      state.resendOtp.error = action.payload.error;
+      state.resendOtpMessage = null;
+    },
+
     forgotPasswordRequested(state, _action: PayloadAction<{ email: string }>) {
       state.forgotPassword.status = 'loading';
       state.forgotPassword.error = null;
@@ -121,6 +144,8 @@ const authSlice = createSlice({
       state.register = { status: 'idle', error: null };
       state.registerOtp = { status: 'idle', error: null };
       state.registerRequiresOtp = false;
+      state.resendOtp = { status: 'idle', error: null };
+      state.resendOtpMessage = null;
       state.forgotPassword = { status: 'idle', error: null };
       state.resetPassword = { status: 'idle', error: null };
     },
@@ -131,6 +156,10 @@ const authSlice = createSlice({
     },
     clearRegisterOtpState(state) {
       state.registerOtp = { status: 'idle', error: null };
+    },
+    clearResendOtpState(state) {
+      state.resendOtp = { status: 'idle', error: null };
+      state.resendOtpMessage = null;
     },
     clearLoginState(state) {
       state.login = { status: 'idle', error: null };
