@@ -716,6 +716,7 @@ export default function FilmDetailPage() {
         </section>
       )}
 
+
       <Footer />
     </div>
   );
