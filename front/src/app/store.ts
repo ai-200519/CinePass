@@ -7,12 +7,13 @@ import { sallesReducer } from '../features/salles/sallesSlice';
 import { cinemasReducer } from '../features/cinemas/cinemasSlice';
 import { tokenStorage } from '../services/tokenStorage';
 import { rootSaga } from './rootSaga';
-
+import { reservationsReducer } from "../features/reservations/reservationsslice";
 const sagaMiddleware = createSagaMiddleware();
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
+    reservations: reservationsReducer,
     films: filmsReducer,
     seances: seancesReducer,
     salles: sallesReducer,
