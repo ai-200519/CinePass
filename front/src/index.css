@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@config "../tailwind.config.js";
+
 html,
 body,
 #root {
@@ -8,4 +10,5 @@ body,
 
 body {
   margin: 0;
+  @apply bg-cinema-bg text-white font-sans;
 }

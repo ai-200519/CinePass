@@ -1,11 +1,17 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { StatutReservation } from '../common/enums/statut-reservation.enum';
 import { Film } from '../film/entities/film.entity';
 import { Salle } from '../salle/entities/salle.entity';
 import { CreateSeanceDto } from './dto/create-seance.dto';
 import { UpdateSeanceDto } from './dto/update-seance.dto';
 import { Seance } from './entities/seance.entity';
+
+const EXCLUDED_RESERVATION_STATUSES: StatutReservation[] = [
+  StatutReservation.ANNULEE,
+  StatutReservation.EXPIREE,
+];
 
 @Injectable()
 export class SeanceService {
@@ -37,14 +43,63 @@ export class SeanceService {
     return this.findOne(saved.id_seance);
   }
 
-  findAll() {
-    return this.seanceRepository.find({ relations: ['film', 'salle'] });
+  private mapAvailability(seance: Seance & { reservationsCount?: number }) {
+    const totalSeats = seance.salle?.capaciteTotale ?? null;
+    const reservedSeats = seance.reservationsCount ?? 0;
+    const remainingSeats =
+      typeof totalSeats === 'number' ? Math.max(0, totalSeats - reservedSeats) : null;
+
+    return {
+      id_seance: seance.id_seance,
+      dateHeure: seance.dateHeure,
+      technologie: seance.technologie,
+      statut: seance.statut,
+      film: seance.film ? { id: seance.film.id, title: seance.film.title } : null,
+      salle: seance.salle
+        ? {
+            id_salle: seance.salle.id_salle,
+            numero: seance.salle.numero,
+            capaciteTotale: seance.salle.capaciteTotale ?? null,
+          }
+        : null,
+      totalSeats,
+      reservedSeats,
+      remainingSeats,
+    };
+  }
+
+  async findAll() {
+    const seances = await this.seanceRepository
+      .createQueryBuilder('seance')
+      .leftJoinAndSelect('seance.film', 'film')
+      .leftJoinAndSelect('seance.salle', 'salle')
+      .loadRelationCountAndMap(
+        'seance.reservationsCount',
+        'seance.reservations',
+        'reservation',
+        (qb) => qb.andWhere('reservation.statut NOT IN (:...excluded)', { excluded: EXCLUDED_RESERVATION_STATUSES }),
+      )
+      .getMany();
+
+    return seances.map((s) => this.mapAvailability(s as any));
   }
 
   async findOne(id: number) {
-    const seance = await this.seanceRepository.findOne({ where: { id_seance: id }, relations: ['film', 'salle'] });
+    const seance = await this.seanceRepository
+      .createQueryBuilder('seance')
+      .leftJoinAndSelect('seance.film', 'film')
+      .leftJoinAndSelect('seance.salle', 'salle')
+      .where('seance.id_seance = :id', { id })
+      .loadRelationCountAndMap(
+        'seance.reservationsCount',
+        'seance.reservations',
+        'reservation',
+        (qb) => qb.andWhere('reservation.statut NOT IN (:...excluded)', { excluded: EXCLUDED_RESERVATION_STATUSES }),
+      )
+      .getOne();
+
     if (!seance) throw new NotFoundException(`Seance with ID ${id} not found`);
-    return seance;
+    return this.mapAvailability(seance as any);
   }
 
   async update(id: number, updateSeanceDto: UpdateSeanceDto) {

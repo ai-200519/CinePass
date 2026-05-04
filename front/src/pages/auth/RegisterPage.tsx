@@ -2,14 +2,15 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import {
-    selectRegisterError,
-    selectRegisterOtpError,
-    selectRegisterOtpStatus,
-    selectRegisterRequiresOtp,
-    selectRegisterStatus,
-    selectResendOtpError,
-    selectResendOtpMessage,
-    selectResendOtpStatus,
+  selectAuthRole,
+  selectRegisterError,
+  selectRegisterOtpError,
+  selectRegisterOtpStatus,
+  selectRegisterRequiresOtp,
+  selectRegisterStatus,
+  selectResendOtpError,
+  selectResendOtpMessage,
+  selectResendOtpStatus,
 } from '../../features/auth/authSelectors';
 import { authActions } from '../../features/auth/authSlice';
 
@@ -17,6 +18,7 @@ export default function RegisterPage() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
+  const role = useAppSelector(selectAuthRole);
   const registerStatus = useAppSelector(selectRegisterStatus);
   const registerError = useAppSelector(selectRegisterError);
   const registerRequiresOtp = useAppSelector(selectRegisterRequiresOtp);
@@ -51,18 +53,18 @@ export default function RegisterPage() {
         setStep('otp');
       } else {
         dispatch(authActions.clearRegisterState());
-        navigate('/admin', { replace: true });
+        navigate(role === 'ADMIN' ? '/admin' : '/', { replace: true });
       }
     }
-  }, [dispatch, navigate, registerRequiresOtp, registerStatus]);
+  }, [dispatch, navigate, registerRequiresOtp, registerStatus, role]);
 
   useEffect(() => {
     if (registerOtpStatus === 'succeeded') {
       dispatch(authActions.clearRegisterState());
       dispatch(authActions.clearRegisterOtpState());
-      navigate('/admin', { replace: true });
+      navigate(role === 'ADMIN' ? '/admin' : '/', { replace: true });
     }
-  }, [dispatch, navigate, registerOtpStatus]);
+  }, [dispatch, navigate, registerOtpStatus, role]);
 
   const canSubmit = useMemo(() => {
     return (
