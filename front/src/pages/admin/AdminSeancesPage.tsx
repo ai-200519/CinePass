@@ -7,15 +7,15 @@ import { selectSalles, selectSallesFetchStatus } from '../../features/salles/sal
 import { fetchSalles } from '../../features/salles/sallesSlice';
 import type { CreateSeanceDto, Seance } from '../../features/seances/seancesApi';
 import {
-    selectCreateSeanceError,
-    selectCreateSeanceStatus,
-    selectDeleteSeanceError,
-    selectDeleteSeanceStatus,
-    selectFetchSeancesError,
-    selectFetchSeancesStatus,
-    selectSeances,
-    selectUpdateSeanceError,
-    selectUpdateSeanceStatus,
+  selectCreateSeanceError,
+  selectCreateSeanceStatus,
+  selectDeleteSeanceError,
+  selectDeleteSeanceStatus,
+  selectFetchSeancesError,
+  selectFetchSeancesStatus,
+  selectSeances,
+  selectUpdateSeanceError,
+  selectUpdateSeanceStatus,
 } from '../../features/seances/seancesSelectors';
 import { seancesActions } from '../../features/seances/seancesSlice';
 
@@ -65,12 +65,14 @@ const fmtHeure = (iso: string) =>
 
 const STATUT_STYLE: Record<Seance['statut'], string> = {
   PROGRAMMEE: 'bg-blue-500/15 text-blue-400',
+  EN_COURS: 'bg-amber-500/15 text-amber-400',
   TERMINEE: 'bg-zinc-700/50 text-zinc-400',
   ANNULEE: 'bg-red-500/15 text-red-400',
 };
 
 const STATUT_LABEL: Record<Seance['statut'], string> = {
   PROGRAMMEE: 'Programmée',
+  EN_COURS: 'En cours',
   TERMINEE: 'Terminée',
   ANNULEE: 'Annulée',
 };

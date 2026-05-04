@@ -80,18 +80,7 @@ function buildSeatMatrix(seed: number) {
     matrix.push(row);
   }
 
-  // 2) add a few deterministic gaps (subtle), avoiding VIP block
-  // (kept light so layout stays similar to the screenshot)
-  for (let i = 0; i < 10; i++) {
-    const rr = Math.floor(rng() * ROWS.length);
-    const cc = Math.floor(rng() * COLS.length);
-    const seat = matrix[rr][cc];
-    if (!seat) continue;
-    if (seat.kind === 'vip') continue;
-    if (rng() < 0.25) matrix[rr][cc] = null;
-  }
-
-  // 3) mark some seats occupied (deterministic per seed), never VIP
+  // 2) mark some seats occupied (deterministic per seed), never VIP
   let occupiedPlaced = 0;
   const targetOccupied = 14;
   let safety = 0;
@@ -386,7 +375,7 @@ export default function SeatSelectionPage() {
           </div>
 
           {/* Summary */}
-          <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl">
+          <div className="h-fit self-start rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl">
             <h2 className="text-2xl font-black">Votre sélection</h2>
 
             {seatCount === 0 ? (
