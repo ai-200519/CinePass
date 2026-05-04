@@ -9,3 +9,34 @@ body,
 body {
   margin: 0;
 }
+
+@keyframes seatIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-seat-in {
+  opacity: 0;
+  animation: seatIn 0.35s ease forwards;
+}
+
+@keyframes snackbarIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-snackbar-in {
+  animation: snackbarIn 0.2s ease-out both;
+}

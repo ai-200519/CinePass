@@ -7,15 +7,15 @@ import Navbar from '../components/Navbar';
 import { selectIsAuthenticated } from '../features/auth/authSelectors';
 import { type Film, filmsApi } from '../features/films/filmsApi';
 import {
-    selectFetchFilmsError,
-    selectFetchFilmsStatus,
-    selectFilms,
+  selectFetchFilmsError,
+  selectFetchFilmsStatus,
+  selectFilms,
 } from '../features/films/filmsSelectors';
 import { filmsActions } from '../features/films/filmsSlice';
 import {
-    selectFetchSeancesError,
-    selectFetchSeancesStatus,
-    selectSeances,
+  selectFetchSeancesError,
+  selectFetchSeancesStatus,
+  selectSeances,
 } from '../features/seances/seancesSelectors';
 import { seancesActions } from '../features/seances/seancesSlice';
 
@@ -452,8 +452,17 @@ export default function FilmDetailPage() {
                                   navigate('/login');
                                   return;
                                 }
-                                // Page de reservation pas encore branchee.
-                                alert('Reservation bientot disponible.');
+                                navigate(`/seances/${seance.id_seance}/seats`, {
+                                  state: {
+                                    seance,
+                                    film: {
+                                      id: film.id,
+                                      title: film.title,
+                                      poster: film.poster,
+                                      duration: film.duration,
+                                    },
+                                  },
+                                });
                               }}
                               className="inline-flex h-11 items-center justify-center rounded-xl bg-red-600 px-6 text-sm font-black text-white transition hover:bg-red-500"
                             >

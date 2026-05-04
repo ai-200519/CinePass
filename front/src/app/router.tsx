@@ -15,6 +15,7 @@ import RegisterPage from '../pages/auth/RegisterPage';
 import ResetPasswordPage from '../pages/auth/ResetPasswordPage';
 import FilmDetailPage from '../pages/FilmDetailPage';
 import HomePage from '../pages/HomePage';
+import SeatSelectionPage from '../pages/SeatSelectionPage';
 
 export const router = createBrowserRouter([
   {
@@ -23,6 +24,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <HomePage /> },
       { path: 'films/:id', element: <FilmDetailPage /> },
+      { path: 'seances/:id/seats', element: <SeatSelectionPage /> },
       { path: 'login', element: <LoginPage /> },
       { path: 'register', element: <RegisterPage /> },
       { path: 'forgot-password', element: <ForgotPasswordPage /> },
