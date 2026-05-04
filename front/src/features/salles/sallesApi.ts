@@ -13,6 +13,7 @@ export type CreateSalleDto = {
   nom: string;
   capaciteTotale: number;
   equipements?: string | null;
+  id_cinema: number;
 };
 export type UpdateSalleDto = Partial<Omit<Salle, 'id_salle'>>;
 

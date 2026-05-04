@@ -2,7 +2,12 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import iconPng from '../../assets/icon.png';
-import { selectIsAuthenticated, selectLoginError, selectLoginStatus } from '../../features/auth/authSelectors';
+import {
+  selectAuthRole,
+  selectIsAuthenticated,
+  selectLoginError,
+  selectLoginStatus,
+} from '../../features/auth/authSelectors';
 import { authActions } from '../../features/auth/authSlice';
 
 export default function LoginPage() {
@@ -10,6 +15,7 @@ export default function LoginPage() {
   const navigate = useNavigate();
 
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
+  const role = useAppSelector(selectAuthRole);
   const loginStatus = useAppSelector(selectLoginStatus);
   const loginError = useAppSelector(selectLoginError);
 
@@ -23,9 +29,9 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/admin', { replace: true });
+      navigate(role === 'ADMIN' ? '/admin' : '/', { replace: true });
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, role]);
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-zinc-950 px-4 py-10 text-white">

@@ -27,6 +27,9 @@ export default function MovieCard({
   times = [],
   onDetails,
 }: MovieCardProps) {
+  const ratingNumber = Number(rating);
+  const safeRating = Number.isFinite(ratingNumber) ? ratingNumber : 0;
+
   return (
     <article className="group overflow-hidden rounded-lg border border-white/10 bg-zinc-900 shadow-2xl shadow-black/20 transition duration-300 hover:-translate-y-1 hover:border-red-500/40">
       <div className="relative aspect-[3/4] overflow-hidden bg-zinc-800">
@@ -65,12 +68,20 @@ export default function MovieCard({
         </div>
       </div>
 
-      <div className="space-y-4 p-4">
+      <div className="relative space-y-4 overflow-hidden p-4">
+        <img
+          src={image}
+          alt=""
+          className="absolute inset-0 -z-10 h-full w-full object-cover opacity-10 blur-sm"
+          loading="lazy"
+        />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-zinc-950/95 via-zinc-950/70 to-zinc-950/95" />
+
         <div className="flex items-center justify-between gap-3">
           <span className="rounded-md bg-white/5 px-3 py-1.5 text-sm font-bold text-zinc-300">{genre}</span>
-          <span className="inline-flex items-center gap-1.5 text-sm font-bold text-amber-300">
-            <Star className="h-4 w-4 fill-amber-300" />
-            {rating}
+          <span className="inline-flex items-center gap-2 rounded-md bg-black/70 px-2.5 py-1 text-sm font-black text-amber-300 backdrop-blur">
+            <Star className="h-4 w-4 fill-amber-300 text-amber-300" aria-hidden="true" />
+            {safeRating.toFixed(1)}/10
           </span>
         </div>
 
