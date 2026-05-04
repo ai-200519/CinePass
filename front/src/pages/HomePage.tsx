@@ -1,21 +1,22 @@
 import { ChevronsUpDown, Filter, MapPin, Search, SlidersHorizontal, Ticket } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import Footer from '../components/Footer';
 import MovieCard from '../components/MovieCard';
 import Navbar from '../components/Navbar';
+import {
+    selectCinemas,
+    selectCinemasError,
+    selectCinemasFetchStatus,
+} from '../features/cinemas/cinemasSelectors';
 import { fetchCinemas } from '../features/cinemas/cinemasSlice';
 import {
-  selectCinemas,
-  selectCinemasError,
-  selectCinemasFetchStatus,
-} from '../features/cinemas/cinemasSelectors';
-import { filmsActions } from '../features/films/filmsSlice';
-import {
-  selectFetchFilmsError,
-  selectFetchFilmsStatus,
-  selectFilms,
+    selectFetchFilmsError,
+    selectFetchFilmsStatus,
+    selectFilms,
 } from '../features/films/filmsSelectors';
+import { filmsActions } from '../features/films/filmsSlice';
 
 const fallbackPoster =
   'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=900&q=85';
@@ -29,6 +30,7 @@ const formatDuration = (minutes: number) => {
 
 export default function HomePage() {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const films = useAppSelector(selectFilms);
   const filmsStatus = useAppSelector(selectFetchFilmsStatus);
   const filmsError = useAppSelector(selectFetchFilmsError);
@@ -256,6 +258,7 @@ export default function HomePage() {
                 format={movie.statut === 'EN_COURS' ? 'Maintenant' : 'Bientot'}
                 language="Catalogue"
                 times={[]}
+                onDetails={() => navigate(`/films/${movie.id}`)}
               />
             ))}
           </div>

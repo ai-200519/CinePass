@@ -1,11 +1,7 @@
 import { createBrowserRouter } from 'react-router-dom';
 import AdminLayout from '../layouts/AdminLayout';
 import MainLayout from '../layouts/MainLayout';
-import ForgotPasswordPage from '../pages/auth/ForgotPasswordPage';
-import HomePage from '../pages/HomePage';
-import LoginPage from '../pages/auth/LoginPage';
-import RegisterPage from '../pages/auth/RegisterPage';
-import ResetPasswordPage from '../pages/auth/ResetPasswordPage';
+import AdminCinemasPage from '../pages/admin/AdminCinemasPage';
 import AdminDashboardPage from '../pages/admin/AdminDashboardPage';
 import AdminFilmsPage from '../pages/admin/AdminFilmsPage';
 import AdminParametresPage from '../pages/admin/AdminParametresPage';
@@ -13,7 +9,12 @@ import AdminRapportsPage from '../pages/admin/AdminRapportsPage';
 import AdminReservationsPage from '../pages/admin/AdminReservationsPage';
 import AdminSallesPage from '../pages/admin/AdminSallesPage';
 import AdminSeancesPage from '../pages/admin/AdminSeancesPage';
-import AdminCinemasPage from '../pages/admin/AdminCinemasPage';
+import ForgotPasswordPage from '../pages/auth/ForgotPasswordPage';
+import LoginPage from '../pages/auth/LoginPage';
+import RegisterPage from '../pages/auth/RegisterPage';
+import ResetPasswordPage from '../pages/auth/ResetPasswordPage';
+import FilmDetailPage from '../pages/FilmDetailPage';
+import HomePage from '../pages/HomePage';
 
 export const router = createBrowserRouter([
   {
@@ -21,6 +22,7 @@ export const router = createBrowserRouter([
     element: <MainLayout />,
     children: [
       { index: true, element: <HomePage /> },
+      { path: 'films/:id', element: <FilmDetailPage /> },
       { path: 'login', element: <LoginPage /> },
       { path: 'register', element: <RegisterPage /> },
       { path: 'forgot-password', element: <ForgotPasswordPage /> },
