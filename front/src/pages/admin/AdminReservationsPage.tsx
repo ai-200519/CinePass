@@ -1,22 +1,26 @@
-import { useEffect, useState, useMemo } from 'react';
 import {
-  Search, Ticket, Trash2, X, ChevronDown, ChevronUp, Eye,
-  Calendar, User, Film, MapPin, CreditCard,
+  Calendar,
+  ChevronDown, ChevronUp, Eye,
+  Film, MapPin,
+  Search, Ticket, Trash2,
+  User,
+  X
 } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import type { Reservation, StatutReservation } from '../../features/reservations/reservationsapi';
 import {
+  selectDeleteReservationState,
+  selectReservations,
+  selectReservationsFetchError,
+  selectReservationsFetchStatus,
+  selectUpdateReservationState,
+} from '../../features/reservations/reservationsselectors';
+import {
+  deleteReservation,
   fetchReservations,
   updateReservationStatut,
-  deleteReservation,
-} from '../../features/reservations/reservationsSlice';
-import {
-  selectReservations,
-  selectReservationsFetchStatus,
-  selectReservationsFetchError,
-  selectUpdateReservationState,
-  selectDeleteReservationState,
-} from '../../features/reservations/reservationsSelectors';
-import type { Reservation, StatutReservation } from '../../features/reservations/reservationsApi';
+} from '../../features/reservations/reservationsslice';
 
 // ─── Constantes & Helpers ─────────────────────────────────────────────────────
 const STATUTS: StatutReservation[] = ['EN_COURS', 'PAYEE', 'ANNULEE', 'EXPIREE'];
@@ -165,13 +169,13 @@ function DetailModal({
                         {rs.categorie}
                       </span>
                     </span>
-                    <span className="font-semibold text-white">{Number(rs.prixUnitaire).toFixed(2)} €</span>
+                    <span className="font-semibold text-white">{Number(rs.prixUnitaire).toFixed(2)} DH</span>
                   </div>
                 ))}
               </div>
               <div className="flex justify-between border-t border-white/10 pt-3 font-semibold">
                 <span className="flex items-center gap-1.5">Total</span>
-                <span className="text-lg">{total.toFixed(2)} €</span>
+                <span className="text-lg">{total.toFixed(2)} DH</span>
               </div>
             </div>
           )}
@@ -360,7 +364,7 @@ export default function AdminReservationsPage() {
 
         <article className="col-span-2 rounded-2xl border border-white/10 bg-zinc-950/60 px-4 py-4 sm:col-span-4 lg:col-span-1">
           <p className="text-xs font-medium uppercase tracking-widest text-zinc-500">Revenu (payées)</p>
-          <p className="mt-1 text-2xl font-black text-white">{stats.revenu.toFixed(2)} €</p>
+          <p className="mt-1 text-2xl font-black text-white">{stats.revenu.toFixed(2)} DH</p>
         </article>
       </div>
 
@@ -460,7 +464,7 @@ export default function AdminReservationsPage() {
                     <td className="px-6 py-4">
                       <StatutBadge statut={res.statut} />
                     </td>
-                    <td className="px-6 py-4 font-semibold">{totalPrix(res).toFixed(2)} €</td>
+                    <td className="px-6 py-4 font-semibold">{totalPrix(res).toFixed(2)} DH</td>
                     <td className="px-6 py-4">
                       <div className="flex justify-center gap-2">
                         <button onClick={() => setDetailRes(res)} className="p-2 hover:bg-white/10 rounded-lg text-zinc-400 hover:text-white">
