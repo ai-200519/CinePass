@@ -4,13 +4,13 @@ import { IsDateString, IsEnum, IsNumber, ValidateNested } from 'class-validator'
 import { StatutSeance } from '../../common/enums/statut-seance.enum';
 import { TechnologieSeance } from '../../common/enums/technologie-seance.enum';
 
-class FilmRefDto {
+export class FilmRefDto {
 	@ApiProperty({ example: 1 })
 	@IsNumber()
 	id: number;
 }
 
-class SalleRefDto {
+export class SalleRefDto {
 	@ApiProperty({ example: 1 })
 	@IsNumber()
 	id_salle: number;
