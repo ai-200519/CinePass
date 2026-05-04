@@ -11,6 +11,7 @@ type MovieCardProps = {
   badge?: string;
   duration?: string;
   times?: string[];
+  onDetails?: () => void;
 };
 
 export default function MovieCard({
@@ -24,6 +25,7 @@ export default function MovieCard({
   badge,
   duration = '2h00',
   times = [],
+  onDetails,
 }: MovieCardProps) {
   return (
     <article className="group overflow-hidden rounded-lg border border-white/10 bg-zinc-900 shadow-2xl shadow-black/20 transition duration-300 hover:-translate-y-1 hover:border-red-500/40">
@@ -93,7 +95,12 @@ export default function MovieCard({
             <Ticket className="h-4 w-4" />
             Reserver
           </button>
-          <button className="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-white/10 text-zinc-300 transition hover:border-white/30 hover:text-white">
+          <button
+            type="button"
+            onClick={onDetails}
+            className="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-white/10 text-zinc-300 transition hover:border-white/30 hover:text-white"
+            aria-label={`Voir les details de ${title}`}
+          >
             <ChevronRight className="h-5 w-5" />
           </button>
         </div>
