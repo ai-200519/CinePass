@@ -1,4 +1,4 @@
-import { Clock3, Play, Star } from 'lucide-react';
+import { Armchair, Clock3, Play, Star } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
@@ -62,8 +62,8 @@ const technologieLabel = (t: string) => (t === 'TROIS_D' ? '3D' : t === 'DEUX_D'
 
 const ratingStars = (rating: number) => {
   const safe = Number.isFinite(rating) ? rating : 0;
-  const full = Math.max(0, Math.min(5, Math.floor(safe)));
-  return Array.from({ length: 5 }, (_, index) => index < full);
+  const full = Math.max(0, Math.min(10, Math.floor(safe)));
+  return Array.from({ length: 10 }, (_, index) => index < full);
 };
 
 const toTrailerEmbedUrl = (rawUrl: string) => {
@@ -273,12 +273,12 @@ export default function FilmDetailPage() {
                       {ratingStars(film.note).map((filled, idx) => (
                         <Star
                           key={idx}
-                          className={`h-6 w-6 ${filled ? 'fill-red-500 text-red-500' : 'text-zinc-700'}`}
+                          className={`h-4 w-4 ${filled ? 'fill-red-500 text-red-500' : 'text-zinc-700'}`}
                         />
                       ))}
                     </div>
                     <div className="text-2xl font-black text-white">
-                      {Number.isFinite(film.note) ? film.note.toFixed(1) : '0.0'}
+                      {Number.isFinite(film.note) ? `${film.note.toFixed(1)}/10` : '0.0/10'}
                     </div>
                   </div>
 
@@ -396,24 +396,69 @@ export default function FilmDetailPage() {
                       ? date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
                       : seance.dateHeure;
 
-                    const tech = technologieLabel(seance.technologie);
-                    const statusLabel =
-                      seance.statut === 'ANNULEE'
-                        ? 'Seance annulee'
-                        : seance.statut === 'TERMINEE'
-                          ? 'Seance terminee'
-                          : seance.statut === 'EN_COURS'
-                            ? 'Places limitees'
-                            : 'Nombreuses places';
+                    const totalSeats =
+                      (seance.totalSeats ?? seance.salle?.capaciteTotale ?? null) as number | null;
+                    const reservedSeats = (seance.reservedSeats ?? null) as number | null;
+                    const remainingSeats =
+                      (seance.remainingSeats ??
+                        (typeof totalSeats === 'number' && typeof reservedSeats === 'number'
+                          ? totalSeats - reservedSeats
+                          : null)) as number | null;
 
-                    const dotColor =
-                      seance.statut === 'ANNULEE'
-                        ? 'bg-red-500'
-                        : seance.statut === 'EN_COURS'
-                          ? 'bg-amber-500'
-                          : seance.statut === 'TERMINEE'
-                            ? 'bg-zinc-500'
-                            : 'bg-emerald-500';
+                    const safeTotal =
+                      typeof totalSeats === 'number' && Number.isFinite(totalSeats) ? totalSeats : null;
+                    const safeRemaining =
+                      typeof remainingSeats === 'number' && Number.isFinite(remainingSeats)
+                        ? Math.max(0, remainingSeats)
+                        : null;
+                    const safeReserved =
+                      typeof reservedSeats === 'number' && Number.isFinite(reservedSeats)
+                        ? Math.max(0, reservedSeats)
+                        : null;
+
+                    const ratio =
+                      safeTotal && safeTotal > 0 && typeof safeRemaining === 'number'
+                        ? safeRemaining / safeTotal
+                        : null;
+
+                    const tech = technologieLabel(seance.technologie);
+                    const statusLabel = (() => {
+                      if (seance.statut === 'ANNULEE') return 'Séance annulée';
+                      if (seance.statut === 'TERMINEE') return 'Séance terminée';
+                      if (seance.statut === 'EN_COURS') return 'En cours';
+                      if (ratio === null) return 'Places disponibles';
+                      if (safeRemaining !== null && safeTotal && safeRemaining <= Math.max(5, Math.ceil(safeTotal * 0.1))) {
+                        return 'Dernières places';
+                      }
+                      if (ratio <= 0.35) return 'Places limitées';
+                      return 'Nombreuses places';
+                    })();
+
+                    const dotColor = (() => {
+                      if (seance.statut === 'ANNULEE') return 'bg-red-500';
+                      if (seance.statut === 'TERMINEE') return 'bg-zinc-500';
+                      if (statusLabel === 'Dernières places') return 'bg-red-500';
+                      if (statusLabel === 'Places limitées') return 'bg-amber-500';
+                      if (seance.statut === 'EN_COURS') return 'bg-amber-500';
+                      return 'bg-emerald-500';
+                    })();
+
+                    const reservedLine =
+                      seance.statut === 'PROGRAMMEE' && safeTotal && typeof safeReserved === 'number'
+                        ? `${safeReserved}/${safeTotal}`
+                        : null;
+
+                    const seatsLine =
+                      seance.statut === 'PROGRAMMEE' && safeTotal && typeof safeRemaining === 'number'
+                        ? `${safeRemaining}/${safeTotal} places disponibles`
+                        : null;
+
+                    const reservedPct =
+                      seance.statut === 'PROGRAMMEE' && safeTotal && safeTotal > 0 && typeof safeReserved === 'number'
+                        ? Math.max(0, Math.min(100, (safeReserved / safeTotal) * 100))
+                        : null;
+
+                    const isDisabled = seance.statut !== 'PROGRAMMEE';
 
                     return (
                       <div
@@ -437,6 +482,25 @@ export default function FilmDetailPage() {
                           <div>
                             <div className="text-5xl font-black leading-none">{timeLabel}</div>
                             <div className="mt-2 text-sm font-bold text-zinc-500">{formatDateIso(seance.dateHeure)}</div>
+
+                            {reservedLine && reservedPct !== null && (
+                              <div className="mt-5">
+                                <div className="flex items-center justify-between text-sm font-bold text-zinc-300">
+                                  <span>Occupation</span>
+                                  <span className="inline-flex items-center gap-2 rounded-md bg-black/40 px-2 py-1 text-amber-300">
+                                    <Armchair className="h-4 w-4 text-amber-300" aria-hidden="true" />
+                                    {reservedLine}
+                                  </span>
+                                </div>
+                                <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-white/10">
+                                  <div
+                                    className="h-full rounded-full bg-red-600 transition-[width] duration-700"
+                                    style={{ width: `${reservedPct}%` }}
+                                  />
+                                </div>
+                                {seatsLine && <div className="mt-2 text-sm font-bold text-zinc-400">{seatsLine}</div>}
+                              </div>
+                            )}
                           </div>
 
                           <div className="flex flex-col items-start gap-4 sm:items-end">
@@ -447,11 +511,13 @@ export default function FilmDetailPage() {
 
                             <button
                               type="button"
+                              disabled={isDisabled}
                               onClick={() => {
                                 if (!isAuthenticated) {
                                   navigate('/login');
                                   return;
                                 }
+                                if (isDisabled) return;
                                 navigate(`/seances/${seance.id_seance}/seats`, {
                                   state: {
                                     seance,
@@ -464,7 +530,11 @@ export default function FilmDetailPage() {
                                   },
                                 });
                               }}
-                              className="inline-flex h-11 items-center justify-center rounded-xl bg-red-600 px-6 text-sm font-black text-white transition hover:bg-red-500"
+                              className={`inline-flex h-11 items-center justify-center rounded-xl px-6 text-sm font-black text-white transition ${
+                                isDisabled
+                                  ? 'cursor-not-allowed bg-white/10 text-zinc-400'
+                                  : 'bg-red-600 hover:bg-red-500'
+                              }`}
                             >
                               Reserver
                             </button>

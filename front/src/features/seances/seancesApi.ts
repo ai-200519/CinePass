@@ -5,6 +5,9 @@ export type Seance = {
   dateHeure: string;
   technologie: '2D' | '3D' | '4DX' | 'DOLBY'; // ✅ valeurs réelles de l'enum backend
   statut: 'PROGRAMMEE' | 'EN_COURS' | 'TERMINEE' | 'ANNULEE';
+  totalSeats?: number;
+  reservedSeats?: number;
+  remainingSeats?: number;
   film: {
     id: number;
     title: string;
@@ -12,6 +15,7 @@ export type Seance = {
   salle: {
     id_salle: number;
     numero: number;
+    capaciteTotale?: number;
   };
 };
 
