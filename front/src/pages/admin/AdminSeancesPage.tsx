@@ -3,6 +3,7 @@ import { Clock, Edit2, Plus, Trash2, X } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { seancesActions } from '../../features/seances/seancesSlice';
 import { filmsActions } from '../../features/films/filmsSlice';
+import { fetchSalles } from '../../features/salles/sallesSlice';
 import {
   selectSeances,
   selectFetchSeancesStatus,
@@ -15,14 +16,14 @@ import {
   selectDeleteSeanceError,
 } from '../../features/seances/seancesSelectors';
 import { selectFilms, selectFetchFilmsStatus } from '../../features/films/filmsSelectors';
-import type { Seance, CreateSeanceDto, UpdateSeanceDto } from '../../features/seances/seancesApi';
+import { selectSalles, selectSallesFetchStatus } from '../../features/salles/sallesSelectors';
+import type { Seance, CreateSeanceDto } from '../../features/seances/seancesApi';
 
-// ─── Types UI ─────────────────────────────────────────────────────────────────
 interface SeanceForm {
   filmId: number;
   salleId: number;
-  date: string;   // 'YYYY-MM-DD'
-  heure: string;  // 'HH:mm'
+  date: string;
+  heure: string;
   technologie: Seance['technologie'];
   statut: Seance['statut'];
 }
@@ -32,16 +33,15 @@ const EMPTY_FORM: SeanceForm = {
   salleId: 0,
   date: new Date().toISOString().split('T')[0],
   heure: '14:00',
-  technologie: 'DEUX_D',
+  technologie: '2D',
   statut: 'PROGRAMMEE',
 };
 
-// Convertit une Seance du store en SeanceForm
 const seanceToForm = (s: Seance): SeanceForm => {
   const dt = new Date(s.dateHeure);
   return {
-    filmId: s.film.id,
-    salleId: s.salle.id_salle,
+    filmId: s.film?.id ?? 0,
+    salleId: s.salle?.id_salle ?? 0,
     date: dt.toISOString().split('T')[0],
     heure: dt.toTimeString().slice(0, 5),
     technologie: s.technologie,
@@ -49,16 +49,14 @@ const seanceToForm = (s: Seance): SeanceForm => {
   };
 };
 
-// Convertit un SeanceForm en DTO backend
 const formToDto = (form: SeanceForm): CreateSeanceDto => ({
-  dateHeure: `${form.date}T${form.heure}:00`,
+  dateHeure: new Date(`${form.date}T${form.heure}:00`).toISOString(),
   technologie: form.technologie,
   statut: form.statut,
-  film: { id: form.filmId, title: '' },
-  salle: { id_salle: form.salleId, numero: 0 },
+  film: { id: Number(form.filmId) },
+  salle: { id_salle: Number(form.salleId) },
 });
 
-// ─── Helpers visuels ──────────────────────────────────────────────────────────
 const fmtDate = (iso: string) =>
   new Date(iso).toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' });
 
@@ -80,12 +78,12 @@ const STATUT_LABEL: Record<Seance['statut'], string> = {
 };
 
 const TECHNO_LABEL: Record<Seance['technologie'], string> = {
-  DEUX_D: '2D',
-  TROIS_D: '3D',
-  IMAX: 'IMAX',
+  '2D': '2D',
+  '3D': '3D',
+  '4DX': '4DX',
+  'DOLBY': 'Dolby',
 };
 
-// ─── Modal ────────────────────────────────────────────────────────────────────
 function SeanceModal({
   open, onClose, onSave, initial, title, isLoading, error, filmOptions, salleOptions,
 }: {
@@ -97,7 +95,7 @@ function SeanceModal({
   isLoading: boolean;
   error: string | null;
   filmOptions: { id: number; title: string }[];
-  salleOptions: { id_salle: number; numero: number }[];
+  salleOptions: { id_salle: number; numero: number; nom: string | null }[];
 }) {
   const [form, setForm] = useState(initial);
   useEffect(() => { if (open) setForm(initial); }, [open, initial]);
@@ -128,11 +126,8 @@ function SeanceModal({
         )}
 
         <div className="space-y-4">
-          {/* Film */}
           <div>
-            <label className="mb-1.5 block text-xs font-medium uppercase tracking-widest text-zinc-500">
-              Film *
-            </label>
+            <label className="mb-1.5 block text-xs font-medium uppercase tracking-widest text-zinc-500">Film *</label>
             <select
               value={form.filmId}
               onChange={(e) => set('filmId', Number(e.target.value))}
@@ -145,11 +140,8 @@ function SeanceModal({
             </select>
           </div>
 
-          {/* Salle */}
           <div>
-            <label className="mb-1.5 block text-xs font-medium uppercase tracking-widest text-zinc-500">
-              Salle *
-            </label>
+            <label className="mb-1.5 block text-xs font-medium uppercase tracking-widest text-zinc-500">Salle *</label>
             <select
               value={form.salleId}
               onChange={(e) => set('salleId', Number(e.target.value))}
@@ -157,17 +149,16 @@ function SeanceModal({
             >
               <option value={0}>— Choisir une salle —</option>
               {salleOptions.map((s) => (
-                <option key={s.id_salle} value={s.id_salle}>Salle {s.numero}</option>
+                <option key={s.id_salle} value={s.id_salle}>
+                  Salle {s.numero}{s.nom ? ` — ${s.nom}` : ''}
+                </option>
               ))}
             </select>
           </div>
 
-          {/* Date + Heure */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-1.5 block text-xs font-medium uppercase tracking-widest text-zinc-500">
-                Date *
-              </label>
+              <label className="mb-1.5 block text-xs font-medium uppercase tracking-widest text-zinc-500">Date *</label>
               <input
                 type="date"
                 value={form.date}
@@ -176,9 +167,7 @@ function SeanceModal({
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-xs font-medium uppercase tracking-widest text-zinc-500">
-                Heure *
-              </label>
+              <label className="mb-1.5 block text-xs font-medium uppercase tracking-widest text-zinc-500">Heure *</label>
               <input
                 type="time"
                 value={form.heure}
@@ -188,26 +177,23 @@ function SeanceModal({
             </div>
           </div>
 
-          {/* Technologie + Statut */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-1.5 block text-xs font-medium uppercase tracking-widest text-zinc-500">
-                Technologie
-              </label>
+              <label className="mb-1.5 block text-xs font-medium uppercase tracking-widest text-zinc-500">Technologie</label>
               <select
                 value={form.technologie}
                 onChange={(e) => set('technologie', e.target.value as Seance['technologie'])}
                 className="w-full rounded-2xl border border-white/10 bg-zinc-800/70 px-4 py-3 text-white outline-none ring-red-500/60 transition focus:ring-2"
               >
-                <option value="DEUX_D">2D</option>
-                <option value="TROIS_D">3D</option>
-                <option value="IMAX">IMAX</option>
+                {/* ✅ valeurs alignées avec TechnologieSeance enum backend */}
+                <option value="2D">2D</option>
+                <option value="3D">3D</option>
+                <option value="4DX">4DX</option>
+                <option value="DOLBY">Dolby</option>
               </select>
             </div>
             <div>
-              <label className="mb-1.5 block text-xs font-medium uppercase tracking-widest text-zinc-500">
-                Statut
-              </label>
+              <label className="mb-1.5 block text-xs font-medium uppercase tracking-widest text-zinc-500">Statut</label>
               <select
                 value={form.statut}
                 onChange={(e) => set('statut', e.target.value as Seance['statut'])}
@@ -242,11 +228,9 @@ function SeanceModal({
   );
 }
 
-// ─── Composant principal ──────────────────────────────────────────────────────
 export default function AdminSeancesPage() {
   const dispatch = useAppDispatch();
 
-  // Seances
   const seances = useAppSelector(selectSeances);
   const fetchStatus = useAppSelector(selectFetchSeancesStatus);
   const fetchError = useAppSelector(selectFetchSeancesError);
@@ -257,20 +241,17 @@ export default function AdminSeancesPage() {
   const deleteStatus = useAppSelector(selectDeleteSeanceStatus);
   const deleteError = useAppSelector(selectDeleteSeanceError);
 
-  // Films (pour le select)
   const films = useAppSelector(selectFilms);
   const filmsStatus = useAppSelector(selectFetchFilmsStatus);
+  const salles = useAppSelector(selectSalles);
+  const sallesStatus = useAppSelector(selectSallesFetchStatus);
 
-  // Filtres
   const [filterFilm, setFilterFilm] = useState('');
   const [filterStatut, setFilterStatut] = useState('');
   const [filterDate, setFilterDate] = useState('');
-
-  // Modals
   const [modal, setModal] = useState<{ open: boolean; seance: Seance | null }>({ open: false, seance: null });
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
-  // Fetch initial
   useEffect(() => {
     if (fetchStatus === 'idle') dispatch(seancesActions.fetchSeancesRequested());
   }, [dispatch, fetchStatus]);
@@ -279,20 +260,23 @@ export default function AdminSeancesPage() {
     if (filmsStatus === 'idle') dispatch(filmsActions.fetchFilmsRequested());
   }, [dispatch, filmsStatus]);
 
-  // Fermer le modal après succès
+  useEffect(() => {
+    if (sallesStatus === 'idle') dispatch(fetchSalles());
+  }, [dispatch, sallesStatus]);
+
   useEffect(() => {
     if (createStatus === 'succeeded' || updateStatus === 'succeeded') {
       setModal({ open: false, seance: null });
+      dispatch(seancesActions.fetchSeancesRequested());
     }
-  }, [createStatus, updateStatus]);
+  }, [createStatus, updateStatus, dispatch]);
 
   const handleSave = (form: SeanceForm) => {
     const dto = formToDto(form);
     if (modal.seance) {
-      const updateDto: UpdateSeanceDto = dto;
-      dispatch(seancesActions.updateSeanceRequested({ id: modal.seance.id_seance, seance: updateDto as any }));
+      dispatch(seancesActions.updateSeanceRequested({ id: modal.seance.id_seance, seance: dto }));
     } else {
-      dispatch(seancesActions.createSeanceRequested(dto as any));
+      dispatch(seancesActions.createSeanceRequested(dto));
     }
   };
 
@@ -304,7 +288,7 @@ export default function AdminSeancesPage() {
   };
 
   const filtered = seances.filter((s) => {
-    const matchFilm = filterFilm ? s.film.id === Number(filterFilm) : true;
+    const matchFilm = filterFilm ? s.film?.id === Number(filterFilm) : true;
     const matchStatut = filterStatut ? s.statut === filterStatut : true;
     const matchDate = filterDate ? s.dateHeure.startsWith(filterDate) : true;
     return matchFilm && matchStatut && matchDate;
@@ -313,14 +297,14 @@ export default function AdminSeancesPage() {
   const isModalLoading = createStatus === 'loading' || updateStatus === 'loading';
   const modalError = modal.seance ? updateError : createError;
 
-  // Salles extraites des séances existantes (pas d'API salle dédiée ici)
-  const salleOptions = Array.from(
-    new Map(seances.map((s) => [s.salle.id_salle, s.salle])).values()
-  );
+  const salleOptions = salles.map((s) => ({
+    id_salle: s.id_salle,
+    numero: s.numero,
+    nom: s.nom,
+  }));
 
   return (
     <div className="relative">
-      {/* ── Header ── */}
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-4xl font-black tracking-tight">Séances</h1>
@@ -337,19 +321,13 @@ export default function AdminSeancesPage() {
         </button>
       </header>
 
-      {/* ── Erreurs globales ── */}
       {fetchError && (
-        <div className="mt-4 rounded-xl border border-red-500/30 bg-red-600/10 px-4 py-2 text-sm text-red-400">
-          {fetchError}
-        </div>
+        <div className="mt-4 rounded-xl border border-red-500/30 bg-red-600/10 px-4 py-2 text-sm text-red-400">{fetchError}</div>
       )}
       {deleteError && (
-        <div className="mt-4 rounded-xl border border-red-500/30 bg-red-600/10 px-4 py-2 text-sm text-red-400">
-          {deleteError}
-        </div>
+        <div className="mt-4 rounded-xl border border-red-500/30 bg-red-600/10 px-4 py-2 text-sm text-red-400">{deleteError}</div>
       )}
 
-      {/* ── Stats ── */}
       <section className="mt-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
         {[
           { label: 'Total séances', value: seances.length, color: 'text-white' },
@@ -364,7 +342,6 @@ export default function AdminSeancesPage() {
         ))}
       </section>
 
-      {/* ── Filtres ── */}
       <div className="mt-6 flex flex-wrap gap-3 rounded-2xl border border-white/10 bg-zinc-950/40 p-4">
         <select
           value={filterFilm}
@@ -403,31 +380,26 @@ export default function AdminSeancesPage() {
         )}
       </div>
 
-      {/* ── Table ── */}
       <div className="mt-6 overflow-hidden rounded-2xl border border-white/10 bg-zinc-950/40 shadow-2xl">
         <table className="w-full border-collapse text-sm">
           <thead>
             <tr className="border-b border-white/10">
               {['Film', 'Date & Heure', 'Salle', 'Technologie', 'Statut', ''].map((h) => (
-                <th key={h} className="px-4 py-3.5 text-left text-xs font-medium uppercase tracking-widest text-zinc-500">
-                  {h}
-                </th>
+                <th key={h} className="px-4 py-3.5 text-left text-xs font-medium uppercase tracking-widest text-zinc-500">{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {fetchStatus === 'loading' ? (
-              <tr>
-                <td colSpan={6} className="py-16 text-center text-zinc-500">Chargement des séances...</td>
-              </tr>
+              <tr><td colSpan={6} className="py-16 text-center text-zinc-500">Chargement des séances...</td></tr>
             ) : filtered.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="py-16 text-center text-zinc-500">Aucune séance trouvée</td>
-              </tr>
+              <tr><td colSpan={6} className="py-16 text-center text-zinc-500">Aucune séance trouvée</td></tr>
             ) : (
               filtered.map((seance) => (
                 <tr key={seance.id_seance} className="border-b border-white/5 transition last:border-0 hover:bg-white/[0.03]">
-                  <td className="px-4 py-4 font-semibold text-white">{seance.film.title}</td>
+                  <td className="px-4 py-4 font-semibold text-white">
+                    {seance.film?.title ?? <span className="italic text-zinc-500">Film inconnu</span>}
+                  </td>
                   <td className="px-4 py-4">
                     <div className="flex items-center gap-2 text-white">
                       <Clock className="h-3.5 w-3.5 text-zinc-500" aria-hidden="true" />
@@ -435,7 +407,9 @@ export default function AdminSeancesPage() {
                     </div>
                     <div className="mt-0.5 text-xs text-zinc-500">{fmtDate(seance.dateHeure)}</div>
                   </td>
-                  <td className="px-4 py-4 text-zinc-300">Salle {seance.salle.numero}</td>
+                  <td className="px-4 py-4 text-zinc-300">
+                    {seance.salle ? `Salle ${seance.salle.numero}` : <span className="italic text-zinc-500">Salle inconnue</span>}
+                  </td>
                   <td className="px-4 py-4">
                     <span className="rounded-lg bg-white/8 px-2.5 py-1 text-xs font-medium text-zinc-300">
                       {TECHNO_LABEL[seance.technologie]}
@@ -471,7 +445,6 @@ export default function AdminSeancesPage() {
         </table>
       </div>
 
-      {/* ── Modal Créer / Modifier ── */}
       <SeanceModal
         open={modal.open}
         onClose={() => setModal({ open: false, seance: null })}
@@ -484,7 +457,6 @@ export default function AdminSeancesPage() {
         salleOptions={salleOptions}
       />
 
-      {/* ── Modal Supprimer ── */}
       {deleteId !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
           <div className="w-full max-w-sm rounded-3xl border border-white/10 bg-zinc-900 p-8 text-center shadow-2xl">
@@ -512,7 +484,6 @@ export default function AdminSeancesPage() {
         </div>
       )}
 
-      {/* FAB */}
       <button
         onClick={() => setModal({ open: true, seance: null })}
         className="fixed bottom-8 right-8 inline-flex h-14 w-14 items-center justify-center rounded-full bg-red-600 text-white shadow-2xl transition hover:bg-red-500"

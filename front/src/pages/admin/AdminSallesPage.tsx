@@ -42,7 +42,15 @@ export default function AdminSallesPage() {
   const [formState, setFormState] = useState<SalleFormState>(emptyFormState);
   const [localError, setLocalError] = useState<string | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [addForm, setAddForm] = useState({ nom: '', numero: '', capaciteTotale: '', equipements: '' });
+
+  // ✅ Ajout du champ id_cinema dans l'état du formulaire
+  const [addForm, setAddForm] = useState({
+    nom: '',
+    numero: '',
+    capaciteTotale: '',
+    equipements: '',
+    id_cinema: '',
+  });
   const [addError, setAddError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -72,21 +80,28 @@ export default function AdminSallesPage() {
     const numero = Number(addForm.numero);
     const capaciteTotale = Number(addForm.capaciteTotale);
 
+    // ✅ Validation de id_cinema
+    const id_cinema = Number(addForm.id_cinema);
+
     if (!addForm.nom.trim()) { setAddError('Le nom est requis.'); return; }
     if (Number.isNaN(numero) || numero <= 0) { setAddError('Le numéro doit être un entier valide.'); return; }
     if (Number.isNaN(capaciteTotale) || capaciteTotale <= 0) { setAddError('La capacité doit être un entier valide.'); return; }
+    if (Number.isNaN(id_cinema) || id_cinema <= 0) { setAddError("L'ID du cinéma est requis et doit être valide."); return; }
 
+    // ✅ Ajout de id_cinema dans le payload
     const payload: CreateSalleDto = {
       numero,
       nom: addForm.nom.trim(),
       capaciteTotale,
       equipements: addForm.equipements.trim() || undefined,
+      id_cinema,
     };
 
     try {
       await dispatch(createSalle(payload)).unwrap();
       setShowAddModal(false);
-      setAddForm({ nom: '', numero: '', capaciteTotale: '', equipements: '' });
+      // ✅ Reset complet incluant id_cinema
+      setAddForm({ nom: '', numero: '', capaciteTotale: '', equipements: '', id_cinema: '' });
     } catch {
       // l'erreur est gérée par le slice
     }
@@ -187,6 +202,12 @@ export default function AdminSallesPage() {
         </div>
       )}
 
+      {createState.status === 'failed' && (
+        <div className="mb-4 rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-red-700">
+          {createState.error}
+        </div>
+      )}
+
       <div className="overflow-x-auto rounded-3xl border border-zinc-800 bg-zinc-950/80 shadow-sm">
         <table className="min-w-full divide-y divide-zinc-800 text-left text-sm">
           <thead className="bg-zinc-950">
@@ -202,13 +223,13 @@ export default function AdminSallesPage() {
           <tbody className="divide-y divide-zinc-800">
             {isLoading ? (
               <tr>
-                <td className="px-4 py-8 text-zinc-400" colSpan={6}>
-                  Chargement des salles...
+                <td colSpan={6} className="px-4 py-8 text-center text-zinc-400">
+                  Chargement...
                 </td>
               </tr>
             ) : salles.length === 0 ? (
               <tr>
-                <td className="px-4 py-8 text-zinc-400" colSpan={6}>
+                <td colSpan={6} className="px-4 py-8 text-center text-zinc-400">
                   Aucune salle trouvée.
                 </td>
               </tr>
@@ -287,9 +308,10 @@ export default function AdminSallesPage() {
                           <button
                             type="button"
                             onClick={handleSave}
-                            className="rounded-full bg-emerald-500 px-3 py-1 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-400"
+                            disabled={updateState.status === 'loading'}
+                            className="rounded-full bg-emerald-500 px-3 py-1 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-400 disabled:opacity-50"
                           >
-                            Enregistrer
+                            {updateState.status === 'loading' ? 'Enregistrement...' : 'Enregistrer'}
                           </button>
                         </div>
                       ) : (
@@ -379,12 +401,28 @@ export default function AdminSallesPage() {
                   className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-red-500"
                 />
               </div>
+
+              {/* ✅ Nouveau champ id_cinema */}
+              <div>
+                <label className="mb-1 block text-sm text-zinc-400">ID Cinéma *</label>
+                <input
+                  type="number"
+                  placeholder="Ex: 1"
+                  value={addForm.id_cinema}
+                  onChange={(e) => setAddForm((f) => ({ ...f, id_cinema: e.target.value }))}
+                  className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-red-500"
+                />
+              </div>
             </div>
 
             <div className="mt-5 flex justify-end gap-3">
               <button
                 type="button"
-                onClick={() => { setShowAddModal(false); setAddError(null); }}
+                onClick={() => {
+                  setShowAddModal(false);
+                  setAddError(null);
+                  setAddForm({ nom: '', numero: '', capaciteTotale: '', equipements: '', id_cinema: '' });
+                }}
                 className="rounded-full border border-zinc-700 px-4 py-2 text-sm text-zinc-100 transition hover:bg-zinc-800"
               >
                 Annuler
