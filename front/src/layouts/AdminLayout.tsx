@@ -10,6 +10,7 @@ import {
   Menu,
   Settings,
   Ticket,
+  Users,
   X,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -33,6 +34,7 @@ const navItems: AdminNavItem[] = [
   { to: '/admin/seances', label: 'Séances', icon: CalendarDays },
   { to: '/admin/salles', label: 'Salles', icon: DoorOpen },
   { to: '/admin/reservations', label: 'Réservations', icon: Ticket },
+  { to: '/admin/utilisateurs', label: 'Utilisateurs', icon: Users }, // ← ajouté
   { to: '/admin/rapports', label: 'Rapports', icon: BarChart3 },
   { to: '/admin/parametres', label: 'Paramètres', icon: Settings },
 ];
@@ -50,12 +52,10 @@ export default function AdminLayout() {
     setMobileOpen(false);
   }, [location.pathname]);
 
-  // Redirige vers /login si pas connecté
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
-  // Si connecté mais pas ADMIN, rester côté user
   if (role !== 'ADMIN') {
     return <Navigate to="/" replace />;
   }
@@ -144,7 +144,7 @@ export default function AdminLayout() {
         </div>
       )}
 
-      {/* Desktop layout */}
+      {/* Desktop sidebar */}
       <aside className="fixed inset-y-0 left-0 z-40 hidden border-r border-white/10 bg-[#141414] md:flex md:w-[72px] md:flex-col md:px-3 md:py-6 lg:w-[240px] lg:px-5">
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-center lg:justify-start">
