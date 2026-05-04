@@ -1,4 +1,4 @@
-import { Clock3, Play, Star, Ticket } from 'lucide-react';
+import { Clock3, Play, Star } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
