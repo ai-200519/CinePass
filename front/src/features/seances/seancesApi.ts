@@ -17,6 +17,11 @@ export type Seance = {
     numero: number;
     capaciteTotale?: number;
   };
+
+  // Optional fields returned by backend for UX (availability)
+  totalSeats?: number | null;
+  reservedSeats?: number;
+  remainingSeats?: number;
 };
 
 export type CreateSeanceDto = {

@@ -1,21 +1,21 @@
 import type { LucideIcon } from 'lucide-react';
 import {
-    BarChart3,
-    Building2,
-    CalendarDays,
-    Clapperboard,
-    DoorOpen,
-    Film,
-    LayoutDashboard,
-    LogOut,
-    Settings,
-    Ticket,
+  BarChart3,
+  Building2,
+  CalendarDays,
+  Clapperboard,
+  DoorOpen,
+  Film,
+  LayoutDashboard,
+  LogOut,
+  Settings,
+  Ticket,
 } from 'lucide-react';
-import { NavLink, Outlet, useNavigate, Navigate } from 'react-router-dom';
+import { Navigate, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import Logo from '../components/Logo';
+import { selectAuthRole, selectIsAuthenticated } from '../features/auth/authSelectors';
 import { authActions } from '../features/auth/authSlice';
-import { selectIsAuthenticated } from '../features/auth/authSelectors';
 
 type AdminNavItem = {
   to: string;
@@ -39,10 +39,16 @@ export default function AdminLayout() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
+  const role = useAppSelector(selectAuthRole);
 
   // Redirige vers /login si pas connecté
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
+  }
+
+  // Si connecté mais pas ADMIN, rester côté user
+  if (role !== 'ADMIN') {
+    return <Navigate to="/" replace />;
   }
 
   return (

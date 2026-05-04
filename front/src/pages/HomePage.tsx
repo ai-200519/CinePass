@@ -5,16 +5,17 @@ import { useAppDispatch, useAppSelector } from '../app/hooks';
 import Footer from '../components/Footer';
 import MovieCard from '../components/MovieCard';
 import Navbar from '../components/Navbar';
+import { selectAuthRole } from '../features/auth/authSelectors';
 import {
-    selectCinemas,
-    selectCinemasError,
-    selectCinemasFetchStatus,
+  selectCinemas,
+  selectCinemasError,
+  selectCinemasFetchStatus,
 } from '../features/cinemas/cinemasSelectors';
 import { fetchCinemas } from '../features/cinemas/cinemasSlice';
 import {
-    selectFetchFilmsError,
-    selectFetchFilmsStatus,
-    selectFilms,
+  selectFetchFilmsError,
+  selectFetchFilmsStatus,
+  selectFilms,
 } from '../features/films/filmsSelectors';
 import { filmsActions } from '../features/films/filmsSlice';
 
@@ -31,12 +32,19 @@ const formatDuration = (minutes: number) => {
 export default function HomePage() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const role = useAppSelector(selectAuthRole);
   const films = useAppSelector(selectFilms);
   const filmsStatus = useAppSelector(selectFetchFilmsStatus);
   const filmsError = useAppSelector(selectFetchFilmsError);
   const cinemas = useAppSelector(selectCinemas);
   const cinemasStatus = useAppSelector(selectCinemasFetchStatus);
   const cinemasError = useAppSelector(selectCinemasError);
+
+  useEffect(() => {
+    if (role === 'ADMIN') {
+      navigate('/admin', { replace: true });
+    }
+  }, [navigate, role]);
 
   const [selectedCity, setSelectedCity] = useState('');
   const [query, setQuery] = useState('');

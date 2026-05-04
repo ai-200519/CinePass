@@ -1,23 +1,23 @@
-import { useEffect, useState } from 'react';
 import { Clock, Edit2, Plus, Trash2, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { seancesActions } from '../../features/seances/seancesSlice';
+import { selectFetchFilmsStatus, selectFilms } from '../../features/films/filmsSelectors';
 import { filmsActions } from '../../features/films/filmsSlice';
-import { fetchSalles } from '../../features/salles/sallesSlice';
-import {
-  selectSeances,
-  selectFetchSeancesStatus,
-  selectFetchSeancesError,
-  selectCreateSeanceStatus,
-  selectCreateSeanceError,
-  selectUpdateSeanceStatus,
-  selectUpdateSeanceError,
-  selectDeleteSeanceStatus,
-  selectDeleteSeanceError,
-} from '../../features/seances/seancesSelectors';
-import { selectFilms, selectFetchFilmsStatus } from '../../features/films/filmsSelectors';
 import { selectSalles, selectSallesFetchStatus } from '../../features/salles/sallesSelectors';
-import type { Seance, CreateSeanceDto } from '../../features/seances/seancesApi';
+import { fetchSalles } from '../../features/salles/sallesSlice';
+import type { CreateSeanceDto, Seance } from '../../features/seances/seancesApi';
+import {
+    selectCreateSeanceError,
+    selectCreateSeanceStatus,
+    selectDeleteSeanceError,
+    selectDeleteSeanceStatus,
+    selectFetchSeancesError,
+    selectFetchSeancesStatus,
+    selectSeances,
+    selectUpdateSeanceError,
+    selectUpdateSeanceStatus,
+} from '../../features/seances/seancesSelectors';
+import { seancesActions } from '../../features/seances/seancesSlice';
 
 interface SeanceForm {
   filmId: number;
@@ -65,14 +65,12 @@ const fmtHeure = (iso: string) =>
 
 const STATUT_STYLE: Record<Seance['statut'], string> = {
   PROGRAMMEE: 'bg-blue-500/15 text-blue-400',
-  EN_COURS: 'bg-emerald-500/15 text-emerald-400',
   TERMINEE: 'bg-zinc-700/50 text-zinc-400',
   ANNULEE: 'bg-red-500/15 text-red-400',
 };
 
 const STATUT_LABEL: Record<Seance['statut'], string> = {
   PROGRAMMEE: 'Programmée',
-  EN_COURS: 'En cours',
   TERMINEE: 'Terminée',
   ANNULEE: 'Annulée',
 };
@@ -200,7 +198,6 @@ function SeanceModal({
                 className="w-full rounded-2xl border border-white/10 bg-zinc-800/70 px-4 py-3 text-white outline-none ring-red-500/60 transition focus:ring-2"
               >
                 <option value="PROGRAMMEE">Programmée</option>
-                <option value="EN_COURS">En cours</option>
                 <option value="TERMINEE">Terminée</option>
                 <option value="ANNULEE">Annulée</option>
               </select>
@@ -332,7 +329,7 @@ export default function AdminSeancesPage() {
         {[
           { label: 'Total séances', value: seances.length, color: 'text-white' },
           { label: 'Programmées', value: seances.filter((s) => s.statut === 'PROGRAMMEE').length, color: 'text-blue-400' },
-          { label: 'En cours', value: seances.filter((s) => s.statut === 'EN_COURS').length, color: 'text-emerald-400' },
+          { label: 'Terminées', value: seances.filter((s) => s.statut === 'TERMINEE').length, color: 'text-zinc-400' },
           { label: 'Annulées', value: seances.filter((s) => s.statut === 'ANNULEE').length, color: 'text-red-400' },
         ].map((s) => (
           <article key={s.label} className="rounded-2xl border border-white/10 bg-zinc-950/40 p-5 shadow-2xl">
@@ -366,7 +363,6 @@ export default function AdminSeancesPage() {
         >
           <option value="">Tous statuts</option>
           <option value="PROGRAMMEE">Programmée</option>
-          <option value="EN_COURS">En cours</option>
           <option value="TERMINEE">Terminée</option>
           <option value="ANNULEE">Annulée</option>
         </select>

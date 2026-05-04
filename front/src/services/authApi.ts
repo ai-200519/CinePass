@@ -41,10 +41,19 @@ export type ResendOtpDto = {
   purpose: 'register' | 'reset_password';
 };
 
+export type AuthUser = {
+  id: number;
+  nom: string;
+  prenom: string;
+  email: string;
+  role: 'CLIENT' | 'STAFF' | 'ADMIN';
+  id_cinema: number | null;
+};
+
 // Adjust if your backend returns a different token key.
 export type LoginResponse = {
   access_token: string;
-  user?: unknown;
+  user?: AuthUser;
 };
 
 export const authApi = {
