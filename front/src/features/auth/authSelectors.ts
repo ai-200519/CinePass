@@ -13,6 +13,10 @@ export const selectRegisterRequiresOtp = (state: RootState) => state.auth.regist
 export const selectRegisterOtpStatus = (state: RootState) => state.auth.registerOtp.status;
 export const selectRegisterOtpError = (state: RootState) => state.auth.registerOtp.error;
 
+export const selectResendOtpStatus = (state: RootState) => state.auth.resendOtp.status;
+export const selectResendOtpError = (state: RootState) => state.auth.resendOtp.error;
+export const selectResendOtpMessage = (state: RootState) => state.auth.resendOtpMessage;
+
 export const selectForgotPasswordStatus = (state: RootState) => state.auth.forgotPassword.status;
 export const selectForgotPasswordError = (state: RootState) => state.auth.forgotPassword.error;
 

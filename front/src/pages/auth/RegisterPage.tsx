@@ -7,6 +7,9 @@ import {
     selectRegisterOtpStatus,
     selectRegisterRequiresOtp,
     selectRegisterStatus,
+    selectResendOtpError,
+    selectResendOtpMessage,
+    selectResendOtpStatus,
 } from '../../features/auth/authSelectors';
 import { authActions } from '../../features/auth/authSlice';
 
@@ -19,6 +22,9 @@ export default function RegisterPage() {
   const registerRequiresOtp = useAppSelector(selectRegisterRequiresOtp);
   const registerOtpStatus = useAppSelector(selectRegisterOtpStatus);
   const registerOtpError = useAppSelector(selectRegisterOtpError);
+  const resendOtpStatus = useAppSelector(selectResendOtpStatus);
+  const resendOtpError = useAppSelector(selectResendOtpError);
+  const resendOtpMessage = useAppSelector(selectResendOtpMessage);
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -36,6 +42,7 @@ export default function RegisterPage() {
   useEffect(() => {
     dispatch(authActions.clearRegisterState());
     dispatch(authActions.clearRegisterOtpState());
+    dispatch(authActions.clearResendOtpState());
   }, [dispatch]);
 
   useEffect(() => {
@@ -137,6 +144,24 @@ export default function RegisterPage() {
                     onChange={(e) => setOtp(e.target.value)}
                     className="w-full rounded-2xl border border-white/10 bg-zinc-800/70 px-4 py-3 text-white placeholder:text-zinc-500 outline-none ring-red-500/60 transition focus:ring-2"
                   />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <button
+                    type="button"
+                    disabled={resendOtpStatus === 'loading' || !email.trim()}
+                    onClick={() =>
+                      dispatch(
+                        authActions.resendOtpRequested({
+                          email: email.trim(),
+                          purpose: 'register',
+                        }),
+                      )
+                    }
+                    className="text-sm font-semibold text-zinc-300 transition hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {resendOtpStatus === 'loading' ? 'Renvoi en cours...' : 'Renvoyer le code'}
+                  </button>
                 </div>
               </>
             ) : (
@@ -336,6 +361,14 @@ export default function RegisterPage() {
             {registerError ? <p className="text-sm font-medium text-red-300">{registerError}</p> : null}
             {registerOtpError ? (
               <p className="text-sm font-medium text-red-300">{registerOtpError}</p>
+            ) : null}
+
+            {step === 'otp' && resendOtpMessage ? (
+              <p className="text-sm font-medium text-zinc-200">{resendOtpMessage}</p>
+            ) : null}
+
+            {step === 'otp' && resendOtpError ? (
+              <p className="text-sm font-medium text-red-300">{resendOtpError}</p>
             ) : null}
           </form>
 
