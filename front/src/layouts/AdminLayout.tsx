@@ -33,6 +33,7 @@ const navItems: AdminNavItem[] = [
   { to: '/admin/cinemas', label: 'Cinémas', icon: Building2 },
   { to: '/admin/seances', label: 'Séances', icon: CalendarDays },
   { to: '/admin/salles', label: 'Salles', icon: DoorOpen },
+  { to: '/admin/tarifs', label: 'Tarifs', icon: Ticket },
   { to: '/admin/reservations', label: 'Réservations', icon: Ticket },
   { to: '/admin/utilisateurs', label: 'Utilisateurs', icon: Users }, // ← ajouté
   { to: '/admin/rapports', label: 'Rapports', icon: BarChart3 },

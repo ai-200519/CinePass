@@ -1,4 +1,19 @@
-import { Ticket, Users, Film as FilmIcon, RefreshCw, Star, Clock, Monitor } from 'lucide-react';
+
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Label,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
+import { adminStatsApi } from '../../services/adminStatsApi';
+import { Ticket, Users, Film as FilmIcon,ArrowUpRight, RefreshCw, Star, Clock, Monitor } from 'lucide-react';
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import { filmsApi, type Film as FilmType } from '../../features/films/filmsApi';
 import { seancesApi, type Seance } from '../../features/seances/seancesApi';
@@ -32,6 +47,42 @@ function formatCurrency(n: number) {
 }
 const today = new Date().toISOString().split('T')[0];
 
+function toYmd(d: Date) {
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+function startOfWeekMonday(d: Date) {
+  const date = new Date(d);
+  const day = date.getDay();
+  const diff = (day + 6) % 7;
+  date.setDate(date.getDate() - diff);
+  date.setHours(0, 0, 0, 0);
+  return date;
+}
+
+function endOfWeekSunday(d: Date) {
+  const start = startOfWeekMonday(d);
+  const end = new Date(start);
+  end.setDate(end.getDate() + 6);
+  end.setHours(23, 59, 59, 999);
+  return end;
+}
+
+function parsePercent(percent: string | null | undefined) {
+  const raw = String(percent ?? '').replace('%', '').trim();
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : 0;
+}
+
+type KpiCardProps = {
+  title: string;
+  value: string;
+  icon: React.ReactNode;
+  trend?: { label: string };
+  rightVisual?: React.ReactNode;
 const STATUT_COLOR: Record<string, string> = {
   PROGRAMMEE: '#60a5fa', EN_COURS: '#34d399', TERMINEE: '#71717a', ANNULEE: '#E50914',
 };
@@ -108,6 +159,82 @@ function FilmCard({ film, ticketCount, seanceCount }: {
   );
 }
 
+type ChartPoint = { name: string; value: number };
+
+function occupancyColor(value: number) {
+  if (value > 80) return '#E50914';
+  if (value >= 60) return '#fb7185';
+  if (value >= 40) return '#f59e0b';
+  return '#facc15';
+}
+
+export default function AdminDashboardPage() {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const [reservationsToday, setReservationsToday] = useState(0);
+  const [revenusToday, setRevenusToday] = useState(0);
+  const [avgOccupancy, setAvgOccupancy] = useState(0);
+  const [ventesData, setVentesData] = useState<ChartPoint[]>([]);
+  const [occupancyData, setOccupancyData] = useState<ChartPoint[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const now = new Date();
+    const today = toYmd(now);
+    const weekStart = toYmd(startOfWeekMonday(now));
+    const weekEnd = toYmd(endOfWeekSunday(now));
+
+    setLoading(true);
+    setError(null);
+
+    Promise.all([
+      adminStatsApi.global({ dateDebut: today, dateFin: today }),
+      adminStatsApi.global({ dateDebut: weekStart, dateFin: weekEnd }),
+      adminStatsApi.films({ dateDebut: weekStart, dateFin: weekEnd, limit: 6 }),
+      adminStatsApi.seances({ dateDebut: weekStart, dateFin: weekEnd, limit: 200 }),
+    ])
+      .then(([globalToday, globalWeek, filmsWeek, seancesWeek]) => {
+        if (cancelled) return;
+
+        setReservationsToday(globalToday.kpis.totalReservations ?? 0);
+        setRevenusToday(globalToday.kpis.chiffreAffaires ?? 0);
+        setAvgOccupancy(parsePercent(globalWeek.kpis.tauxRemplissageMoyen));
+
+        setVentesData(
+          (filmsWeek.films ?? []).map((f) => ({
+            name: f.title,
+            value: f.nbReservations,
+          })),
+        );
+
+        const agg = new Map<string, { sum: number; count: number }>();
+        for (const s of seancesWeek.seances ?? []) {
+          const salle = s.salle ?? '—';
+          const p = parsePercent(s.tauxRemplissage);
+          const prev = agg.get(salle) ?? { sum: 0, count: 0 };
+          agg.set(salle, { sum: prev.sum + p, count: prev.count + 1 });
+        }
+        const occ = Array.from(agg.entries())
+          .map(([name, v]) => ({ name, value: v.count > 0 ? Math.round(v.sum / v.count) : 0 }))
+          .sort((a, b) => b.value - a.value)
+          .slice(0, 6);
+        setOccupancyData(occ);
+      })
+      .catch((e) => {
+        if (cancelled) return;
+        setError(e?.message ? String(e.message) : 'Erreur lors du chargement des statistiques');
+      })
+      .finally(() => {
+        if (cancelled) return;
+        setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 // ─── Salle Card ───────────────────────────────────────────────────────────────
 function SalleCard({ salle, seanceCount, occupancy }: {
   salle: Salle; seanceCount: number; occupancy: number;
@@ -199,6 +326,9 @@ export default function AdminDashboardPage() {
   const [lastRefresh, setLastRefresh] = useState(new Date());
   const [activeTab, setActiveTab] = useState<'films' | 'salles'>('films');
 
+  const ventesSorted = useMemo(() => {
+    return ventesData.slice().sort((a, b) => b.value - a.value);
+  }, [ventesData]);
   const load = useCallback(async () => {
     setLoading(true);
     try {
@@ -239,6 +369,12 @@ export default function AdminDashboardPage() {
     return map;
   }, [reservations]);
 
+  const avgOcc = useMemo(() => {
+    const avg = occupancyData.length
+      ? occupancyData.reduce((sum, d) => sum + d.value, 0) / occupancyData.length
+      : 0;
+    return Math.round(avg);
+  }, [occupancyData]);
   const seancesParFilm = useMemo(() => {
     const map = new Map<number, number>();
     seances.forEach(s => {
@@ -304,6 +440,52 @@ export default function AdminDashboardPage() {
         </button>
       </header>
 
+      {error ? (
+        <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm font-semibold text-zinc-200">
+          {error}
+        </div>
+      ) : null}
+
+      {/* KPI */}
+      <section className="grid gap-6 lg:grid-cols-3">
+        <KpiCard
+          title="Réservations aujourd'hui"
+          value={formatInt(reservationsAnimated)}
+          icon={<Ticket className="h-6 w-6" aria-hidden="true" />}
+          trend={{ label: '+12%' }}
+        />
+
+        <KpiCard
+          title="Revenus du jour"
+          value={formatCurrencyDh(revenusAnimated)}
+          icon={<span className="text-base font-black" aria-hidden="true">DH</span>}
+          trend={{ label: '+8%' }}
+        />
+
+        <KpiCard
+          title="Taux de remplissage moyen"
+          value={`${formatInt(occupancyAnimated)}%`}
+          icon={<Users className="h-6 w-6" aria-hidden="true" />}
+          trend={{ label: '+3%' }}
+        />
+      </section>
+
+      {/* Charts */}
+      <section className="grid gap-6 lg:grid-cols-[3fr_2fr]">
+        <article className="rounded-2xl bg-[#1F1F1F] p-6 shadow-[0_0_0_1px_rgba(255,255,255,0.08)]">
+          <h2 className="text-2xl font-black">Ventes par film cette semaine</h2>
+          <div className="mt-6 h-[320px]">
+            {loading ? (
+              <div className="h-full rounded-xl bg-white/5" />
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={ventesData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
+                <XAxis
+                  dataKey="name"
+                  tick={{ fill: 'rgba(255,255,255,0.65)', fontSize: 12 }}
+                  axisLine={{ stroke: 'rgba(255,255,255,0.12)' }}
+                  tickLine={{ stroke: 'rgba(255,255,255,0.12)' }}
       {/* KPIs */}
       <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <KpiCard label="Réservations aujourd'hui" value={formatInt(animRes)} sub={`${statsRes.total} au total`} />
@@ -382,6 +564,53 @@ export default function AdminDashboardPage() {
                   ticketCount={ticketsParFilm.get(film.id) ?? 0}
                   seanceCount={seancesParFilm.get(film.id) ?? 0}
                 />
+                <Bar dataKey="value" radius={[6, 6, 0, 0]}>
+                  {ventesData.map((entry) => (
+                    <Cell key={entry.name} fill={barColorsByName.get(entry.name) ?? '#8f060d'} />
+                  ))}
+                </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+        </article>
+
+        <article className="rounded-2xl bg-[#1F1F1F] p-6 shadow-[0_0_0_1px_rgba(255,255,255,0.08)]">
+          <h2 className="text-2xl font-black">Remplissage par salle (%)</h2>
+          <div className="mt-6 h-[320px]">
+            {loading ? (
+              <div className="h-full rounded-xl bg-white/5" />
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart margin={{ top: 10, right: 56, bottom: 10, left: 56 }}>
+                <Tooltip
+                  contentStyle={{
+                    background: '#141414',
+                    border: '1px solid rgba(255,255,255,0.12)',
+                    borderRadius: 12,
+                    color: 'white',
+                  }}
+                  formatter={(value) => [`${value}%`, 'Occupation']}
+                />
+                <Pie
+                  data={occupancyData}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={80}
+                  outerRadius={110}
+                  paddingAngle={2}
+                  labelLine
+                  label={({ name, value }) => `${name}: ${value}%`}
+                >
+                  <Label value={`${avgOcc}%`} position="center" fill="white" style={{ fontWeight: 900, fontSize: 22 }} />
+                  {occupancyData.map((entry) => (
+                    <Cell key={entry.name} fill={occupancyColor(entry.value)} />
+                  ))}
+                </Pie>
+                </PieChart>
+              </ResponsiveContainer>
               ))
             )}
           </div>
