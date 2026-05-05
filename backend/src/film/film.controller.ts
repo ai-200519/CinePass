@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, BadRequestException, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody } from '@nestjs/swagger';
 import { FilmService } from './film.service';
 import { CreateFilmDto } from './dto/create-film.dto';
 import { UpdateFilmDto } from './dto/update-film.dto';
+import { PaginationDto } from './dto/pagination.dto';
 
 
 
@@ -31,8 +32,8 @@ export class FilmController {
   @Get('all')
   @ApiOperation({ summary: 'Get all films' })
   @ApiResponse({ status: 200, description: 'Returns all films' })
-  findAll() {
-    return this.filmService.findAll();
+  findAll(@Query() paginationDto: PaginationDto) {
+    return this.filmService.findAll(paginationDto);
   }
 
   @Get(':id')
