@@ -1,5 +1,5 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, BadRequestException } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Patch, Param, Delete, BadRequestException, Query } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody, ApiQuery } from '@nestjs/swagger';
 import { FilmService } from './film.service';
 import { CreateFilmDto } from './dto/create-film.dto';
 import { UpdateFilmDto } from './dto/update-film.dto';
@@ -33,6 +33,13 @@ export class FilmController {
   @ApiResponse({ status: 200, description: 'Returns all films' })
   findAll() {
     return this.filmService.findAll();
+  }
+  @Get('search')
+  @ApiOperation({ summary: 'Search films by a query string' })
+  @ApiQuery({ name: 'q', required: false, description: 'Search query' })
+  @ApiResponse({ status: 200, description: 'Returns matching films' })
+  search(@Query('q') q: string) {
+    return this.filmService.search(q);
   }
 
   @Get(':id')
