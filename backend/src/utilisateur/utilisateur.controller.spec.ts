@@ -11,6 +11,7 @@ describe('UtilisateurController', () => {
 		findOne: jest.fn(),
 		update: jest.fn(),
 		updateProfil: jest.fn(),
+		changePassword: jest.fn(),
 		activerCompte: jest.fn(),
 		suspendreCompte: jest.fn(),
 		changerRole: jest.fn(),
@@ -50,6 +51,16 @@ describe('UtilisateurController', () => {
 
 		await expect(controller.updateProfil(user, dto)).resolves.toEqual(result);
 		expect(mockUtilisateurService.updateProfil).toHaveBeenCalledWith(7, dto);
+	});
+
+	it('should change current user password', async () => {
+		const user = { id_utilisateur: 7 } as any;
+		const dto = { motDePasseActuel: 'old', nouveauMotDePasse: 'new' } as any;
+		const result = { message: 'Mot de passe modifie avec succes' };
+		mockUtilisateurService.changePassword.mockResolvedValue(result);
+
+		await expect(controller.changePassword(user, dto)).resolves.toEqual(result);
+		expect(mockUtilisateurService.changePassword).toHaveBeenCalledWith(7, 'old', 'new');
 	});
 
 	it('should return all users with filters', async () => {
