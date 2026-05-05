@@ -1,91 +1,112 @@
 import {
-  Injectable,
-  ConflictException,
-  NotFoundException,
+  Injectable, ConflictException,
+  NotFoundException, ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Utilisateur } from './entities/utilisateur.entity';
-import { Role } from '../common/enums/role.enum';
-import { StatutUtilisateur } from '../common/enums/statut-utilisateur.enum';
-import { RegisterDto } from '../auth/dto/register.dto';
+import { Repository, ILike, FindManyOptions } from 'typeorm';
+import { Utilisateur }         from './entities/utilisateur.entity';
+import { Role }                from '../common/enums/role.enum';
+import { StatutUtilisateur }   from '../common/enums/statut-utilisateur.enum';
+import { RegisterDto }         from '../auth/dto/register.dto';
 import { UpdateUtilisateurDto } from './dto/update-utilisateur.dto';
+import { FilterUtilisateurDto } from './dto/filter-utilisateur.dto';
 import * as bcrypt from 'bcrypt';
+import { UpdateProfilDto } from './dto/update-profile.dto';
 
 @Injectable()
 export class UtilisateurService {
+
   constructor(
     @InjectRepository(Utilisateur)
     private readonly utilisateurRepository: Repository<Utilisateur>,
   ) {}
 
-  // ── Find by email ───────────────────────────────────────────────────────────
+  // ── Find by email ─────────────────────────────────────────────────────────
   async findByEmail(email: string): Promise<Utilisateur | null> {
     return this.utilisateurRepository.findOne({
-      where: { email },
+      where:     { email },
       relations: ['cinema'],
     });
   }
 
-  // ── Find by ID ──────────────────────────────────────────────────────────────
+  // ── Find by ID ────────────────────────────────────────────────────────────
   async findById(id: number): Promise<Utilisateur | null> {
     return this.utilisateurRepository.findOne({
-      where: { id_utilisateur: id },
+      where:     { id_utilisateur: id },
       relations: ['cinema'],
     });
   }
 
-  // ── Find all (admin) ────────────────────────────────────────────────────────
-  async findAll(): Promise<Omit<Utilisateur, 'motDePasse'>[]> {
-    const users = await this.utilisateurRepository.find({
-      relations: ['cinema'],
-      order: { dateInscription: 'DESC' },
-    });
-    // Never expose password hashes
-    return users.map(({ motDePasse, otpCode, otpExpiresAt, ...safe }) => safe as any);
+  // ── Safe user — removes sensitive fields ──────────────────────────────────
+  private toSafe(user: Utilisateur) {
+    const { motDePasse, otpCode, otpExpiresAt, otpUsed, otpPurpose, ...safe } = user;
+    return safe;
   }
 
-  // ── Find one by ID (admin) ──────────────────────────────────────────────────
-  async findOne(id: number): Promise<Omit<Utilisateur, 'motDePasse'>> {
+  // ── Find all — with filters ───────────────────────────────────────────────
+  async findAll(filter?: FilterUtilisateurDto): Promise<any[]> {
+
+    const qb = this.utilisateurRepository
+      .createQueryBuilder('u')
+      .leftJoinAndSelect('u.cinema', 'c')
+      .orderBy('u.dateInscription', 'DESC');
+
+    // Search by nom, prenom or email
+    if (filter?.search) {
+      qb.andWhere(
+        '(u.nom ILIKE :s OR u.prenom ILIKE :s OR u.email ILIKE :s)',
+        { s: `%${filter.search}%` }
+      );
+    }
+
+    if (filter?.role) {
+      qb.andWhere('u.role = :role', { role: filter.role });
+    }
+
+    if (filter?.statut) {
+      qb.andWhere('u.statut = :statut', { statut: filter.statut });
+    }
+
+    const users = await qb.getMany();
+    return users.map(u => this.toSafe(u));
+  }
+
+  // ── Find one by ID ────────────────────────────────────────────────────────
+  async findOne(id: number): Promise<any> {
     const user = await this.utilisateurRepository.findOne({
-      where: { id_utilisateur: id },
+      where:     { id_utilisateur: id },
       relations: ['cinema'],
     });
     if (!user) throw new NotFoundException(`Utilisateur #${id} introuvable`);
-    const { motDePasse, otpCode, otpExpiresAt, ...safe } = user;
-    return safe as any;
+    return this.toSafe(user);
   }
 
-  // ── Create new client (register) ────────────────────────────────────────────
+  // ── Create new client ─────────────────────────────────────────────────────
   async create(registerDto: RegisterDto): Promise<Utilisateur> {
     const existing = await this.findByEmail(registerDto.email);
     if (existing) throw new ConflictException('Cet email est déjà utilisé');
 
     const hashedPassword = await bcrypt.hash(registerDto.motDePasse, 10);
     const utilisateur = this.utilisateurRepository.create({
-      nom: registerDto.nom,
-      prenom: registerDto.prenom,
-      email: registerDto.email,
+      nom:        registerDto.nom,
+      prenom:     registerDto.prenom,
+      email:      registerDto.email,
       motDePasse: hashedPassword,
-      telephone: registerDto.telephone,
-      langue: registerDto.langue || 'FR',
-      role: Role.CLIENT,
+      telephone:  registerDto.telephone,
+      langue:     registerDto.langue || 'FR',
+      role:       Role.CLIENT,
     });
 
     return this.utilisateurRepository.save(utilisateur);
   }
 
-  // ── Update utilisateur (admin) ──────────────────────────────────────────────
-  async update(
-    id: number,
-    dto: UpdateUtilisateurDto,
-  ): Promise<Omit<Utilisateur, 'motDePasse'>> {
+  // ── Update by admin ───────────────────────────────────────────────────────
+  async update(id: number, dto: UpdateUtilisateurDto): Promise<any> {
     const user = await this.utilisateurRepository.findOne({
       where: { id_utilisateur: id },
     });
     if (!user) throw new NotFoundException(`Utilisateur #${id} introuvable`);
 
-    // Check email uniqueness if changed
     if (dto.email && dto.email !== user.email) {
       const emailTaken = await this.findByEmail(dto.email);
       if (emailTaken) throw new ConflictException('Cet email est déjà utilisé');
@@ -96,25 +117,39 @@ export class UtilisateurService {
     return this.findOne(id);
   }
 
-  // ── Activer un compte ───────────────────────────────────────────────────────
-  async activerCompte(id: number): Promise<Omit<Utilisateur, 'motDePasse'>> {
+  // ── Update own profile — CLIENT ───────────────────────────────────────────
+  async updateProfil(id: number, dto: UpdateProfilDto): Promise<any> {
+    const user = await this.utilisateurRepository.findOne({
+      where: { id_utilisateur: id },
+    });
+    if (!user) throw new NotFoundException('Utilisateur introuvable');
+
+    // Only allow safe profile fields
+    if (dto.nom)       user.nom       = dto.nom;
+    if (dto.prenom)    user.prenom    = dto.prenom;
+    if (dto.telephone) user.telephone = dto.telephone;
+    if (dto.langue)    user.langue    = dto.langue;
+
+    await this.utilisateurRepository.save(user);
+    return this.toSafe(user);
+  }
+
+  // ── Activate account — ADMIN ──────────────────────────────────────────────
+  async activerCompte(id: number): Promise<any> {
     return this.update(id, { statut: StatutUtilisateur.ACTIF });
   }
 
-  // ── Suspendre un compte ─────────────────────────────────────────────────────
-  async suspendreCompte(id: number): Promise<Omit<Utilisateur, 'motDePasse'>> {
-    return this.update(id, { statut: StatutUtilisateur.SUSPENDU });
+  // ── Ban account — ADMIN ───────────────────────────────────────────────────
+  async suspendreCompte(id: number): Promise<any> {
+    return this.update(id, { statut: StatutUtilisateur.BANNI });
   }
 
-  // ── Changer le rôle ─────────────────────────────────────────────────────────
-  async changerRole(
-    id: number,
-    role: Role,
-  ): Promise<Omit<Utilisateur, 'motDePasse'>> {
+  // ── Change role — ADMIN ───────────────────────────────────────────────────
+  async changerRole(id: number, role: Role): Promise<any> {
     return this.update(id, { role });
   }
 
-  // ── Supprimer un utilisateur ────────────────────────────────────────────────
+  // ── Delete — ADMIN ────────────────────────────────────────────────────────
   async remove(id: number): Promise<{ message: string }> {
     const user = await this.utilisateurRepository.findOne({
       where: { id_utilisateur: id },
@@ -124,7 +159,7 @@ export class UtilisateurService {
     return { message: `Utilisateur #${id} supprimé avec succès` };
   }
 
-  // ── OTP helpers (auth module) ───────────────────────────────────────────────
+  // ── OTP helpers ───────────────────────────────────────────────────────────
   async saveOtp(
     id: number,
     otp: string,
@@ -141,10 +176,10 @@ export class UtilisateurService {
     await this.utilisateurRepository.update(
       { id_utilisateur: id },
       {
-        statut: StatutUtilisateur.ACTIF,
-        otpCode: null,
+        statut:      StatutUtilisateur.ACTIF,
+        otpCode:     null,
         otpExpiresAt: null,
-        otpUsed: true,
+        otpUsed:     true,
       },
     );
   }
@@ -156,11 +191,19 @@ export class UtilisateurService {
     await this.utilisateurRepository.update(
       { id_utilisateur: id },
       {
-        motDePasse: hashedPassword,
-        otpCode: null,
+        motDePasse:   hashedPassword,
+        otpCode:      null,
         otpExpiresAt: null,
-        otpUsed: true,
+        otpUsed:      true,
       },
+    );
+  }
+
+  // ── Update password — used by auth reset flow ─────────────────────────────
+  async updatePassword(id: number, hashedPassword: string): Promise<void> {
+    await this.utilisateurRepository.update(
+      { id_utilisateur: id },
+      { motDePasse: hashedPassword },
     );
   }
 }
