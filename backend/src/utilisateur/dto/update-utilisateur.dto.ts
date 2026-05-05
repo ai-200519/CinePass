@@ -1,19 +1,23 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEmail, IsEnum, IsOptional, IsString, Length } from 'class-validator';
-import { Role } from '../../common/enums/role.enum';
+import {
+  IsEmail, IsEnum, IsOptional,
+  IsString, MaxLength,
+} from 'class-validator';
+import { Role }              from '../../common/enums/role.enum';
 import { StatutUtilisateur } from '../../common/enums/statut-utilisateur.enum';
 
 export class UpdateUtilisateurDto {
+
   @ApiPropertyOptional({ example: 'Alami' })
   @IsOptional()
   @IsString()
-  @Length(1, 100)
+  @MaxLength(100)
   nom?: string;
 
   @ApiPropertyOptional({ example: 'Youssef' })
   @IsOptional()
   @IsString()
-  @Length(1, 100)
+  @MaxLength(100)
   prenom?: string;
 
   @ApiPropertyOptional({ example: 'youssef@cinepass.ma' })
@@ -21,10 +25,16 @@ export class UpdateUtilisateurDto {
   @IsEmail()
   email?: string;
 
-  @ApiPropertyOptional({ example: '+212612345678' })
+  @ApiPropertyOptional({ example: '+212 6XX-XXXXXX' })
   @IsOptional()
   @IsString()
+  @MaxLength(20)
   telephone?: string;
+
+  @ApiPropertyOptional({ example: 'FR', enum: ['FR', 'AR', 'EN'] })
+  @IsOptional()
+  @IsString()
+  langue?: string;
 
   @ApiPropertyOptional({ enum: Role })
   @IsOptional()
@@ -35,10 +45,4 @@ export class UpdateUtilisateurDto {
   @IsOptional()
   @IsEnum(StatutUtilisateur)
   statut?: StatutUtilisateur;
-
-  @ApiPropertyOptional({ example: 'FR' })
-  @IsOptional()
-  @IsString()
-  @Length(2, 5)
-  langue?: string;
 }

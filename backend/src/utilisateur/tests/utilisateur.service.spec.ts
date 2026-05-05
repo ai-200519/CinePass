@@ -1,7 +1,7 @@
 // src/utilisateur/tests/utilisateur.service.spec.ts
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { ConflictException } from '@nestjs/common';
+import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { UtilisateurService } from '../utilisateur.service';
 import { Utilisateur } from '../entities/utilisateur.entity';
@@ -25,11 +25,24 @@ const mockUtilisateur: Partial<Utilisateur> = {
 };
 
 // ── Mock repository ───────────────────────────────────────────────────────────
+const createQueryBuilderMock = () => {
+  const qb: any = {
+    leftJoinAndSelect: jest.fn().mockReturnThis(),
+    orderBy: jest.fn().mockReturnThis(),
+    andWhere: jest.fn().mockReturnThis(),
+    getMany: jest.fn(),
+  };
+
+  return qb;
+};
+
 const mockRepository = {
   findOne: jest.fn(),
   create:  jest.fn(),
   save:    jest.fn(),
   update:  jest.fn(),
+  delete:  jest.fn(),
+  createQueryBuilder: jest.fn(),
 };
 
 describe('UtilisateurService', () => {
@@ -65,6 +78,7 @@ describe('UtilisateurService', () => {
       expect(result).toEqual(mockUtilisateur);
       expect(mockRepository.findOne).toHaveBeenCalledWith({
         where: { email: 'youssef@cinepass.ma' },
+        relations: ['cinema'],
       });
     });
 
@@ -88,6 +102,7 @@ describe('UtilisateurService', () => {
       expect(result).toEqual(mockUtilisateur);
       expect(mockRepository.findOne).toHaveBeenCalledWith({
         where: { id_utilisateur: 1 },
+        relations: ['cinema'],
       });
     });
 
@@ -179,6 +194,194 @@ describe('UtilisateurService', () => {
           otpExpiresAt: null,
           otpUsed:     true,
         }),
+      );
+    });
+  });
+
+  // ── findAll ───────────────────────────────────────────────────────────────
+  describe('findAll()', () => {
+
+    it('should return safe users list', async () => {
+      const qb = createQueryBuilderMock();
+      const user = { ...mockUtilisateur } as any;
+      qb.getMany.mockResolvedValue([user]);
+      mockRepository.createQueryBuilder.mockReturnValue(qb);
+
+      const result = await service.findAll();
+
+      expect(result).toHaveLength(1);
+      expect(result[0]).not.toHaveProperty('motDePasse');
+      expect(qb.leftJoinAndSelect).toHaveBeenCalledWith('u.cinema', 'c');
+      expect(qb.orderBy).toHaveBeenCalledWith('u.dateInscription', 'DESC');
+    });
+
+    it('should apply filters when provided', async () => {
+      const qb = createQueryBuilderMock();
+      qb.getMany.mockResolvedValue([]);
+      mockRepository.createQueryBuilder.mockReturnValue(qb);
+
+      await service.findAll({ search: 'ali', role: Role.CLIENT, statut: StatutUtilisateur.ACTIF } as any);
+
+      expect(qb.andWhere).toHaveBeenCalledTimes(3);
+    });
+  });
+
+  // ── findOne ───────────────────────────────────────────────────────────────
+  describe('findOne()', () => {
+
+    it('should return a safe user', async () => {
+      mockRepository.findOne.mockResolvedValue(mockUtilisateur);
+
+      const result = await service.findOne(1);
+
+      expect(result).not.toHaveProperty('motDePasse');
+      expect(mockRepository.findOne).toHaveBeenCalledWith({
+        where: { id_utilisateur: 1 },
+        relations: ['cinema'],
+      });
+    });
+
+    it('should throw NotFoundException when user not found', async () => {
+      mockRepository.findOne.mockResolvedValue(null);
+
+      await expect(service.findOne(999)).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  // ── update ───────────────────────────────────────────────────────────────
+  describe('update()', () => {
+
+    it('should update a user and return safe entity', async () => {
+      const user = { ...mockUtilisateur } as any;
+      mockRepository.findOne.mockResolvedValue(user);
+      mockRepository.save.mockResolvedValue(user);
+
+      const result = await service.update(1, { nom: 'Updated' } as any);
+
+      expect(result).not.toHaveProperty('motDePasse');
+      expect(mockRepository.save).toHaveBeenCalledWith(user);
+    });
+
+    it('should throw NotFoundException when user not found', async () => {
+      mockRepository.findOne.mockResolvedValue(null);
+
+      await expect(service.update(999, { nom: 'Updated' } as any))
+        .rejects.toThrow(NotFoundException);
+    });
+
+    it('should throw ConflictException when email already used', async () => {
+      const user = { ...mockUtilisateur } as any;
+      mockRepository.findOne
+        .mockResolvedValueOnce(user)
+        .mockResolvedValueOnce({ ...mockUtilisateur, email: 'taken@test.com' } as any);
+
+      await expect(service.update(1, { email: 'taken@test.com' } as any))
+        .rejects.toThrow(ConflictException);
+    });
+  });
+
+  // ── updateProfil ─────────────────────────────────────────────────────────
+  describe('updateProfil()', () => {
+
+    it('should update safe profile fields', async () => {
+      const user = { ...mockUtilisateur } as any;
+      mockRepository.findOne.mockResolvedValue(user);
+      mockRepository.save.mockResolvedValue(user);
+
+      const result = await service.updateProfil(1, {
+        nom: 'Updated',
+        prenom: 'Test',
+        telephone: '+2126000000',
+        langue: 'EN',
+      } as any);
+
+      expect(result).not.toHaveProperty('motDePasse');
+      expect(mockRepository.save).toHaveBeenCalledWith(user);
+    });
+
+    it('should throw NotFoundException when user not found', async () => {
+      mockRepository.findOne.mockResolvedValue(null);
+
+      await expect(service.updateProfil(999, { nom: 'Updated' } as any))
+        .rejects.toThrow(NotFoundException);
+    });
+  });
+
+  // ── role/status helpers ──────────────────────────────────────────────────
+  describe('role/status helpers', () => {
+
+    it('should call update for activerCompte', async () => {
+      jest.spyOn(service, 'update').mockResolvedValue({ id_utilisateur: 1 } as any);
+
+      await service.activerCompte(1);
+
+      expect(service.update).toHaveBeenCalledWith(1, { statut: StatutUtilisateur.ACTIF });
+    });
+
+    it('should call update for suspendreCompte', async () => {
+      jest.spyOn(service, 'update').mockResolvedValue({ id_utilisateur: 1 } as any);
+
+      await service.suspendreCompte(1);
+
+      expect(service.update).toHaveBeenCalledWith(1, { statut: StatutUtilisateur.BANNI });
+    });
+
+    it('should call update for changerRole', async () => {
+      jest.spyOn(service, 'update').mockResolvedValue({ id_utilisateur: 1 } as any);
+
+      await service.changerRole(1, Role.ADMIN);
+
+      expect(service.update).toHaveBeenCalledWith(1, { role: Role.ADMIN });
+    });
+  });
+
+  // ── remove ───────────────────────────────────────────────────────────────
+  describe('remove()', () => {
+
+    it('should delete a user', async () => {
+      mockRepository.findOne.mockResolvedValue(mockUtilisateur);
+      mockRepository.delete.mockResolvedValue({ affected: 1 });
+
+      await expect(service.remove(1)).resolves.toEqual({
+        message: 'Utilisateur #1 supprimé avec succès',
+      });
+      expect(mockRepository.delete).toHaveBeenCalledWith(1);
+    });
+
+    it('should throw NotFoundException when user not found', async () => {
+      mockRepository.findOne.mockResolvedValue(null);
+
+      await expect(service.remove(999)).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  // ── password helpers ─────────────────────────────────────────────────────
+  describe('password helpers', () => {
+
+    it('should reset password and clear OTP', async () => {
+      mockRepository.update.mockResolvedValue({ affected: 1 });
+
+      await service.resetPasswordAndClearOtp(1, 'hashed');
+
+      expect(mockRepository.update).toHaveBeenCalledWith(
+        { id_utilisateur: 1 },
+        {
+          motDePasse: 'hashed',
+          otpCode: null,
+          otpExpiresAt: null,
+          otpUsed: true,
+        },
+      );
+    });
+
+    it('should update password', async () => {
+      mockRepository.update.mockResolvedValue({ affected: 1 });
+
+      await service.updatePassword(1, 'hashed');
+
+      expect(mockRepository.update).toHaveBeenCalledWith(
+        { id_utilisateur: 1 },
+        { motDePasse: 'hashed' },
       );
     });
   });

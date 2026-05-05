@@ -1,60 +1,113 @@
 import {
-  Controller,
-  Get,
-  Patch,
-  Delete,
-  Param,
-  Body,
-  UseGuards,
-  ParseIntPipe,
-  HttpCode,
-  HttpStatus,
+  Controller, Get, Patch, Delete,
+  Param, Body, Query, UseGuards,
+  ParseIntPipe, HttpCode, HttpStatus,
 } from '@nestjs/common';
 import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiParam,
-  ApiBearerAuth,
+  ApiTags, ApiOperation, ApiResponse,
+  ApiParam, ApiBearerAuth, ApiQuery,
 } from '@nestjs/swagger';
-import { UtilisateurService } from './utilisateur.service';
+import { UtilisateurService }   from './utilisateur.service';
 import { UpdateUtilisateurDto } from './dto/update-utilisateur.dto';
-import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
-import { RolesGuard } from '../common/guards/roles.guard';
-import { Roles } from '../common/decorators/roles.decorator';
-import { Role } from '../common/enums/role.enum';
+import { FilterUtilisateurDto } from './dto/filter-utilisateur.dto';
+import { JwtAuthGuard }         from '../common/guards/jwt-auth.guard';
+import { RolesGuard }           from '../common/guards/roles.guard';
+import { Roles }                from '../common/decorators/roles.decorator';
+import { Role }                 from '../common/enums/role.enum';
+import { CurrentUser }          from '../common/decorators/current-user.decorator';
+import { UpdateProfilDto } from './dto/update-profile.dto';
 
 @ApiTags('Utilisateur')
 @ApiBearerAuth('JWT-auth')
-@UseGuards(JwtAuthGuard, RolesGuard)
-@Roles(Role.ADMIN)
+@UseGuards(JwtAuthGuard)
 @Controller('utilisateur')
 export class UtilisateurController {
+
   constructor(private readonly utilisateurService: UtilisateurService) {}
 
-  // ── GET /utilisateur ────────────────────────────────────────────────────────
-  @ApiOperation({ summary: 'Lister tous les utilisateurs (admin)' })
-  @ApiResponse({ status: 200, description: 'Liste des utilisateurs' })
-  @Get()
-  findAll() {
-    return this.utilisateurService.findAll();
+  // ══════════════════════════════════════════════════════════════════════════
+  // CLIENT routes — own profile only
+  // ══════════════════════════════════════════════════════════════════════════
+
+  // ── GET /utilisateur/profil — CLIENT ──────────────────────────────────────
+  @Get('profil')
+  @ApiOperation({
+    summary:     '🔒 CLIENT — Consulter mon profil',
+    description: 'Retourne les informations du client connecté.',
+  })
+  @ApiResponse({
+    status: 200,
+    schema: {
+      example: {
+        id_utilisateur: 1,
+        nom:            'Alami',
+        prenom:         'Youssef',
+        email:          'youssef@cinepass.ma',
+        telephone:      '+212 6XX-XXXXXX',
+        langue:         'FR',
+        role:           'CLIENT',
+        statut:         'ACTIF',
+        dateInscription: '2026-05-01T20:00:00.000Z',
+      },
+    },
+  })
+  getProfil(@CurrentUser() user: any) {
+    return this.utilisateurService.findOne(user.id_utilisateur);
   }
 
-  // ── GET /utilisateur/:id ────────────────────────────────────────────────────
-  @ApiOperation({ summary: 'Obtenir un utilisateur par ID' })
+  // ── PATCH /utilisateur/profil — CLIENT ────────────────────────────────────
+  @Patch('profil')
+  @ApiOperation({
+    summary:     '🔒 CLIENT — Modifier mon profil',
+    description: 'Permet au client de modifier son nom, prénom, téléphone et langue.',
+  })
+  @ApiResponse({ status: 200, description: 'Profil mis à jour' })
+  updateProfil(
+    @CurrentUser() user: any,
+    @Body() dto: UpdateProfilDto,
+  ) {
+    return this.utilisateurService.updateProfil(user.id_utilisateur, dto);
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // ADMIN routes — manage all users
+  // ══════════════════════════════════════════════════════════════════════════
+
+  // ── GET /utilisateur — ADMIN ──────────────────────────────────────────────
+  @Get()
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiOperation({
+    summary:     '🔒 ADMIN — Lister tous les utilisateurs',
+    description: 'Retourne la liste des utilisateurs avec filtres optionnels.',
+  })
+  @ApiQuery({ name: 'search', required: false, description: 'Search by nom, prenom or email' })
+  @ApiQuery({ name: 'role',   required: false, enum: Role })
+  @ApiQuery({ name: 'statut', required: false })
+  @ApiResponse({ status: 200, description: 'Liste des utilisateurs' })
+  findAll(@Query() filter: FilterUtilisateurDto) {
+    return this.utilisateurService.findAll(filter);
+  }
+
+  // ── GET /utilisateur/:id — ADMIN ──────────────────────────────────────────
+  @Get(':id')
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiOperation({ summary: '🔒 ADMIN — Obtenir un utilisateur par ID' })
   @ApiParam({ name: 'id', type: Number })
   @ApiResponse({ status: 200, description: 'Utilisateur trouvé' })
   @ApiResponse({ status: 404, description: 'Introuvable' })
-  @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.utilisateurService.findOne(id);
   }
 
-  // ── PATCH /utilisateur/:id ──────────────────────────────────────────────────
-  @ApiOperation({ summary: 'Modifier un utilisateur (role, statut, infos)' })
+  // ── PATCH /utilisateur/:id — ADMIN ───────────────────────────────────────
+  @Patch(':id')
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiOperation({ summary: '🔒 ADMIN — Modifier un utilisateur' })
   @ApiParam({ name: 'id', type: Number })
   @ApiResponse({ status: 200, description: 'Utilisateur mis à jour' })
-  @Patch(':id')
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateUtilisateurDto,
@@ -62,29 +115,35 @@ export class UtilisateurController {
     return this.utilisateurService.update(id, dto);
   }
 
-  // ── PATCH /utilisateur/:id/activer ──────────────────────────────────────────
-  @ApiOperation({ summary: 'Activer le compte d\'un utilisateur' })
+  // ── PATCH /utilisateur/:id/activer — ADMIN ───────────────────────────────
+  @Patch(':id/activer')
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiOperation({ summary: '🔒 ADMIN — Activer le compte d\'un utilisateur' })
   @ApiParam({ name: 'id', type: Number })
   @ApiResponse({ status: 200, description: 'Compte activé' })
-  @Patch(':id/activer')
   activer(@Param('id', ParseIntPipe) id: number) {
     return this.utilisateurService.activerCompte(id);
   }
 
-  // ── PATCH /utilisateur/:id/suspendre ────────────────────────────────────────
-  @ApiOperation({ summary: 'Suspendre le compte d\'un utilisateur' })
+  // ── PATCH /utilisateur/:id/suspendre — ADMIN ─────────────────────────────
+  @Patch(':id/suspendre')
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiOperation({ summary: '🔒 ADMIN — Suspendre le compte d\'un utilisateur' })
   @ApiParam({ name: 'id', type: Number })
   @ApiResponse({ status: 200, description: 'Compte suspendu' })
-  @Patch(':id/suspendre')
   suspendre(@Param('id', ParseIntPipe) id: number) {
     return this.utilisateurService.suspendreCompte(id);
   }
 
-  // ── PATCH /utilisateur/:id/role ─────────────────────────────────────────────
-  @ApiOperation({ summary: 'Changer le rôle d\'un utilisateur' })
+  // ── PATCH /utilisateur/:id/role — ADMIN ──────────────────────────────────
+  @Patch(':id/role')
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiOperation({ summary: '🔒 ADMIN — Changer le rôle d\'un utilisateur' })
   @ApiParam({ name: 'id', type: Number })
   @ApiResponse({ status: 200, description: 'Rôle mis à jour' })
-  @Patch(':id/role')
   changerRole(
     @Param('id', ParseIntPipe) id: number,
     @Body('role') role: Role,
@@ -92,13 +151,15 @@ export class UtilisateurController {
     return this.utilisateurService.changerRole(id, role);
   }
 
-  // ── DELETE /utilisateur/:id ─────────────────────────────────────────────────
-  @ApiOperation({ summary: 'Supprimer un utilisateur' })
+  // ── DELETE /utilisateur/:id — ADMIN ──────────────────────────────────────
+  @Delete(':id')
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: '🔒 ADMIN — Supprimer un utilisateur' })
   @ApiParam({ name: 'id', type: Number })
   @ApiResponse({ status: 200, description: 'Utilisateur supprimé' })
   @ApiResponse({ status: 404, description: 'Introuvable' })
-  @HttpCode(HttpStatus.OK)
-  @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.utilisateurService.remove(id);
   }
