@@ -1,37 +1,46 @@
 import {
-  Calendar,
-  ChevronDown,
-  ChevronLeft,
-  ChevronRight,
-  ChevronUp,
-  Download,
+    Calendar,
+    ChevronDown,
+    ChevronLeft,
+    ChevronRight,
+    ChevronUp,
+    Download,
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import {
-  Area,
-  AreaChart,
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Cell,
-  Pie,
-  PieChart,
-  PolarAngleAxis,
-  PolarGrid,
-  PolarRadiusAxis,
-  Radar,
-  RadarChart,
-  ReferenceLine,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
+    Area,
+    AreaChart,
+    Bar,
+    BarChart,
+    CartesianGrid,
+    Cell,
+    Pie,
+    PieChart,
+    PolarAngleAxis,
+    PolarGrid,
+    PolarRadiusAxis,
+    Radar,
+    RadarChart,
+    ReferenceLine,
+    ResponsiveContainer,
+    Tooltip,
+    XAxis,
+    YAxis,
 } from 'recharts';
+import { adminStatsApi } from '../../services/adminStatsApi';
+import { http } from '../../services/http';
 
 type DatePreset = 'week' | 'month' | 'year' | 'custom';
 type RevenueGranularity = 'week' | 'month' | 'year';
 
-type ActivityStatus = 'CONFIRME' | 'EN_ATTENTE' | 'ANNULE';
+type ActivityStatus =
+  | 'PAYEE'
+  | 'VALIDEE'
+  | 'UTILISEE'
+  | 'ANNULEE'
+  | 'EXPIREE'
+  | 'EN_COURS'
+  | string;
 
 type ActivityRow = {
   id: number;
@@ -48,6 +57,79 @@ const CARD_CLASS =
 
 function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(max, n));
+}
+
+function toYmd(d: Date) {
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+function startOfWeekMonday(d: Date) {
+  const date = new Date(d);
+  const day = date.getDay();
+  const diff = (day + 6) % 7;
+  date.setDate(date.getDate() - diff);
+  date.setHours(0, 0, 0, 0);
+  return date;
+}
+
+function endOfWeekSunday(d: Date) {
+  const start = startOfWeekMonday(d);
+  const end = new Date(start);
+  end.setDate(end.getDate() + 6);
+  end.setHours(23, 59, 59, 999);
+  return end;
+}
+
+function startOfMonth(d: Date) {
+  const date = new Date(d.getFullYear(), d.getMonth(), 1);
+  date.setHours(0, 0, 0, 0);
+  return date;
+}
+
+function endOfMonth(d: Date) {
+  const date = new Date(d.getFullYear(), d.getMonth() + 1, 0);
+  date.setHours(23, 59, 59, 999);
+  return date;
+}
+
+function startOfYear(d: Date) {
+  const date = new Date(d.getFullYear(), 0, 1);
+  date.setHours(0, 0, 0, 0);
+  return date;
+}
+
+function endOfYear(d: Date) {
+  const date = new Date(d.getFullYear(), 11, 31);
+  date.setHours(23, 59, 59, 999);
+  return date;
+}
+
+function parsePercent(percent: string | null | undefined) {
+  const raw = String(percent ?? '').replace('%', '').trim();
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : 0;
+}
+
+function statusLabel(status: ActivityStatus) {
+  switch (status) {
+    case 'PAYEE':
+      return 'Payée';
+    case 'VALIDEE':
+      return 'Validée';
+    case 'UTILISEE':
+      return 'Utilisée';
+    case 'ANNULEE':
+      return 'Annulée';
+    case 'EXPIREE':
+      return 'Expirée';
+    case 'EN_COURS':
+      return 'En cours';
+    default:
+      return status;
+  }
 }
 
 function formatMoneyDh(n: number) {
@@ -139,8 +221,10 @@ function useStaggeredShow(count: number, stepMs = 100) {
 }
 
 function statusBadge(status: ActivityStatus) {
-  if (status === 'CONFIRME') return 'bg-emerald-500/15 text-emerald-300';
-  if (status === 'EN_ATTENTE') return 'bg-amber-500/15 text-amber-300';
+  if (status === 'PAYEE' || status === 'VALIDEE' || status === 'UTILISEE') {
+    return 'bg-emerald-500/15 text-emerald-300';
+  }
+  if (status === 'EN_COURS') return 'bg-amber-500/15 text-amber-300';
   return 'bg-[#E50914]/15 text-[#E50914]';
 }
 
@@ -153,85 +237,25 @@ function occupancyBarColor(p: number) {
 const fallbackPoster =
   'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=400&q=85';
 
-const TOP_FILMS = [
-  { title: 'The Shawshank Redemption', genre: 'Drame', tickets: 1240, poster: fallbackPoster },
-  { title: 'Dune: Part Two', genre: 'Sci-Fi', tickets: 980, poster: fallbackPoster },
-  { title: 'Inside Out 2', genre: 'Animation', tickets: 860, poster: fallbackPoster },
-  { title: 'Oppenheimer', genre: 'Drame', tickets: 740, poster: fallbackPoster },
-  { title: 'Apocalypse', genre: 'Action', tickets: 680, poster: fallbackPoster },
-];
+type RevenuePoint = { label: string; revenue: number; paiements: number };
+type OccupancyPoint = { name: string; value: number };
+type DonutPoint = { name: string; value: number; color: string };
+type RadarPoint = { genre: string; value: number };
 
-const OCCUPANCY_BY_SALLE = [
-  { name: 'Salle 1', value: 85 },
-  { name: 'Salle 2', value: 72 },
-  { name: 'Salle 3', value: 61 },
-  { name: 'Salle 4', value: 49 },
-  { name: 'Salle 5', value: 38 },
-];
-
-const RESERVATIONS_BY_TYPE = [
-  { name: 'Standard', value: 840, color: '#E50914' },
-  { name: 'VIP', value: 210, color: '#f5c542' },
-  { name: 'Couple', value: 130, color: '#fb7185' },
-  { name: 'Étudiant', value: 95, color: '#f59e0b' },
-];
-
-const REVENUE_BY_GENRE = [
-  { genre: 'Action', value: 82 },
-  { genre: 'Drame', value: 76 },
-  { genre: 'Comédie', value: 55 },
-  { genre: 'Sci-Fi', value: 88 },
-  { genre: 'Horreur', value: 41 },
-  { genre: 'Animation', value: 67 },
-];
-
-const REVENUE_YEAR = [
-  { label: 'Jan', revenue: 18200, tickets: 1100 },
-  { label: 'Fév', revenue: 16500, tickets: 980 },
-  { label: 'Mar', revenue: 20100, tickets: 1210 },
-  { label: 'Avr', revenue: 22400, tickets: 1330 },
-  { label: 'Mai', revenue: 19600, tickets: 1180 },
-  { label: 'Juin', revenue: 23800, tickets: 1410 },
-  { label: 'Juil', revenue: 25200, tickets: 1505 },
-  { label: 'Aoû', revenue: 24600, tickets: 1460 },
-  { label: 'Sep', revenue: 21900, tickets: 1310 },
-  { label: 'Oct', revenue: 23100, tickets: 1360 },
-  { label: 'Nov', revenue: 21200, tickets: 1260 },
-  { label: 'Déc', revenue: 26400, tickets: 1580 },
-];
-
-const REVENUE_MONTH = [
-  { label: 'S1', revenue: 5200, tickets: 320 },
-  { label: 'S2', revenue: 6100, tickets: 370 },
-  { label: 'S3', revenue: 5800, tickets: 350 },
-  { label: 'S4', revenue: 6900, tickets: 410 },
-];
-
-const REVENUE_WEEK = [
-  { label: 'Lun', revenue: 720, tickets: 44 },
-  { label: 'Mar', revenue: 840, tickets: 52 },
-  { label: 'Mer', revenue: 990, tickets: 63 },
-  { label: 'Jeu', revenue: 910, tickets: 57 },
-  { label: 'Ven', revenue: 1320, tickets: 82 },
-  { label: 'Sam', revenue: 1680, tickets: 104 },
-  { label: 'Dim', revenue: 1420, tickets: 90 },
-];
-
-const ACTIVITY_ROWS: ActivityRow[] = Array.from({ length: 36 }, (_, i) => {
-  const base = new Date();
-  base.setMinutes(base.getMinutes() - i * 18);
-  const statuses: ActivityStatus[] = ['CONFIRME', 'EN_ATTENTE', 'ANNULE'];
-  const status = statuses[i % statuses.length];
-  return {
-    id: 1000 + i,
-    utilisateur: ['Yassine Elaouni', 'Sara Amrani', 'Hamza Benali', 'Imane Lahlou', 'Mehdi Rami'][i % 5],
-    film: TOP_FILMS[i % TOP_FILMS.length].title,
-    sieges: i % 4 === 0 ? 'E7,E8' : i % 4 === 1 ? 'F9' : i % 4 === 2 ? 'D9,F9,G9' : 'B4,B5',
-    montant: [120, 90, 150, 75, 180][i % 5],
-    statut: status,
-    date: base.toISOString(),
-  };
-});
+type AdminReservationsResponse = {
+  total: number;
+  reservations: Array<{
+    id: number;
+    reference: string;
+    statut: string;
+    dateReservation: string;
+    montant: number;
+    client: { nom?: string; prenom?: string; email?: string };
+    film?: string;
+    cinema?: string;
+    dateSeance?: string;
+  }>;
+};
 
 type SortKey = keyof Pick<ActivityRow, 'id' | 'utilisateur' | 'film' | 'sieges' | 'montant' | 'statut' | 'date'>;
 type SortDir = 'asc' | 'desc';
@@ -243,10 +267,17 @@ function compareValues(a: string | number, b: string | number) {
 
 export default function AdminRapportsPage() {
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [preset, setPreset] = useState<DatePreset>('week');
   const [customFrom, setCustomFrom] = useState('');
   const [customTo, setCustomTo] = useState('');
   const [revGranularity, setRevGranularity] = useState<RevenueGranularity>('year');
+
+  const [revenus, setRevenus] = useState<Awaited<ReturnType<typeof adminStatsApi.revenus>> | null>(null);
+  const [films, setFilms] = useState<Awaited<ReturnType<typeof adminStatsApi.films>> | null>(null);
+  const [seances, setSeances] = useState<Awaited<ReturnType<typeof adminStatsApi.seances>> | null>(null);
+  const [reservationsStats, setReservationsStats] = useState<Awaited<ReturnType<typeof adminStatsApi.reservations>> | null>(null);
+  const [activityRows, setActivityRows] = useState<ActivityRow[]>([]);
 
   const [sortKey, setSortKey] = useState<SortKey>('date');
   const [sortDir, setSortDir] = useState<SortDir>('desc');
@@ -255,31 +286,187 @@ export default function AdminRapportsPage() {
 
   const shown = useStaggeredShow(5, 100);
 
+  const range = useMemo(() => {
+    const now = new Date();
+    const fallback = { from: toYmd(startOfWeekMonday(now)), to: toYmd(endOfWeekSunday(now)) };
+
+    if (preset === 'week') return fallback;
+    if (preset === 'month') return { from: toYmd(startOfMonth(now)), to: toYmd(endOfMonth(now)) };
+    if (preset === 'year') return { from: toYmd(startOfYear(now)), to: toYmd(endOfYear(now)) };
+    // custom
+    const from = customFrom || customTo;
+    const to = customTo || customFrom;
+    if (!from || !to) return fallback;
+    return { from, to };
+  }, [customFrom, customTo, preset]);
+
   useEffect(() => {
-    const t = window.setTimeout(() => setLoading(false), 1200);
-    return () => window.clearTimeout(t);
-  }, []);
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+
+    Promise.all([
+      adminStatsApi.revenus({ dateDebut: range.from, dateFin: range.to }),
+      adminStatsApi.films({ dateDebut: range.from, dateFin: range.to, limit: 50 }),
+      adminStatsApi.seances({ dateDebut: range.from, dateFin: range.to, limit: 200 }),
+      adminStatsApi.reservations({ dateDebut: range.from, dateFin: range.to }),
+      http
+        .get<AdminReservationsResponse>('/admin/reservations', {
+          params: { dateDebut: range.from, dateFin: range.to },
+        })
+        .then((r) => r.data),
+    ])
+      .then(([rev, filmsRes, seancesRes, resStats, resList]) => {
+        if (cancelled) return;
+        setRevenus(rev);
+        setFilms(filmsRes);
+        setSeances(seancesRes);
+        setReservationsStats(resStats);
+
+        const rows: ActivityRow[] = (resList.reservations ?? []).slice(0, 60).map((r) => {
+          const prenom = r.client?.prenom?.trim() ?? '';
+          const nom = r.client?.nom?.trim() ?? '';
+          const utilisateur = `${prenom} ${nom}`.trim() || r.client?.email || '—';
+          return {
+            id: r.id,
+            utilisateur,
+            film: r.film || '—',
+            sieges: '—',
+            montant: Number(r.montant ?? 0),
+            statut: String(r.statut ?? ''),
+            date: r.dateReservation,
+          };
+        });
+        setActivityRows(rows);
+      })
+      .catch((e) => {
+        if (cancelled) return;
+        setError(e?.message ? String(e.message) : 'Erreur lors du chargement des rapports');
+      })
+      .finally(() => {
+        if (cancelled) return;
+        setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [range.from, range.to]);
 
   useEffect(() => {
     setPage(1);
   }, [sortKey, sortDir]);
 
-  const revenueData = useMemo(() => {
-    if (revGranularity === 'week') return REVENUE_WEEK;
-    if (revGranularity === 'month') return REVENUE_MONTH;
-    return REVENUE_YEAR;
-  }, [revGranularity]);
+  const occupancyBySalle = useMemo<OccupancyPoint[]>(() => {
+    const list = seances?.seances ?? [];
+    const agg = new Map<string, { sum: number; count: number }>();
+    for (const s of list) {
+      const name = s.salle ?? '—';
+      const p = parsePercent(s.tauxRemplissage);
+      const prev = agg.get(name) ?? { sum: 0, count: 0 };
+      agg.set(name, { sum: prev.sum + p, count: prev.count + 1 });
+    }
+    return Array.from(agg.entries())
+      .map(([name, v]) => ({ name, value: v.count ? Math.round(v.sum / v.count) : 0 }))
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 8);
+  }, [seances]);
 
   const occAvg = useMemo(() => {
-    return Math.round(OCCUPANCY_BY_SALLE.reduce((sum, d) => sum + d.value, 0) / OCCUPANCY_BY_SALLE.length);
-  }, []);
+    return occupancyBySalle.length
+      ? Math.round(occupancyBySalle.reduce((sum, d) => sum + d.value, 0) / occupancyBySalle.length)
+      : 0;
+  }, [occupancyBySalle]);
 
-  const topTicketsMax = TOP_FILMS[0]?.tickets ?? 1;
+  const topFilms = useMemo(() => {
+    const list = (films?.films ?? []).slice().sort((a, b) => b.nbReservations - a.nbReservations);
+    return list.slice(0, 5).map((f) => ({
+      title: f.title,
+      genre: f.genre || '—',
+      tickets: f.nbReservations,
+      poster: f.poster || fallbackPoster,
+      ca: f.chiffreAffaires,
+    }));
+  }, [films]);
 
-  const typesTotal = useMemo(() => RESERVATIONS_BY_TYPE.reduce((sum, d) => sum + d.value, 0), []);
+  const topTicketsMax = topFilms[0]?.tickets ?? 1;
+
+  const reservationsDonut = useMemo<DonutPoint[]>(() => {
+    const colors = ['#E50914', '#fb7185', '#f59e0b', '#10b981', '#f5c542', '#a78bfa'];
+    const list = reservationsStats?.parStatut ?? [];
+    return list
+      .slice()
+      .sort((a, b) => b.count - a.count)
+      .map((s, idx) => ({ name: statusLabel(s.statut), value: s.count, color: colors[idx % colors.length] }));
+  }, [reservationsStats]);
+
+  const donutTotal = useMemo(() => reservationsDonut.reduce((sum, d) => sum + d.value, 0), [reservationsDonut]);
+
+  const radarByGenre = useMemo<RadarPoint[]>(() => {
+    const list = films?.films ?? [];
+    const agg = new Map<string, number>();
+    for (const f of list) {
+      const key = f.genre || 'Autre';
+      agg.set(key, (agg.get(key) ?? 0) + Number(f.chiffreAffaires ?? 0));
+    }
+    const raw = Array.from(agg.entries()).map(([genre, ca]) => ({ genre, ca }));
+    raw.sort((a, b) => b.ca - a.ca);
+    const top = raw.slice(0, 8);
+    const max = top[0]?.ca ?? 1;
+    return top.map((d) => ({ genre: d.genre, value: Math.round((d.ca / max) * 100) }));
+  }, [films]);
+
+  const revenueData = useMemo<RevenuePoint[]>(() => {
+    const src = revenus?.parJour ?? [];
+    if (!src.length) return [];
+
+    const items = src
+      .map((d) => {
+        const date = new Date(d.jour);
+        return {
+          date,
+          revenue: Number(d.ca ?? 0),
+          paiements: Number(d.nbPaiements ?? 0),
+        };
+      })
+      .filter((d) => Number.isFinite(d.date.getTime()));
+
+    if (revGranularity === 'week') {
+      const dayNames = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+      return items.map((d) => ({
+        label: dayNames[d.date.getDay()] ?? toYmd(d.date),
+        revenue: d.revenue,
+        paiements: d.paiements,
+      }));
+    }
+
+    if (revGranularity === 'month') {
+      const map = new Map<number, { revenue: number; paiements: number }>();
+      for (const d of items) {
+        const weekOfMonth = Math.min(5, Math.ceil(d.date.getDate() / 7));
+        const prev = map.get(weekOfMonth) ?? { revenue: 0, paiements: 0 };
+        map.set(weekOfMonth, { revenue: prev.revenue + d.revenue, paiements: prev.paiements + d.paiements });
+      }
+      return Array.from(map.entries())
+        .sort((a, b) => a[0] - b[0])
+        .map(([w, v]) => ({ label: `S${w}`, revenue: Math.round(v.revenue * 100) / 100, paiements: v.paiements }));
+    }
+
+    // year
+    const monthNames = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'];
+    const map = new Map<number, { revenue: number; paiements: number }>();
+    for (const d of items) {
+      const m = d.date.getMonth();
+      const prev = map.get(m) ?? { revenue: 0, paiements: 0 };
+      map.set(m, { revenue: prev.revenue + d.revenue, paiements: prev.paiements + d.paiements });
+    }
+    return Array.from(map.entries())
+      .sort((a, b) => a[0] - b[0])
+      .map(([m, v]) => ({ label: monthNames[m] ?? String(m + 1), revenue: Math.round(v.revenue * 100) / 100, paiements: v.paiements }));
+  }, [revGranularity, revenus]);
 
   const sortedActivity = useMemo(() => {
-    const rows = ACTIVITY_ROWS.slice();
+    const rows = activityRows.slice();
     rows.sort((ra, rb) => {
       const a = ra[sortKey];
       const b = rb[sortKey];
@@ -289,7 +476,7 @@ export default function AdminRapportsPage() {
       return sortDir === 'asc' ? cmp : -cmp;
     });
     return rows;
-  }, [sortDir, sortKey]);
+  }, [activityRows, sortDir, sortKey]);
 
   const totalPages = Math.max(1, Math.ceil(sortedActivity.length / pageSize));
   const pageRows = sortedActivity.slice((page - 1) * pageSize, page * pageSize);
@@ -370,6 +557,12 @@ export default function AdminRapportsPage() {
         </div>
       </header>
 
+      {error ? (
+        <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm font-semibold text-zinc-200">
+          {error}
+        </div>
+      ) : null}
+
       {/* Revenue full width */}
       <section className={sectionClass(0)}>
         <div className={CARD_CLASS}>
@@ -433,8 +626,8 @@ export default function AdminRapportsPage() {
                     }}
                     formatter={(value: any, _name: any, ctx: any) => {
                       const revenue = Number(value);
-                      const tickets = ctx?.payload?.tickets ?? 0;
-                      return [`${formatMoneyDh(revenue)} · ${tickets} tickets`, 'Revenu'];
+                      const paiements = ctx?.payload?.paiements ?? 0;
+                      return [`${formatMoneyDh(revenue)} · ${paiements} paiements`, 'Revenu'];
                     }}
                     labelFormatter={(label) => `${label}`}
                     cursor={{ stroke: 'rgba(229,9,20,0.4)' }}
@@ -464,7 +657,7 @@ export default function AdminRapportsPage() {
             ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
-                  data={OCCUPANCY_BY_SALLE}
+                  data={occupancyBySalle}
                   layout="vertical"
                   margin={{ top: 10, right: 24, left: 20, bottom: 0 }}
                 >
@@ -499,7 +692,7 @@ export default function AdminRapportsPage() {
                     label={{ value: 'Objectif', position: 'top', fill: 'rgba(255,255,255,0.65)' }}
                   />
                   <Bar dataKey="value" radius={[8, 8, 8, 8]} isAnimationActive>
-                    {OCCUPANCY_BY_SALLE.map((d) => (
+                    {occupancyBySalle.map((d) => (
                       <Cell key={d.name} fill={occupancyBarColor(d.value)} />
                     ))}
                   </Bar>
@@ -514,7 +707,7 @@ export default function AdminRapportsPage() {
           <div className="mt-5 space-y-3">
             {loading
               ? Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-16" />)
-              : TOP_FILMS.map((f, idx) => {
+              : topFilms.map((f, idx) => {
                   const pct = (f.tickets / topTicketsMax) * 100;
                   const rankColor =
                     idx === 0 ? 'text-[#f5c542]' : idx === 1 ? 'text-zinc-200' : idx === 2 ? 'text-amber-500' : 'text-zinc-500';
@@ -557,7 +750,7 @@ export default function AdminRapportsPage() {
       {/* Third row */}
       <section className={`grid gap-6 lg:grid-cols-2 ${sectionClass(2)}`}>
         <div className={CARD_CLASS}>
-          <h2 className="text-2xl font-black">Réservations par type</h2>
+          <h2 className="text-2xl font-black">Réservations par statut</h2>
           <div className="mt-6 grid gap-6 lg:grid-cols-[1.2fr_1fr]">
             <div className="h-[280px]">
               {loading ? (
@@ -575,7 +768,7 @@ export default function AdminRapportsPage() {
                       formatter={(value: any) => [String(value), 'Réservations']}
                     />
                     <Pie
-                      data={RESERVATIONS_BY_TYPE}
+                      data={reservationsDonut}
                       dataKey="value"
                       nameKey="name"
                       innerRadius={78}
@@ -583,7 +776,7 @@ export default function AdminRapportsPage() {
                       paddingAngle={2}
                       isAnimationActive
                     >
-                      {RESERVATIONS_BY_TYPE.map((d) => (
+                      {reservationsDonut.map((d) => (
                         <Cell key={d.name} fill={d.color} />
                       ))}
                     </Pie>
@@ -593,8 +786,8 @@ export default function AdminRapportsPage() {
             </div>
 
             <div className="space-y-3">
-              {RESERVATIONS_BY_TYPE.map((d) => {
-                const pct = typesTotal > 0 ? Math.round((d.value / typesTotal) * 100) : 0;
+              {reservationsDonut.map((d) => {
+                const pct = donutTotal > 0 ? Math.round((d.value / donutTotal) * 100) : 0;
                 return (
                   <div
                     key={d.name}
@@ -622,7 +815,7 @@ export default function AdminRapportsPage() {
               <Skeleton className="h-[320px]" />
             ) : (
               <ResponsiveContainer width="100%" height="100%">
-                <RadarChart data={REVENUE_BY_GENRE} outerRadius="78%">
+                <RadarChart data={radarByGenre} outerRadius="78%">
                   <PolarGrid stroke="#2a2a2a" />
                   <PolarAngleAxis dataKey="genre" tick={{ fill: 'rgba(255,255,255,0.65)', fontSize: 12 }} />
                   <PolarRadiusAxis tick={{ fill: 'rgba(255,255,255,0.45)', fontSize: 11 }} axisLine={false} />
@@ -717,7 +910,7 @@ export default function AdminRapportsPage() {
                       <td className="py-3 pr-4 font-black text-white">{formatMoneyDh(r.montant)}</td>
                       <td className="py-3 pr-4">
                         <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-black ${statusBadge(r.statut)}`}>
-                          {r.statut === 'CONFIRME' ? 'Confirmé' : r.statut === 'EN_ATTENTE' ? 'En attente' : 'Annulé'}
+                          {statusLabel(r.statut)}
                         </span>
                       </td>
                       <td className="py-3 pr-4 text-zinc-400">{formatDateTimeFr(r.date)}</td>

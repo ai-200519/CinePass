@@ -9,6 +9,7 @@ import AdminRapportsPage from '../pages/admin/AdminRapportsPage';
 import AdminReservationsPage from '../pages/admin/AdminReservationsPage';
 import AdminSallesPage from '../pages/admin/AdminSallesPage';
 import AdminSeancesPage from '../pages/admin/AdminSeancesPage';
+import AdminTarificationPage from '../pages/admin/AdminTarificationPage';
 import AdminUtilisateursPage from '../pages/admin/AdminUtilisateursPage';
 import ForgotPasswordPage from '../pages/auth/ForgotPasswordPage';
 import LoginPage from '../pages/auth/LoginPage';
@@ -42,6 +43,7 @@ export const router = createBrowserRouter([
       { path: 'cinemas', element: <AdminCinemasPage /> },
       { path: 'seances', element: <AdminSeancesPage /> },
       { path: 'salles', element: <AdminSallesPage /> },
+      { path: 'tarifs', element: <AdminTarificationPage /> },
       { path: 'reservations', element: <AdminReservationsPage /> },
       { path: 'utilisateurs', element: <AdminUtilisateursPage /> },
       { path: 'rapports', element: <AdminRapportsPage /> },
