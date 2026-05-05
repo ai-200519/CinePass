@@ -1,14 +1,14 @@
 import { Ticket, Users } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import {
-    Bar,
-    BarChart,
-    CartesianGrid,
-    Cell,
-    ResponsiveContainer,
-    Tooltip,
-    XAxis,
-    YAxis,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
 } from 'recharts';
 import { adminStatsApi } from '../../services/adminStatsApi';
 
@@ -226,22 +226,23 @@ export default function AdminDashboardPage() {
       <section className="grid gap-6 lg:grid-cols-[3fr_2fr]">
         <article className="rounded-2xl bg-[#1F1F1F] p-6 shadow-[0_0_0_1px_rgba(255,255,255,0.08)]">
           <h2 className="text-2xl font-black">Ventes par film cette semaine</h2>
-          <div className="mt-6 h-[320px]">
+          <div className="mt-6 h-[380px]">
             {loading ? (
               <div className="h-full rounded-xl bg-white/5" />
             ) : (
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={ventesSorted} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                <BarChart data={ventesSorted} margin={{ top: 10, right: 10, left: 0, bottom: 22 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
                   <XAxis
                     dataKey="name"
-                    tick={{ fill: 'rgba(255,255,255,0.65)', fontSize: 12 }}
+                    tick={{ fill: 'rgba(255,255,255,0.65)', fontSize: 10 }}
                     axisLine={{ stroke: 'rgba(255,255,255,0.12)' }}
                     tickLine={{ stroke: 'rgba(255,255,255,0.12)' }}
                     interval={0}
-                    angle={-12}
+                    angle={-18}
                     textAnchor="end"
-                    height={56}
+                    tickMargin={10}
+                    height={78}
                   />
                   <YAxis
                     tick={{ fill: 'rgba(255,255,255,0.55)', fontSize: 12 }}

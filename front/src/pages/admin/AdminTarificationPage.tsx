@@ -4,9 +4,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import type { Seance } from '../../features/seances/seancesApi';
 import {
-    selectFetchSeancesError,
-    selectFetchSeancesStatus,
-    selectSeances,
+  selectFetchSeancesError,
+  selectFetchSeancesStatus,
+  selectSeances,
 } from '../../features/seances/seancesSelectors';
 import { seancesActions } from '../../features/seances/seancesSlice';
 import { tarifsApi, type CreateTarifDto, type Tarif, type TypePublic } from '../../services/tarifsApi';
@@ -341,19 +341,21 @@ export default function AdminTarificationPage() {
                             type="button"
                             onClick={() => onSave(t)}
                             disabled={isBusy}
-                            className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-emerald-500/15 px-3 text-sm font-black text-emerald-200 shadow-[0_0_0_1px_rgba(16,185,129,0.25)] transition hover:bg-emerald-500/20 disabled:cursor-not-allowed disabled:opacity-60"
+                            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-emerald-500/30 bg-emerald-500/15 text-emerald-200 shadow-[0_0_0_1px_rgba(16,185,129,0.20)] transition hover:bg-emerald-500/20 disabled:cursor-not-allowed disabled:opacity-60"
+                            aria-label="Enregistrer"
+                            title="Enregistrer"
                           >
                             <Save className="h-4 w-4" aria-hidden="true" />
-                            Enregistrer
                           </button>
                           <button
                             type="button"
                             onClick={() => onDelete(t)}
                             disabled={isBusy}
-                            className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-[#E50914]/15 px-3 text-sm font-black text-[#ffb4b7] shadow-[0_0_0_1px_rgba(229,9,20,0.25)] transition hover:bg-[#E50914]/20 disabled:cursor-not-allowed disabled:opacity-60"
+                            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#E50914]/50 bg-[#E50914]/15 text-[#ffb4b7] shadow-[0_0_0_1px_rgba(229,9,20,0.18)] transition hover:bg-[#E50914]/20 disabled:cursor-not-allowed disabled:opacity-60"
+                            aria-label="Supprimer"
+                            title="Supprimer"
                           >
                             <Trash2 className="h-4 w-4" aria-hidden="true" />
-                            Supprimer
                           </button>
                         </div>
                       </td>
