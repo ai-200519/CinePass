@@ -1,16 +1,15 @@
 // src/admin/admin.service.ts
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Between, Like } from 'typeorm';
-import { Reservation } from '../reservation/entities/reservation.entity';
-import { Paiement } from '../paiement/entities/paiement.entity';
-import { Film } from '../film/entities/film.entity';
-import { Seance } from '../seance/entities/seance.entity';
-import { StatutReservation } from '../common/enums/statut-reservation.enum';
+import { Repository } from 'typeorm';
 import { Cinema } from '../cinema/entities/cinema.entity';
+import { Film } from '../film/entities/film.entity';
+import { Paiement } from '../paiement/entities/paiement.entity';
 import { FilterReservationDto } from '../reservation/dto/filter-reservation.dto';
-import { StatsFilterDto } from './dto/stats-filter.dto';
 import { ReservationSiege } from '../reservation/entities/reservation-siege.entity';
+import { Reservation } from '../reservation/entities/reservation.entity';
+import { Seance } from '../seance/entities/seance.entity';
+import { StatsFilterDto } from './dto/stats-filter.dto';
 
 @Injectable()
 export class AdminService {
@@ -239,6 +238,12 @@ export class AdminService {
   async getSeancesStats(filter: StatsFilterDto) {
     const limit = filter.limit || 10;
 
+    const { condition, params } = this.getDateCondition(
+      's.dateHeure',
+      filter.dateDebut,
+      filter.dateFin,
+    );
+
     let query = await this.seanceRepo
       .createQueryBuilder('s')
       .leftJoin('s.film', 'f')
@@ -255,15 +260,15 @@ export class AdminService {
       .addSelect('sa.capaciteTotale', 'capacite')
       .addSelect('COUNT(r.id_reservation)', 'nbReservations');
 
-    if (filter.id_cinema) {
-      query.where('sa.id_cinema = :id_cinema', { id_cinema: filter.id_cinema });
-    }
+    query.where(condition, params);
+    this.applyCinemaFilter(query, filter.id_cinema);
 
     const seances = await query
       .groupBy('s.id_seance')
       .addGroupBy('s.dateHeure')
       .addGroupBy('s.technologie')
       .addGroupBy('f.title')
+      .addGroupBy('f.poster')
       .addGroupBy('sa.nom')
       .addGroupBy('sa.capaciteTotale')
       .orderBy('s.dateHeure', 'DESC')

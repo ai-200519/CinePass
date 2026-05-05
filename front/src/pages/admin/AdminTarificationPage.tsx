@@ -1,4 +1,5 @@
-import { Plus, RefreshCw, Save, Trash2 } from 'lucide-react';
+import * as Select from '@radix-ui/react-select';
+import { Check, ChevronDown, Plus, RefreshCw, Save, Trash2 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import type { Seance } from '../../features/seances/seancesApi';
@@ -31,6 +32,68 @@ function fmtSeanceOption(s: Seance) {
   const film = s.film?.title ?? '—';
   const salle = s.salle?.numero != null ? `Salle ${s.salle.numero}` : 'Salle —';
   return `#${s.id_seance} · ${film} · ${salle} · ${date} ${heure}`;
+}
+
+type DarkSelectOption = { value: string; label: string; disabled?: boolean };
+
+function DarkSelect({
+  value,
+  onValueChange,
+  placeholder,
+  options,
+  triggerClassName,
+  disabled,
+  ariaLabel,
+}: {
+  value: string;
+  onValueChange: (v: string) => void;
+  placeholder: string;
+  options: DarkSelectOption[];
+  triggerClassName: string;
+  disabled?: boolean;
+  ariaLabel: string;
+}) {
+  return (
+    <Select.Root
+      value={value.trim() === '' ? undefined : value}
+      onValueChange={onValueChange}
+      disabled={disabled}
+    >
+      <Select.Trigger
+        className={triggerClassName}
+        aria-label={ariaLabel}
+      >
+        <Select.Value placeholder={placeholder} />
+        <Select.Icon className="text-zinc-400">
+          <ChevronDown className="h-4 w-4" aria-hidden="true" />
+        </Select.Icon>
+      </Select.Trigger>
+
+      <Select.Portal>
+        <Select.Content
+          position="popper"
+          sideOffset={8}
+          className="z-50 overflow-hidden rounded-xl border border-white/10 bg-[#1F1F1F] shadow-[0_18px_60px_rgba(0,0,0,0.55)]"
+        >
+          <Select.Viewport className="p-1">
+            {options.map((o) => (
+              <Select.Item
+                key={o.value}
+                value={o.value}
+                disabled={o.disabled}
+                className="relative flex cursor-default select-none items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-zinc-200 outline-none data-[disabled]:opacity-40 data-[highlighted]:bg-white/10"
+              >
+                <Select.ItemIndicator className="inline-flex h-4 w-4 items-center justify-center text-[#E50914]">
+                  <Check className="h-4 w-4" aria-hidden="true" />
+                </Select.ItemIndicator>
+                <Select.ItemText>{o.label}</Select.ItemText>
+              </Select.Item>
+            ))}
+          </Select.Viewport>
+        </Select.Content>
+      </Select.Portal>
+    </Select.Root>
+  );
 }
 
 export default function AdminTarificationPage() {
@@ -202,19 +265,17 @@ export default function AdminTarificationPage() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div className="flex flex-col gap-2">
             <label className="text-sm font-black text-zinc-200">Séance</label>
-            <select
+            <DarkSelect
               value={selectedSeanceId}
-              onChange={(e) => setSelectedSeanceId(e.target.value)}
-              className="h-11 w-full rounded-xl border border-white/10 bg-white/5 px-3 text-sm font-semibold text-zinc-200 outline-none sm:w-[520px]"
-              aria-label="Séance"
-            >
-              <option value="">Sélectionner une séance…</option>
-              {seancesSorted.map((s) => (
-                <option key={s.id_seance} value={String(s.id_seance)}>
-                  {fmtSeanceOption(s)}
-                </option>
-              ))}
-            </select>
+              onValueChange={setSelectedSeanceId}
+              placeholder="Sélectionner une séance…"
+              ariaLabel="Séance"
+              triggerClassName="inline-flex h-11 w-full items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 text-sm font-semibold text-zinc-200 outline-none focus-visible:ring-2 focus-visible:ring-white/15 sm:w-[520px]"
+              options={seancesSorted.map((s) => ({
+                value: String(s.id_seance),
+                label: fmtSeanceOption(s),
+              }))}
+            />
             {seancesStatus === 'loading' ? (
               <div className="text-xs font-semibold text-zinc-500">Chargement des séances…</div>
             ) : seancesStatus === 'failed' ? (
@@ -317,17 +378,16 @@ export default function AdminTarificationPage() {
         <div className="mt-5 grid gap-4 sm:grid-cols-3">
           <div>
             <label className="text-sm font-black text-zinc-200">Type de public</label>
-            <select
-              value={createTypePublic}
-              onChange={(e) => setCreateTypePublic(e.target.value)}
-              className="mt-2 h-11 w-full rounded-xl border border-white/10 bg-white/5 px-3 text-sm font-semibold text-zinc-200 outline-none"
-            >
-              {TYPE_PUBLIC_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
+            <div className="mt-2">
+              <DarkSelect
+                value={String(createTypePublic)}
+                onValueChange={(v) => setCreateTypePublic(v as TypePublic)}
+                placeholder="Choisir…"
+                ariaLabel="Type de public"
+                triggerClassName="inline-flex h-11 w-full items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 text-sm font-semibold text-zinc-200 outline-none focus-visible:ring-2 focus-visible:ring-white/15"
+                options={TYPE_PUBLIC_OPTIONS.map((o) => ({ value: o.value, label: o.label }))}
+              />
+            </div>
           </div>
 
           <div>
