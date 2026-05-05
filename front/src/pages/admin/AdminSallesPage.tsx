@@ -4,7 +4,7 @@ import * as Switch from '@radix-ui/react-switch';
 import {
     AlertTriangle,
     Armchair,
-  DoorOpen,
+    DoorOpen,
     Film,
     LayoutGrid,
     Pencil,
