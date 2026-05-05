@@ -7,7 +7,7 @@ import { PaginationDto } from './dto/pagination.dto';
 
 
 
-@ApiTags('films')
+@ApiTags('Film')
 @Controller('film')
 export class FilmController {
   constructor(private readonly filmService: FilmService) { }
