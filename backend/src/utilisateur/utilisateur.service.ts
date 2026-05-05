@@ -101,9 +101,9 @@ export class UtilisateurService {
     return this.update(id, { statut: StatutUtilisateur.ACTIF });
   }
 
-  // ── Suspendre un compte ─────────────────────────────────────────────────────
+  // ── Ban an accouont ─────────────────────────────────────────────────────────────
   async suspendreCompte(id: number): Promise<Omit<Utilisateur, 'motDePasse'>> {
-    return this.update(id, { statut: StatutUtilisateur.SUSPENDU });
+    return this.update(id, { statut: StatutUtilisateur.BANNI });
   }
 
   // ── Changer le rôle ─────────────────────────────────────────────────────────
