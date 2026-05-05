@@ -10,6 +10,7 @@ import AdminReservationsPage from '../pages/admin/AdminReservationsPage';
 import AdminSallesPage from '../pages/admin/AdminSallesPage';
 import AdminSeancesPage from '../pages/admin/AdminSeancesPage';
 import AdminTarificationPage from '../pages/admin/AdminTarificationPage';
+import AdminUtilisateursPage from '../pages/admin/AdminUtilisateursPage';
 import ForgotPasswordPage from '../pages/auth/ForgotPasswordPage';
 import LoginPage from '../pages/auth/LoginPage';
 import RegisterPage from '../pages/auth/RegisterPage';
@@ -17,6 +18,7 @@ import ResetPasswordPage from '../pages/auth/ResetPasswordPage';
 import FilmDetailPage from '../pages/FilmDetailPage';
 import HomePage from '../pages/HomePage';
 import SeatSelectionPage from '../pages/SeatSelectionPage';
+
 
 export const router = createBrowserRouter([
   {
@@ -43,6 +45,7 @@ export const router = createBrowserRouter([
       { path: 'salles', element: <AdminSallesPage /> },
       { path: 'tarifs', element: <AdminTarificationPage /> },
       { path: 'reservations', element: <AdminReservationsPage /> },
+      { path: 'utilisateurs', element: <AdminUtilisateursPage /> },
       { path: 'rapports', element: <AdminRapportsPage /> },
       { path: 'parametres', element: <AdminParametresPage /> },
     ],
