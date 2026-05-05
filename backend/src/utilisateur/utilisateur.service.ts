@@ -1,13 +1,16 @@
 import {
-  Injectable, ConflictException,
-  NotFoundException, ForbiddenException,
+  Injectable,
+  ConflictException,
+  NotFoundException,
+  ForbiddenException,
+  BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, ILike, FindManyOptions } from 'typeorm';
-import { Utilisateur }         from './entities/utilisateur.entity';
-import { Role }                from '../common/enums/role.enum';
-import { StatutUtilisateur }   from '../common/enums/statut-utilisateur.enum';
-import { RegisterDto }         from '../auth/dto/register.dto';
+import { Utilisateur } from './entities/utilisateur.entity';
+import { Role } from '../common/enums/role.enum';
+import { StatutUtilisateur } from '../common/enums/statut-utilisateur.enum';
+import { RegisterDto } from '../auth/dto/register.dto';
 import { UpdateUtilisateurDto } from './dto/update-utilisateur.dto';
 import { FilterUtilisateurDto } from './dto/filter-utilisateur.dto';
 import * as bcrypt from 'bcrypt';
@@ -15,7 +18,6 @@ import { UpdateProfilDto } from './dto/update-profile.dto';
 
 @Injectable()
 export class UtilisateurService {
-
   constructor(
     @InjectRepository(Utilisateur)
     private readonly utilisateurRepository: Repository<Utilisateur>,
@@ -24,7 +26,7 @@ export class UtilisateurService {
   // ── Find by email ─────────────────────────────────────────────────────────
   async findByEmail(email: string): Promise<Utilisateur | null> {
     return this.utilisateurRepository.findOne({
-      where:     { email },
+      where: { email },
       relations: ['cinema'],
     });
   }
@@ -32,20 +34,20 @@ export class UtilisateurService {
   // ── Find by ID ────────────────────────────────────────────────────────────
   async findById(id: number): Promise<Utilisateur | null> {
     return this.utilisateurRepository.findOne({
-      where:     { id_utilisateur: id },
+      where: { id_utilisateur: id },
       relations: ['cinema'],
     });
   }
 
   // ── Safe user — removes sensitive fields ──────────────────────────────────
   private toSafe(user: Utilisateur) {
-    const { motDePasse, otpCode, otpExpiresAt, otpUsed, otpPurpose, ...safe } = user;
+    const { motDePasse, otpCode, otpExpiresAt, otpUsed, otpPurpose, ...safe } =
+      user;
     return safe;
   }
 
   // ── Find all — with filters ───────────────────────────────────────────────
   async findAll(filter?: FilterUtilisateurDto): Promise<any[]> {
-
     const qb = this.utilisateurRepository
       .createQueryBuilder('u')
       .leftJoinAndSelect('u.cinema', 'c')
@@ -53,10 +55,9 @@ export class UtilisateurService {
 
     // Search by nom, prenom or email
     if (filter?.search) {
-      qb.andWhere(
-        '(u.nom ILIKE :s OR u.prenom ILIKE :s OR u.email ILIKE :s)',
-        { s: `%${filter.search}%` }
-      );
+      qb.andWhere('(u.nom ILIKE :s OR u.prenom ILIKE :s OR u.email ILIKE :s)', {
+        s: `%${filter.search}%`,
+      });
     }
 
     if (filter?.role) {
@@ -68,13 +69,13 @@ export class UtilisateurService {
     }
 
     const users = await qb.getMany();
-    return users.map(u => this.toSafe(u));
+    return users.map((u) => this.toSafe(u));
   }
 
   // ── Find one by ID ────────────────────────────────────────────────────────
   async findOne(id: number): Promise<any> {
     const user = await this.utilisateurRepository.findOne({
-      where:     { id_utilisateur: id },
+      where: { id_utilisateur: id },
       relations: ['cinema'],
     });
     if (!user) throw new NotFoundException(`Utilisateur #${id} introuvable`);
@@ -88,13 +89,13 @@ export class UtilisateurService {
 
     const hashedPassword = await bcrypt.hash(registerDto.motDePasse, 10);
     const utilisateur = this.utilisateurRepository.create({
-      nom:        registerDto.nom,
-      prenom:     registerDto.prenom,
-      email:      registerDto.email,
+      nom: registerDto.nom,
+      prenom: registerDto.prenom,
+      email: registerDto.email,
       motDePasse: hashedPassword,
-      telephone:  registerDto.telephone,
-      langue:     registerDto.langue || 'FR',
-      role:       Role.CLIENT,
+      telephone: registerDto.telephone,
+      langue: registerDto.langue || 'FR',
+      role: Role.CLIENT,
     });
 
     return this.utilisateurRepository.save(utilisateur);
@@ -125,10 +126,10 @@ export class UtilisateurService {
     if (!user) throw new NotFoundException('Utilisateur introuvable');
 
     // Only allow safe profile fields
-    if (dto.nom)       user.nom       = dto.nom;
-    if (dto.prenom)    user.prenom    = dto.prenom;
+    if (dto.nom) user.nom = dto.nom;
+    if (dto.prenom) user.prenom = dto.prenom;
     if (dto.telephone) user.telephone = dto.telephone;
-    if (dto.langue)    user.langue    = dto.langue;
+    if (dto.langue) user.langue = dto.langue;
 
     await this.utilisateurRepository.save(user);
     return this.toSafe(user);
@@ -168,7 +169,12 @@ export class UtilisateurService {
   ): Promise<void> {
     await this.utilisateurRepository.update(
       { id_utilisateur: id },
-      { otpCode: otp, otpExpiresAt: expiresAt, otpUsed: false, otpPurpose: purpose },
+      {
+        otpCode: otp,
+        otpExpiresAt: expiresAt,
+        otpUsed: false,
+        otpPurpose: purpose,
+      },
     );
   }
 
@@ -176,10 +182,10 @@ export class UtilisateurService {
     await this.utilisateurRepository.update(
       { id_utilisateur: id },
       {
-        statut:      StatutUtilisateur.ACTIF,
-        otpCode:     null,
+        statut: StatutUtilisateur.ACTIF,
+        otpCode: null,
         otpExpiresAt: null,
-        otpUsed:     true,
+        otpUsed: true,
       },
     );
   }
@@ -191,12 +197,45 @@ export class UtilisateurService {
     await this.utilisateurRepository.update(
       { id_utilisateur: id },
       {
-        motDePasse:   hashedPassword,
-        otpCode:      null,
+        motDePasse: hashedPassword,
+        otpCode: null,
         otpExpiresAt: null,
-        otpUsed:      true,
+        otpUsed: true,
       },
     );
+  }
+
+  // ── Change password — CLIENT (authenticated) ──────────────────────────────
+  async changePassword(
+    id: number,
+    motDePasseActuel: string,
+    nouveauMotDePasse: string,
+  ): Promise<{ message: string }> {
+    // 1. Get user with password
+    const user = await this.utilisateurRepository.findOne({
+      where: { id_utilisateur: id },
+    });
+    if (!user) throw new NotFoundException('Utilisateur introuvable');
+
+    // 2. Verify current password
+    const passwordMatch = await bcrypt.compare(
+      motDePasseActuel,
+      user.motDePasse,
+    );
+    if (!passwordMatch) {
+      throw new BadRequestException('Mot de passe actuel incorrect');
+    }
+
+    // 3. Hash new password
+    const hashedPassword = await bcrypt.hash(nouveauMotDePasse, 10);
+
+    // 4. Update
+    await this.utilisateurRepository.update(
+      { id_utilisateur: id },
+      { motDePasse: hashedPassword },
+    );
+
+    return { message: 'Mot de passe modifié avec succès' };
   }
 
   // ── Update password — used by auth reset flow ─────────────────────────────
