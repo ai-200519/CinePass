@@ -429,11 +429,11 @@ export default function AdminReservationsPage() {
       </div>
 
       {/* Tableau des réservations */}
-      <div className="rounded-3xl border border-white/10 bg-zinc-950/60 overflow-hidden">
+      <div className="rounded-3xl border border-white/10 bg-[#1F1F1F] overflow-hidden shadow-[0_0_0_1px_rgba(255,255,255,0.08)]">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-white/10 text-left text-xs uppercase tracking-widest text-zinc-500">
+              <tr className="bg-black/20 text-left text-xs font-black uppercase tracking-wide text-zinc-400">
                 <th className="px-6 py-4">Référence</th>
                 <th className="px-6 py-4">Client</th>
                 <th className="px-6 py-4">Séance</th>
@@ -467,10 +467,22 @@ export default function AdminReservationsPage() {
                     <td className="px-6 py-4 font-semibold">{totalPrix(res).toFixed(2)} DH</td>
                     <td className="px-6 py-4">
                       <div className="flex justify-center gap-2">
-                        <button onClick={() => setDetailRes(res)} className="p-2 hover:bg-white/10 rounded-lg text-zinc-400 hover:text-white">
+                        <button
+                          type="button"
+                          onClick={() => setDetailRes(res)}
+                          className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-zinc-200 transition hover:bg-white/5"
+                          aria-label="Détails"
+                          title="Détails"
+                        >
                           <Eye size={18} />
                         </button>
-                        <button onClick={() => setDeleteRes(res)} className="p-2 hover:bg-white/10 rounded-lg text-red-400 hover:text-red-500">
+                        <button
+                          type="button"
+                          onClick={() => setDeleteRes(res)}
+                          className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#E50914]/50 text-[#ffb4b7] transition hover:bg-[#E50914]/10"
+                          aria-label="Supprimer"
+                          title="Supprimer"
+                        >
                           <Trash2 size={18} />
                         </button>
                       </div>
