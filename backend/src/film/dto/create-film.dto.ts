@@ -1,6 +1,7 @@
-import { IsString, IsNumber, IsDate, IsArray, IsBoolean } from 'class-validator';
+import { IsString, IsNumber, IsArray, IsBoolean, IsDateString } from 'class-validator';
+import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
-
+import { Type } from 'class-transformer';
 
 export class CreateFilmDto {
     @ApiProperty()
@@ -13,9 +14,11 @@ export class CreateFilmDto {
 
     @ApiProperty()
     @IsNumber()
+    @Type(() => Number)        // ← convertit string → number
     duration: number;
 
     @ApiProperty()
+    @Type(() => Date)
     @IsDate()
     releaseDate: Date;
 
@@ -41,9 +44,11 @@ export class CreateFilmDto {
 
     @ApiProperty()
     @IsNumber()
+    @Type(() => Number)        // ← convertit string → number
     note: number;
 
     @ApiProperty()
     @IsBoolean()
+    @Type(() => Boolean)       // ← convertit string → boolean
     isShowing: boolean;
 }

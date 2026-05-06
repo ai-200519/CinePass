@@ -37,9 +37,10 @@ describe('FilmController', () => {
 
     it('should return all films', () => {
         const films = [{ id: 1, title: 'Inception' }];
+        const mockPaginationDto = { page: 1, limit: 10 };
         mockFilmService.findAll.mockReturnValue(films);
 
-        expect(controller.findAll()).toEqual(films);
+        expect(controller.findAll(mockPaginationDto)).toEqual(films);
     });
 
     it('should search for films', () => {

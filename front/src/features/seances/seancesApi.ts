@@ -2,9 +2,13 @@ import { http } from '../../services/http';
 
 export type Seance = {
   id_seance: number;
-  dateHeure: string; // ISO date string
-  technologie: 'DEUX_D' | 'TROIS_D' | 'IMAX';
+  dateHeure: string;
+  technologie: '2D' | '3D' | '4DX' | 'DOLBY'; // ✅ valeurs réelles de l'enum backend
   statut: 'PROGRAMMEE' | 'EN_COURS' | 'TERMINEE' | 'ANNULEE';
+  // Optional fields returned by backend for UX (availability)
+  totalSeats?: number | null;
+  reservedSeats?: number | null;
+  remainingSeats?: number | null;
   film: {
     id: number;
     title: string;
@@ -12,10 +16,18 @@ export type Seance = {
   salle: {
     id_salle: number;
     numero: number;
+    capaciteTotale?: number | null;
   };
 };
 
-export type CreateSeanceDto = Omit<Seance, 'id_seance'>;
+export type CreateSeanceDto = {
+  dateHeure: string;
+  technologie: Seance['technologie'];
+  statut: Seance['statut'];
+  film: { id: number };
+  salle: { id_salle: number };
+};
+
 export type UpdateSeanceDto = Partial<CreateSeanceDto>;
 
 export const seancesApi = {

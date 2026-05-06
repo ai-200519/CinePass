@@ -8,6 +8,7 @@ export interface JwtPayload {
   sub:   number;   // id_utilisateur
   email: string;
   role:  string;
+  id_cinema?: number; // ← optional cinema ID for STAFF users
 }
 
 @Injectable()
@@ -42,6 +43,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       role:           user.role,
       nom:            user.nom,
       prenom:         user.prenom,
+      id_cinema:      user.cinema?.id_cinema || null, // ← include cinema in request.user for STAFF
     };
   }
 }

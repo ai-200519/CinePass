@@ -8,7 +8,13 @@ export type Salle = {
   equipements: string | null;
 };
 
-export type CreateSalleDto = Omit<Salle, 'id_salle'> & { equipements?: string };
+export type CreateSalleDto = {
+  numero: number;
+  nom: string;
+  capaciteTotale: number;
+  equipements?: string | null;
+  id_cinema: number;
+};
 export type UpdateSalleDto = Partial<Omit<Salle, 'id_salle'>>;
 
 export const sallesApi = {

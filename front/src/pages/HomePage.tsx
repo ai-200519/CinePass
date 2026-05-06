@@ -1,395 +1,299 @@
-import { Armchair, ChevronRight, Search, Smartphone, Ticket } from 'lucide-react';
-import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { ChevronsUpDown, Filter, MapPin, Search, SlidersHorizontal, Ticket } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '../app/hooks';
 import Footer from '../components/Footer';
 import MovieCard from '../components/MovieCard';
 import Navbar from '../components/Navbar';
+import { selectAuthRole } from '../features/auth/authSelectors';
+import {
+  selectCinemas,
+  selectCinemasError,
+  selectCinemasFetchStatus,
+} from '../features/cinemas/cinemasSelectors';
+import { fetchCinemas } from '../features/cinemas/cinemasSlice';
+import {
+  selectFetchFilmsError,
+  selectFetchFilmsStatus,
+  selectFilms,
+} from '../features/films/filmsSelectors';
+import { filmsActions } from '../features/films/filmsSlice';
 
-const movies = [
-  {
-    id: 'ombres-du-passe',
-    title: 'Les Ombres du Passé',
-    genre: 'Thriller',
-    rating: '4.6',
-    image:
-      'https://images.unsplash.com/photo-1619347903021-4d286ec4e8f1?auto=format&fit=crop&w=700&q=80',
-  },
-  {
-    id: 'royaume-des-etoiles',
-    title: 'Royaume des Étoiles',
-    genre: 'Fantaisie',
-    rating: '4.7',
-    image:
-      'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?auto=format&fit=crop&w=700&q=80',
-  },
-  {
-    id: 'apocalypse-stellaire',
-    title: 'Apocalypse Stellaire',
-    genre: 'Science-Fiction',
-    rating: '4.8',
-    image:
-      'https://images.unsplash.com/photo-1504386106331-3e4e71712b38?auto=format&fit=crop&w=700&q=80',
-  },
-  {
-    id: 'la-derniere-seance',
-    title: 'La Dernière Séance',
-    genre: 'Drame',
-    rating: '4.5',
-    image:
-      'https://images.unsplash.com/photo-1524985069026-dd778a71c7b4?auto=format&fit=crop&w=700&q=80',
-  },
-  {
-    id: 'legende-urbaine',
-    title: 'Légende Urbaine',
-    genre: 'Action',
-    rating: '4.4',
-    image:
-      'https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=700&q=80',
-  },
-];
+const fallbackPoster =
+  'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=900&q=85';
 
-const seancesDuJour = [
-  {
-    title: 'Apocalypse Stellaire',
-    salle: 'Salle 1',
-    duration: '2h28',
-    format: 'IMAX',
-    time: '14:00',
-    date: '2026-03-17',
-    status: 'Places limitées',
-    available: 45,
-    total: 120,
-    statusColor: 'orange' as const,
-  },
-  {
-    title: 'Apocalypse Stellaire',
-    salle: 'Salle 1',
-    duration: '2h28',
-    format: 'IMAX',
-    time: '17:30',
-    date: '2026-03-17',
-    status: 'Dernières places',
-    available: 12,
-    total: 120,
-    statusColor: 'red' as const,
-  },
-  {
-    title: 'Apocalypse Stellaire',
-    salle: 'Salle 2',
-    duration: '2h28',
-    format: '3D',
-    time: '20:45',
-    date: '2026-03-17',
-    status: 'Dernières places',
-    available: 5,
-    total: 80,
-    statusColor: 'red' as const,
-  },
-  {
-    title: 'Les Ombres du Passé',
-    salle: 'Salle 3',
-    duration: '2h05',
-    format: '2D',
-    time: '15:15',
-    date: '2026-03-17',
-    status: 'Nombreuses places',
-    available: 67,
-    total: 100,
-    statusColor: 'green' as const,
-  },
-  {
-    title: 'Les Ombres du Passé',
-    salle: 'Salle 3',
-    duration: '2h05',
-    format: '2D',
-    time: '19:00',
-    date: '2026-03-17',
-    status: 'Places limitées',
-    available: 23,
-    total: 100,
-    statusColor: 'orange' as const,
-  },
-  {
-    title: 'Les Ombres du Passé',
-    salle: 'Salle 4',
-    duration: '2h05',
-    format: '2D',
-    time: '21:30',
-    date: '2026-03-17',
-    status: 'Dernières places',
-    available: 8,
-    total: 60,
-    statusColor: 'red' as const,
-  },
-];
+const formatDuration = (minutes: number) => {
+  if (!Number.isFinite(minutes) || minutes <= 0) return 'Duree inconnue';
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+  return hours > 0 ? `${hours}h${String(mins).padStart(2, '0')}` : `${mins}min`;
+};
 
-function SeanceCard({
-  title,
-  salle,
-  duration,
-  format,
-  time,
-  date,
-  status,
-  available,
-  total,
-  statusColor,
-}: (typeof seancesDuJour)[number]) {
-  const dotClass =
-    statusColor === 'green'
-      ? 'bg-emerald-400'
-      : statusColor === 'orange'
-        ? 'bg-orange-400'
-        : 'bg-red-500';
+export default function HomePage() {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const role = useAppSelector(selectAuthRole);
+  const films = useAppSelector(selectFilms);
+  const filmsStatus = useAppSelector(selectFetchFilmsStatus);
+  const filmsError = useAppSelector(selectFetchFilmsError);
+  const cinemas = useAppSelector(selectCinemas);
+  const cinemasStatus = useAppSelector(selectCinemasFetchStatus);
+  const cinemasError = useAppSelector(selectCinemasError);
+
+  useEffect(() => {
+    if (role === 'ADMIN') {
+      navigate('/admin', { replace: true });
+    }
+  }, [navigate, role]);
+
+  const [selectedCity, setSelectedCity] = useState('');
+  const [query, setQuery] = useState('');
+  const [activeGenre, setActiveGenre] = useState('Tous');
+
+  useEffect(() => {
+    if (filmsStatus === 'idle') dispatch(filmsActions.fetchFilmsRequested());
+    if (cinemasStatus === 'idle') dispatch(fetchCinemas());
+  }, [cinemasStatus, dispatch, filmsStatus]);
+
+  const cities = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          cinemas
+            .map((cinema) => cinema.ville?.trim())
+            .filter((ville): ville is string => Boolean(ville)),
+        ),
+      ),
+    [cinemas],
+  );
+
+  useEffect(() => {
+    if (!selectedCity && cities.length > 0) setSelectedCity(cities[0]);
+  }, [cities, selectedCity]);
+
+  const genres = useMemo(
+    () =>
+      [
+        'Tous',
+        ...Array.from(
+          new Set(
+            films
+              .map((film) => film.genre?.trim())
+              .filter((genre): genre is string => Boolean(genre)),
+          ),
+        ),
+      ],
+    [films],
+  );
+
+  const visibleMovies = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+
+    return films.filter((movie) => {
+      const matchesQuery =
+        !normalizedQuery ||
+        movie.title.toLowerCase().includes(normalizedQuery) ||
+        movie.genre.toLowerCase().includes(normalizedQuery);
+      const matchesGenre = activeGenre === 'Tous' || movie.genre === activeGenre;
+
+      return matchesQuery && matchesGenre;
+    });
+  }, [activeGenre, query, films]);
+
+  const isLoading = filmsStatus === 'loading' || cinemasStatus === 'loading';
+  const cityLabel = selectedCity || 'votre ville';
 
   return (
-    <article className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-zinc-900 via-zinc-900/70 to-zinc-950 p-8 shadow-2xl">
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/5 via-transparent to-transparent" />
+    <div className="min-h-screen bg-[#09090b] text-white">
+      <Navbar />
 
-      <span className="absolute right-6 top-6 rounded-full border border-red-500/25 bg-red-600/10 px-3 py-1 text-xs font-semibold tracking-wide text-red-500">
-        {format}
-      </span>
+      <section className="relative isolate overflow-hidden border-b border-white/10">
+        <img
+          src="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=2200&q=85"
+          alt=""
+          className="absolute inset-0 -z-20 h-full w-full object-cover"
+        />
+        <div className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(9,9,11,.98)_0%,rgba(9,9,11,.82)_38%,rgba(9,9,11,.7)_100%)]" />
+        <div className="absolute inset-x-0 bottom-0 -z-10 h-48 bg-gradient-to-t from-[#09090b] to-transparent" />
 
-      <div className="relative">
-        <h3 className="pr-16 text-2xl font-bold tracking-tight">{title}</h3>
+        <div className="mx-auto flex min-h-[calc(100vh-88px)] w-full max-w-7xl items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-5xl text-center">
+            <h1 className="mx-auto max-w-5xl text-4xl font-black leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-6xl">
+              Choisissez votre ville et trouvez la meilleure seance pres de vous.
+            </h1>
+            <p className="mx-auto mt-5 max-w-3xl text-base leading-8 text-zinc-300 sm:text-lg">
+              Selectionnez une ville et explorez le catalogue CinePass disponible.
+            </p>
 
-        <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-zinc-400">
-          <span className="inline-flex items-center gap-2">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="h-4 w-4 text-zinc-400"
-              aria-hidden="true"
-            >
-              <path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0Z" />
-              <path d="M12 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" />
-            </svg>
-            {salle}
-          </span>
+            <div className="mx-auto mt-8 max-w-5xl rounded-lg border border-white/10 bg-white/[0.06] p-3 text-left shadow-2xl shadow-black/30 backdrop-blur-xl">
+              <div className="flex flex-col gap-3 rounded-md border border-white/10 bg-zinc-950/75 p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-black uppercase tracking-wide text-zinc-500">Votre ville</p>
+                    <p className="mt-1 text-sm text-zinc-300">Les villes viennent des cinemas enregistres.</p>
+                  </div>
+                  <span className="rounded-md bg-white px-2.5 py-1 text-xs font-black text-zinc-950">
+                    {visibleMovies.length} films
+                  </span>
+                </div>
 
-          <span className="inline-flex items-center gap-2">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="h-4 w-4 text-zinc-400"
-              aria-hidden="true"
-            >
-              <path d="M12 6v6l4 2" />
-              <path d="M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0Z" />
-            </svg>
-            {duration}
-          </span>
-        </div>
-
-        <div className="mt-10 flex items-center justify-between gap-6">
-          <div className="flex items-center gap-7">
-            <div>
-              <div className="text-4xl font-extrabold leading-none tracking-tight">{time}</div>
-              <div className="mt-2 text-sm text-zinc-500">{date}</div>
-            </div>
-
-            <div className="h-12 w-px bg-white/10" aria-hidden="true" />
-
-            <div className="flex items-start gap-3">
-              <span className={`mt-1.5 h-2 w-2 rounded-full ${dotClass}`} aria-hidden="true" />
-              <div className="w-40 text-sm">
-                <div className="font-medium text-zinc-200">{status}</div>
-                <div className="mt-1.5 text-zinc-400">
-                  {available}/{total} places disponibles
+                <div className="grid gap-3 md:grid-cols-[1fr_180px]">
+                  <label className="relative block">
+                    <MapPin className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-red-400" />
+                    <select
+                      value={selectedCity}
+                      onChange={(event) => setSelectedCity(event.target.value)}
+                      disabled={cities.length === 0}
+                      className="h-14 w-full appearance-none rounded-lg border border-white/10 bg-zinc-900 pl-11 pr-11 text-base font-black text-white outline-none transition focus:border-red-500 focus:ring-4 focus:ring-red-500/10"
+                      aria-label="Choisir une ville"
+                    >
+                      {cities.length === 0 && <option value="">Aucune ville</option>}
+                      {cities.map((city) => (
+                        <option key={city} value={city}>
+                          {city}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronsUpDown className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
+                  </label>
+                  <a
+                    href="#films"
+                    className="inline-flex h-14 items-center justify-center gap-2 rounded-lg bg-red-600 px-6 text-sm font-black text-white shadow-xl shadow-red-950/40 transition hover:bg-red-500"
+                  >
+                    <Ticket className="h-4 w-4" />
+                    Voir les films
+                  </a>
                 </div>
               </div>
             </div>
           </div>
-
-          <button className="rounded-xl bg-red-600 px-8 py-3 text-sm font-semibold text-white transition hover:bg-red-500">
-            Réserver
-          </button>
-        </div>
-      </div>
-    </article>
-  );
-}
-
-export default function HomePage() {
-  const [selectedCity, setSelectedCity] = useState('');
-  const [selectedMovie, setSelectedMovie] = useState('');
-  const defaultDate = '2026-03-17';
-  const selectedMovieTitle = useMemo(
-    () => movies.find((movie) => movie.id === selectedMovie)?.title ?? '',
-    [selectedMovie],
-  );
-
-  return (
-    <div className="min-h-screen bg-zinc-950 text-white">
-      <Navbar />
-
-      {/* Hero Section */}
-      <section className="relative h-[500px] overflow-hidden md:h-[600px]">
-        <div className="absolute inset-0">
-          <img
-            src="https://images.unsplash.com/photo-1757186202331-e72fee53815f?w=1920&h=800&fit=crop"
-            alt="Cinema"
-            className="h-full w-full object-cover"
-            loading="lazy"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/80 to-transparent" />
-        </div>
-
-        <div className="relative mx-auto flex h-full w-full max-w-7xl flex-col items-center justify-center px-4 text-center sm:px-6 lg:px-8">
-          <h1 className="mb-4 max-w-4xl px-4 text-3xl font-bold text-white md:mb-6 md:text-5xl lg:text-6xl">
-            Réservez vos places en quelques clics
-          </h1>
-          <p className="mb-8 max-w-2xl px-4 text-base text-zinc-400 md:mb-12 md:text-xl">
-            Choisissez votre film, votre séance, et payez en ligne en toute simplicité.
-          </p>
-
-          <form
-            className="w-full max-w-4xl rounded-xl border border-white/10 bg-zinc-900 p-4 shadow-2xl md:p-6"
-            onSubmit={(event) => {
-              event.preventDefault();
-            }}
-          >
-            <div className="grid grid-cols-1 gap-3 md:grid-cols-4 md:gap-4">
-              <select
-                value={selectedCity}
-                onChange={(event) => setSelectedCity(event.target.value)}
-                className="h-11 w-full rounded-lg border border-white/10 bg-zinc-800 px-3 text-sm text-white outline-none ring-red-500/50 focus:ring-2"
-              >
-                <option value="" disabled>
-                  Ville
-                </option>
-                <option value="paris">Paris</option>
-                <option value="lyon">Lyon</option>
-                <option value="marseille">Marseille</option>
-                <option value="toulouse">Toulouse</option>
-              </select>
-
-              <select
-                value={selectedMovie}
-                onChange={(event) => setSelectedMovie(event.target.value)}
-                className="h-11 w-full rounded-lg border border-white/10 bg-zinc-800 px-3 text-sm text-white outline-none ring-red-500/50 focus:ring-2"
-                aria-label="Film"
-              >
-                <option value="" disabled>
-                  Film
-                </option>
-                {movies.map((movie) => (
-                  <option key={movie.id} value={movie.id}>
-                    {movie.title}
-                  </option>
-                ))}
-              </select>
-
-              <input
-                type="date"
-                className="h-11 w-full rounded-lg border border-white/10 bg-zinc-800 px-3 text-sm text-white outline-none ring-red-500/50 focus:ring-2"
-                defaultValue={defaultDate}
-              />
-
-              <button
-                type="submit"
-                className="inline-flex h-11 items-center justify-center rounded-lg bg-gradient-to-r from-red-600 to-red-800 px-4 text-sm font-semibold text-white transition hover:from-red-800 hover:to-red-600"
-                aria-label="Rechercher"
-              >
-                <Search className="mr-2 h-4 w-4" />
-                Rechercher
-              </button>
-            </div>
-
-            {/* Keeps layout consistent with the provided design while remaining no-op for now */}
-            <div className="sr-only" aria-live="polite">
-              {selectedCity || selectedMovieTitle ? `Recherche: ${selectedCity} ${selectedMovieTitle}` : ''}
-            </div>
-          </form>
         </div>
       </section>
 
-      {/* Films à l'affiche */}
-      <section id="films" className="bg-zinc-950">
-        <div className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-          <div className="mb-8 flex items-center justify-between">
-            <h2 className="text-3xl font-bold text-white">Films à l'affiche</h2>
-            <Link
-              to="/films"
-              className="flex items-center gap-2 font-medium text-red-500 transition hover:text-red-600"
-            >
-              Voir tout
-              <ChevronRight className="h-5 w-5" />
-            </Link>
+      <section id="films" className="bg-[#09090b]">
+        <div className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+          <div className="mb-6 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <div className="mb-3 inline-flex items-center gap-2 text-sm font-bold uppercase text-red-400">
+                <Filter className="h-4 w-4" />
+                Programme cinema
+              </div>
+              <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
+                Films a l affiche
+              </h2>
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-zinc-400">
+                Catalogue charge depuis <span className="font-semibold text-zinc-200">/film/all</span>.
+              </p>
+            </div>
+
+            <div className="grid w-full gap-3 lg:w-[520px] lg:grid-cols-[180px_1fr]">
+              <select
+                value={selectedCity}
+                onChange={(event) => setSelectedCity(event.target.value)}
+                disabled={cities.length === 0}
+                className="h-12 rounded-lg border border-white/10 bg-zinc-900 px-4 text-sm font-bold text-white outline-none transition focus:border-red-500 focus:ring-4 focus:ring-red-500/10"
+                aria-label="Filtrer par ville"
+              >
+                {cities.length === 0 && <option value="">Aucune ville</option>}
+                {cities.map((city) => (
+                  <option key={city} value={city}>
+                    {city}
+                  </option>
+                ))}
+              </select>
+              <div className="relative">
+                <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
+                <input
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  placeholder="Rechercher un film ou un genre"
+                  className="h-12 w-full rounded-lg border border-white/10 bg-zinc-900 pl-11 pr-4 text-sm text-white outline-none transition placeholder:text-zinc-500 focus:border-red-500 focus:ring-4 focus:ring-red-500/10"
+                />
+              </div>
+            </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-6">
-            {movies.map((movie) => (
+          <div className="sticky top-20 z-10 mb-8 space-y-4 rounded-lg border border-white/10 bg-zinc-950/90 p-4 backdrop-blur-xl">
+            <div className="flex items-center gap-3 overflow-x-auto pb-1">
+              <SlidersHorizontal className="h-5 w-5 shrink-0 text-zinc-500" />
+              {genres.map((genre) => (
+                <button
+                  key={genre}
+                  onClick={() => setActiveGenre(genre)}
+                  className={`h-10 shrink-0 rounded-lg px-4 text-sm font-bold transition ${
+                    activeGenre === genre
+                      ? 'bg-white text-zinc-950'
+                      : 'border border-white/10 bg-white/5 text-zinc-300 hover:bg-white/10'
+                  }`}
+                >
+                  {genre}
+                </button>
+              ))}
+            </div>
+
+          </div>
+
+          <div className="mb-5 flex items-center justify-between text-sm text-zinc-400">
+            <span>
+              {visibleMovies.length} film{visibleMovies.length > 1 ? 's' : ''} disponible
+              {visibleMovies.length > 1 ? 's' : ''}
+            </span>
+            <span className="hidden sm:inline-flex">Selection cinema: {cityLabel}</span>
+          </div>
+
+          {(filmsError || cinemasError) && (
+            <div className="mb-5 rounded-lg border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-100">
+              {filmsError || cinemasError}
+            </div>
+          )}
+
+          {isLoading && (
+            <div className="rounded-lg border border-white/10 bg-zinc-900 p-10 text-center text-zinc-400">
+              Chargement du catalogue...
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {!isLoading && visibleMovies.map((movie) => (
               <MovieCard
                 key={movie.id}
                 title={movie.title}
                 genre={movie.genre}
-                rating={movie.rating}
-                image={movie.image}
+                rating={String(movie.note ?? 0)}
+                image={movie.poster || fallbackPoster}
+                duration={formatDuration(movie.duration)}
+                badge={movie.isShowing ? 'A l affiche' : 'A venir'}
+                format={movie.statut === 'EN_COURS' ? 'Maintenant' : 'Bientot'}
+                language="Catalogue"
+                times={[]}
+                onDetails={() => navigate(`/films/${movie.id}`)}
               />
             ))}
           </div>
+
+          {!isLoading && visibleMovies.length === 0 && (
+            <div className="rounded-lg border border-white/10 bg-zinc-900 p-10 text-center">
+              <h3 className="text-xl font-black text-white">Aucun film trouve</h3>
+              <p className="mt-2 text-sm text-zinc-400">
+                Essayez un autre genre, format ou mot cle.
+              </p>
+            </div>
+          )}
         </div>
       </section>
 
-      {/* Séances du jour */}
-      <section className="bg-zinc-950">
-        <div className="mx-auto w-full max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
-          <h2 className="mb-10 text-4xl font-extrabold text-white">Séances du jour</h2>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {seancesDuJour.map((seance) => (
-              <SeanceCard
-                key={`${seance.title}-${seance.salle}-${seance.time}-${seance.format}`}
-                {...seance}
-              />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Pourquoi CinePass */}
-      <section className="bg-zinc-950">
-        <div className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-          <h2 className="mb-12 text-center text-3xl font-bold text-white">Pourquoi CinePass ?</h2>
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-            <article className="rounded-xl border border-white/10 bg-zinc-900 p-8 text-center">
-              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-r from-red-600 to-red-800">
-                <Ticket className="h-8 w-8 text-white" />
-              </div>
-              <h3 className="mb-3 text-xl font-semibold text-white">Réservation rapide</h3>
-              <p className="text-zinc-400">
-                Réservez vos billets en quelques clics depuis votre ordinateur ou smartphone
-              </p>
-            </article>
-
-            <article className="rounded-xl border border-white/10 bg-zinc-900 p-8 text-center">
-              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-r from-red-600 to-red-800">
-                <Smartphone className="h-8 w-8 text-white" />
-              </div>
-              <h3 className="mb-3 text-xl font-semibold text-white">Confirmation instantanée</h3>
-              <p className="text-zinc-400">
-                Recevez votre billet par email ou SMS immédiatement après votre paiement
-              </p>
-            </article>
-
-            <article className="rounded-xl border border-white/10 bg-zinc-900 p-8 text-center">
-              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-r from-red-600 to-red-800">
-                <Armchair className="h-8 w-8 text-white" />
-              </div>
-              <h3 className="mb-3 text-xl font-semibold text-white">Choix de vos sièges</h3>
-              <p className="text-zinc-400">
-                Sélectionnez vos places préférées directement sur le plan de la salle
-              </p>
-            </article>
-          </div>
+      <section className="border-y border-white/10 bg-zinc-950">
+        <div className="mx-auto grid w-full max-w-7xl gap-4 px-4 py-8 sm:px-6 md:grid-cols-3 lg:px-8">
+          {[
+            [String(films.length), 'films au catalogue'],
+            [String(cinemas.length), 'cinemas disponibles'],
+            ['24/7', 'reservation en ligne'],
+          ].map(([value, label]) => (
+            <div key={label} className="rounded-lg bg-white/[0.03] p-5">
+              <div className="text-3xl font-black text-white">{value}</div>
+              <div className="mt-1 text-sm font-medium text-zinc-400">{label}</div>
+            </div>
+          ))}
         </div>
       </section>
 

@@ -3,10 +3,11 @@ import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody, ApiQuery } from 
 import { FilmService } from './film.service';
 import { CreateFilmDto } from './dto/create-film.dto';
 import { UpdateFilmDto } from './dto/update-film.dto';
+import { PaginationDto } from './dto/pagination.dto';
 
 
 
-@ApiTags('films')
+@ApiTags('Film')
 @Controller('film')
 export class FilmController {
   constructor(private readonly filmService: FilmService) { }
@@ -31,8 +32,8 @@ export class FilmController {
   @Get('all')
   @ApiOperation({ summary: 'Get all films' })
   @ApiResponse({ status: 200, description: 'Returns all films' })
-  findAll() {
-    return this.filmService.findAll();
+  findAll(@Query() paginationDto: PaginationDto) {
+    return this.filmService.findAll(paginationDto);
   }
   @Get('search')
   @ApiOperation({ summary: 'Search films by a query string' })

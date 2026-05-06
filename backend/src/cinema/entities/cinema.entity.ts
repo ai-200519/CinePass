@@ -1,4 +1,5 @@
 
+import { Utilisateur } from 'src/utilisateur/entities/utilisateur.entity';
 import { Salle } from '../../salle/entities/salle.entity';
 import {
   Entity, PrimaryGeneratedColumn, Column, OneToMany
@@ -31,5 +32,8 @@ export class Cinema {
   // Relations
   @OneToMany(() => Salle, s => s.cinema)
   salles: Salle[];
+
+  @OneToMany(() => Utilisateur, u => u.cinema)
+  staff: Utilisateur[];
 }
 

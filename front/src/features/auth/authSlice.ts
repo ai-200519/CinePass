@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { decodeJwtPayload } from '../../services/jwt';
 
 export type AsyncStatus = 'idle' | 'loading' | 'succeeded' | 'failed';
 
@@ -9,20 +10,36 @@ export type AsyncState = {
 
 export type AuthState = {
   token: string | null;
+  role: string | null;
+  user: {
+    id?: number;
+    nom?: string;
+    prenom?: string;
+    email?: string;
+    role?: string;
+    id_cinema?: number | null;
+    avatarUrl?: string | null;
+  } | null;
   login: AsyncState;
   register: AsyncState;
   registerOtp: AsyncState;
   registerRequiresOtp: boolean;
+  resendOtp: AsyncState;
+  resendOtpMessage: string | null;
   forgotPassword: AsyncState;
   resetPassword: AsyncState;
 };
 
 const initialState: AuthState = {
   token: null,
+  role: null,
+  user: null,
   login: { status: 'idle', error: null },
   register: { status: 'idle', error: null },
   registerOtp: { status: 'idle', error: null },
   registerRequiresOtp: false,
+  resendOtp: { status: 'idle', error: null },
+  resendOtpMessage: null,
   forgotPassword: { status: 'idle', error: null },
   resetPassword: { status: 'idle', error: null },
 };
@@ -33,14 +50,40 @@ const authSlice = createSlice({
   reducers: {
     hydrateFromStorage(state, action: PayloadAction<{ token: string | null }>) {
       state.token = action.payload.token;
+      const payload = decodeJwtPayload(action.payload.token);
+      state.role = payload?.role ?? null;
+      state.user = payload?.email
+        ? {
+            email: payload.email,
+            role: payload.role,
+            id_cinema: payload.id_cinema ?? null,
+          }
+        : null;
     },
 
     loginRequested(state, _action: PayloadAction<{ email: string; password: string }>) {
       state.login.status = 'loading';
       state.login.error = null;
     },
-    loginSucceeded(state, action: PayloadAction<{ token: string }>) {
+    loginSucceeded(
+      state,
+      action: PayloadAction<{
+        token: string;
+        user?: {
+          id?: number;
+          nom?: string;
+          prenom?: string;
+          email?: string;
+          role?: string;
+          id_cinema?: number | null;
+          avatarUrl?: string | null;
+        };
+      }>,
+    ) {
       state.token = action.payload.token;
+      const payload = decodeJwtPayload(action.payload.token);
+      state.role = action.payload.user?.role ?? payload?.role ?? null;
+      state.user = action.payload.user ?? (payload?.email ? { email: payload.email, role: payload.role } : null);
       state.login.status = 'succeeded';
       state.login.error = null;
     },
@@ -86,6 +129,25 @@ const authSlice = createSlice({
       state.registerOtp.error = action.payload.error;
     },
 
+    resendOtpRequested(
+      state,
+      _action: PayloadAction<{ email: string; purpose: 'register' | 'reset_password' }>,
+    ) {
+      state.resendOtp.status = 'loading';
+      state.resendOtp.error = null;
+      state.resendOtpMessage = null;
+    },
+    resendOtpSucceeded(state, action: PayloadAction<{ message: string }>) {
+      state.resendOtp.status = 'succeeded';
+      state.resendOtp.error = null;
+      state.resendOtpMessage = action.payload.message;
+    },
+    resendOtpFailed(state, action: PayloadAction<{ error: string }>) {
+      state.resendOtp.status = 'failed';
+      state.resendOtp.error = action.payload.error;
+      state.resendOtpMessage = null;
+    },
+
     forgotPasswordRequested(state, _action: PayloadAction<{ email: string }>) {
       state.forgotPassword.status = 'loading';
       state.forgotPassword.error = null;
@@ -117,10 +179,14 @@ const authSlice = createSlice({
 
     logout(state) {
       state.token = null;
+      state.role = null;
+      state.user = null;
       state.login = { status: 'idle', error: null };
       state.register = { status: 'idle', error: null };
       state.registerOtp = { status: 'idle', error: null };
       state.registerRequiresOtp = false;
+      state.resendOtp = { status: 'idle', error: null };
+      state.resendOtpMessage = null;
       state.forgotPassword = { status: 'idle', error: null };
       state.resetPassword = { status: 'idle', error: null };
     },
@@ -131,6 +197,10 @@ const authSlice = createSlice({
     },
     clearRegisterOtpState(state) {
       state.registerOtp = { status: 'idle', error: null };
+    },
+    clearResendOtpState(state) {
+      state.resendOtp = { status: 'idle', error: null };
+      state.resendOtpMessage = null;
     },
     clearLoginState(state) {
       state.login = { status: 'idle', error: null };
