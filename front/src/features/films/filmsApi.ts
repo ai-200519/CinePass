@@ -42,8 +42,11 @@ const normalizeFilm = (film: any): Film => ({
 
 export const filmsApi = {
   async getAll() {
-    const res = await http.get<Film[]>('/film/all');
-    return res.data.map(normalizeFilm);
+    const res = await http.get('/film/all');
+    // Backend may return a paginated object { data, meta } or a plain array.
+    const payload = res?.data && res.data.data !== undefined ? res.data.data : res.data;
+    if (!Array.isArray(payload)) return [];
+    return payload.map(normalizeFilm);
   },
 
   async getById(id: number) {
