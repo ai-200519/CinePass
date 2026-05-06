@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, ILike } from 'typeorm';
 import { Film } from './entities/film.entity';
 import { PaginationDto } from './dto/pagination.dto';
+import { SearchFilmDto } from './dto/search-film.dto';
 
 /**
  * Service responsible for handling Film business logic.
@@ -15,7 +16,7 @@ export class FilmService {
   constructor(
     @InjectRepository(Film)
     private filmRepository: Repository<Film>, // Injected TypeORM repository for Film entity
-  ) {}
+  ) { }
 
   /**
    * Create a new film.
@@ -53,16 +54,33 @@ export class FilmService {
       },
     };
   }
-  search(query: string) {
-    if (!query) return this.findAll();
-    return this.filmRepository.find({
+  async search(searchFilmDto : SearchFilmDto) {
+
+    if (!searchFilmDto.q) return this.findAll(searchFilmDto);
+    const { page, limit } = searchFilmDto;
+    const skip = (page - 1) * limit;
+    const [data, total] = await this.filmRepository.findAndCount({
       where: [
-        { title: ILike(`%${query}%`) },
-        { description: ILike(`%${query}%`) },
-        { genre: ILike(`%${query}%`) },
-        { director: ILike(`%${query}%`) },
+        { title: ILike(`%${searchFilmDto.q}%`) },
+        { description: ILike(`%${searchFilmDto.q}%`) },
+        { genre: ILike(`%${searchFilmDto.q}%`) },
+        { director: ILike(`%${searchFilmDto.q}%`) },
       ],
+      skip,
+      take: limit,
+      order: { id: 'DESC' },
     });
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+        hasNextPage: page < Math.ceil(total / limit),
+        hasPrevPage: page > 1,
+      },
+    };
   }
 
   /**

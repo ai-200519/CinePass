@@ -16,6 +16,8 @@ describe('FilmController', () => {
         search: jest.fn(),
     };
 
+    const mockPaginationDto = { page: 1, limit: 10 };
+
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
             controllers: [FilmController],
@@ -45,11 +47,11 @@ describe('FilmController', () => {
 
     it('should search for films', () => {
         const films = [{ id: 1, title: 'Inception' }];
-        const query = 'Incep';
+        const searchDto = { q: 'Incep', page: 1, limit: 10 };
         mockFilmService.search.mockReturnValue(films);
 
-        expect(controller.search(query)).toEqual(films);
-        expect(service.search).toHaveBeenCalledWith(query);
+        expect(controller.search(searchDto)).toEqual(films);
+        expect(service.search).toHaveBeenCalledWith(searchDto.q, searchDto);
     });
 
     it('should return one film', () => {

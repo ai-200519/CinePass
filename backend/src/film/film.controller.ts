@@ -4,6 +4,7 @@ import { FilmService } from './film.service';
 import { CreateFilmDto } from './dto/create-film.dto';
 import { UpdateFilmDto } from './dto/update-film.dto';
 import { PaginationDto } from './dto/pagination.dto';
+import { SearchFilmDto } from './dto/search-film.dto';
 
 
 
@@ -37,10 +38,9 @@ export class FilmController {
   }
   @Get('search')
   @ApiOperation({ summary: 'Search films by a query string' })
-  @ApiQuery({ name: 'q', required: false, description: 'Search query' })
   @ApiResponse({ status: 200, description: 'Returns matching films' })
-  search(@Query('q') q: string) {
-    return this.filmService.search(q);
+  search(@Query() searchFilmDto: SearchFilmDto) {
+    return this.filmService.search(searchFilmDto);
   }
 
   @Get(':id')
