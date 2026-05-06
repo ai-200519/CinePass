@@ -23,20 +23,20 @@ async function bootstrap() {
       },
       'JWT-auth',   // ← reference name used in controllers
     )
-    .addTag('Auth',         'Inscription et connexion')
-    .addTag('Utilisateur',  'Gestion du profil client')
-    .addTag('Cinema',       'Informations du cinéma')
-    .addTag('Salle',        'Gestion des salles')
-    .addTag('Siege',        'Gestion des sièges')
-    .addTag('films',         'Catalogue des films')
-    .addTag('Seance',       'Programmation des séances')
-    .addTag('Tarif',        'Grille tarifaire')
-    .addTag('Reservation',  'Réservation des places')
-    .addTag('Paiement',     'Paiement en ligne')
+    .addTag('Auth', 'Inscription et connexion')
+    .addTag('Utilisateur', 'Gestion du profil client')
+    .addTag('Cinema', 'Informations du cinéma')
+    .addTag('Salle', 'Gestion des salles')
+    .addTag('Siege', 'Gestion des sièges')
+    .addTag('Film', 'Catalogue des films')
+    .addTag('Seance', 'Programmation des séances')
+    .addTag('Tarif', 'Grille tarifaire')
+    .addTag('Reservation', 'Réservation des places')
+    .addTag('Paiement', 'Paiement en ligne')
     .addTag('Notification', 'Notifications client')
-    .addTag('Admin',        'Back office administrateur')
+    .addTag('Admin', 'Back office administrateur')
     .build();
-  
+
   // Global validation
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true,
