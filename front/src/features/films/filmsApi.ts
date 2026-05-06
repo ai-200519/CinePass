@@ -42,8 +42,8 @@ const normalizeFilm = (film: any): Film => ({
 
 export const filmsApi = {
   async getAll() {
-    const res = await http.get<Film[]>('/film/all');
-    return res.data.map(normalizeFilm);
+    const res = await http.get<{ data: any[]; meta: any }>('/film/all');
+    return res.data.data.map(normalizeFilm);   // ← Important : res.data.data
   },
 
   async getById(id: number) {
@@ -53,12 +53,10 @@ export const filmsApi = {
 
   async create(dto: CreateFilmDto) {
     await http.post('/film/create', dto);
-    // Le backend retourne { message } pas le film, on refetch la liste
-    return filmsApi.getAll();
+    return filmsApi.getAll(); // refetch
   },
 
   async update(id: number, dto: UpdateFilmDto) {
-    // repository.update() retourne UpdateResult, on refetch après
     await http.patch(`/film/${id}`, dto);
     return filmsApi.getById(id);
   },
