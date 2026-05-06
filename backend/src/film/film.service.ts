@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateFilmDto } from './dto/create-film.dto';
 import { UpdateFilmDto } from './dto/update-film.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, ILike } from 'typeorm';
 import { Film } from './entities/film.entity';
 import { PaginationDto } from './dto/pagination.dto';
 
@@ -52,6 +52,17 @@ export class FilmService {
         hasPrevPage: page > 1,
       },
     };
+  }
+  search(query: string) {
+    if (!query) return this.findAll();
+    return this.filmRepository.find({
+      where: [
+        { title: ILike(`%${query}%`) },
+        { description: ILike(`%${query}%`) },
+        { genre: ILike(`%${query}%`) },
+        { director: ILike(`%${query}%`) },
+      ],
+    });
   }
 
   /**

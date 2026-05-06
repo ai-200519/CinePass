@@ -13,6 +13,7 @@ describe('FilmController', () => {
         findOne: jest.fn(),
         update: jest.fn(),
         remove: jest.fn(),
+        search: jest.fn(),
     };
 
     beforeEach(async () => {
@@ -40,6 +41,15 @@ describe('FilmController', () => {
         mockFilmService.findAll.mockReturnValue(films);
 
         expect(controller.findAll(mockPaginationDto)).toEqual(films);
+    });
+
+    it('should search for films', () => {
+        const films = [{ id: 1, title: 'Inception' }];
+        const query = 'Incep';
+        mockFilmService.search.mockReturnValue(films);
+
+        expect(controller.search(query)).toEqual(films);
+        expect(service.search).toHaveBeenCalledWith(query);
     });
 
     it('should return one film', () => {
