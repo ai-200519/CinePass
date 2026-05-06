@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@config "../tailwind.config.js";
+
 html,
 body,
 #root {
@@ -8,4 +10,58 @@ body,
 
 body {
   margin: 0;
+  @apply bg-cinema-bg text-white font-sans;
+}
+
+/* Leaflet base styling helpers */
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  font: inherit;
+}
+
+/* Custom red pin marker (no external image assets) */
+.cinema-pin {
+  background: transparent;
+  border: none;
+}
+
+.cinema-pin__dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 9999px;
+  background: #E50914;
+  box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.18), 0 10px 22px rgba(0, 0, 0, 0.5);
+  border: 2px solid rgba(255, 255, 255, 0.85);
+}
+
+@keyframes seatIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-seat-in {
+  opacity: 0;
+  animation: seatIn 0.35s ease forwards;
+}
+
+@keyframes snackbarIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-snackbar-in {
+  animation: snackbarIn 0.2s ease-out both;
 }

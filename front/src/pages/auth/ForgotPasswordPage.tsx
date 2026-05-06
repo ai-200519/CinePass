@@ -5,6 +5,9 @@ import iconPng from '../../assets/icon.png';
 import {
     selectForgotPasswordError,
     selectForgotPasswordStatus,
+    selectResendOtpError,
+    selectResendOtpMessage,
+    selectResendOtpStatus,
 } from '../../features/auth/authSelectors';
 import { authActions } from '../../features/auth/authSlice';
 
@@ -13,6 +16,9 @@ export default function ForgotPasswordPage() {
   const dispatch = useAppDispatch();
   const status = useAppSelector(selectForgotPasswordStatus);
   const apiError = useAppSelector(selectForgotPasswordError);
+  const resendOtpStatus = useAppSelector(selectResendOtpStatus);
+  const resendOtpError = useAppSelector(selectResendOtpError);
+  const resendOtpMessage = useAppSelector(selectResendOtpMessage);
   const [email, setEmail] = useState('');
   const [step, setStep] = useState<'email' | 'code'>('email');
   const [code, setCode] = useState('');
@@ -24,6 +30,10 @@ export default function ForgotPasswordPage() {
       setCode('');
     }
   }, [status, step]);
+
+  useEffect(() => {
+    dispatch(authActions.clearResendOtpState());
+  }, [dispatch]);
 
   const normalizedCode = useMemo(() => code.replace(/\D/g, '').slice(0, 6), [code]);
 
@@ -111,6 +121,24 @@ export default function ForgotPasswordPage() {
                     className="w-full rounded-2xl border border-white/10 bg-zinc-800/70 px-4 py-3 text-white placeholder:text-zinc-500 outline-none ring-red-500/60 transition focus:ring-2"
                   />
                 </div>
+
+                <div className="flex items-center justify-between">
+                  <button
+                    type="button"
+                    disabled={resendOtpStatus === 'loading' || !email.trim()}
+                    onClick={() =>
+                      dispatch(
+                        authActions.resendOtpRequested({
+                          email: email.trim(),
+                          purpose: 'reset_password',
+                        }),
+                      )
+                    }
+                    className="text-sm font-semibold text-zinc-300 transition hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {resendOtpStatus === 'loading' ? 'Renvoi en cours...' : 'Renvoyer le code'}
+                  </button>
+                </div>
               </>
             )}
 
@@ -122,6 +150,18 @@ export default function ForgotPasswordPage() {
             {apiError ? (
               <div className="rounded-2xl border border-red-500/30 bg-red-600/10 px-4 py-3 text-sm text-red-100">
                 {apiError}
+              </div>
+            ) : null}
+
+            {step === 'code' && resendOtpMessage ? (
+              <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-zinc-200">
+                {resendOtpMessage}
+              </div>
+            ) : null}
+
+            {step === 'code' && resendOtpError ? (
+              <div className="rounded-2xl border border-red-500/30 bg-red-600/10 px-4 py-3 text-sm text-red-100">
+                {resendOtpError}
               </div>
             ) : null}
 

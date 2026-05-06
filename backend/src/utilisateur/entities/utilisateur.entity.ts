@@ -1,11 +1,14 @@
 import {
   Entity, PrimaryGeneratedColumn, Column,
-  CreateDateColumn, OneToMany
+  CreateDateColumn, OneToMany,
+  JoinColumn,
+  ManyToOne
 } from 'typeorm';
 import { Role } from '../../common/enums/role.enum';
 import { StatutUtilisateur } from '../../common/enums/statut-utilisateur.enum';
 import { Notification } from '../../notification/entities/notification.entity';
 import { Reservation } from '../../reservation/entities/reservation.entity';
+import { Cinema } from 'src/cinema/entities/cinema.entity';
 
 @Entity('utilisateur')
 export class Utilisateur {
@@ -66,4 +69,7 @@ export class Utilisateur {
 
   @OneToMany(() => Notification, n => n.utilisateur)
   notifications: Notification[];
+  @ManyToOne(() => Cinema, c => c.staff, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'id_cinema' })
+  cinema?: Cinema;
 }

@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import type { Seance } from './seancesApi';
+import type { Seance, CreateSeanceDto, UpdateSeanceDto } from './seancesApi';
 
 export type AsyncStatus = 'idle' | 'loading' | 'succeeded' | 'failed';
 
@@ -42,7 +42,8 @@ const seancesSlice = createSlice({
       state.fetchSeances.error = action.payload.error;
     },
 
-    createSeanceRequested(state, _action: PayloadAction<Seance>) {
+    // ✅ CreateSeanceDto au lieu de Seance — pas de champs title/numero parasites
+    createSeanceRequested(state, _action: PayloadAction<CreateSeanceDto>) {
       state.createSeance.status = 'loading';
       state.createSeance.error = null;
     },
@@ -56,7 +57,8 @@ const seancesSlice = createSlice({
       state.createSeance.error = action.payload.error;
     },
 
-    updateSeanceRequested(state, _action: PayloadAction<{ id: number; seance: Seance }>) {
+    // ✅ UpdateSeanceDto au lieu de Seance
+    updateSeanceRequested(state, _action: PayloadAction<{ id: number; seance: UpdateSeanceDto }>) {
       state.updateSeance.status = 'loading';
       state.updateSeance.error = null;
     },

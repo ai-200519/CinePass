@@ -22,7 +22,7 @@ function* loginWorker(action: ReturnType<typeof authActions.loginRequested>): Ge
       motDePasse: action.payload.password,
     });
     tokenStorage.set(data.access_token);
-    yield put(authActions.loginSucceeded({ token: data.access_token }));
+    yield put(authActions.loginSucceeded({ token: data.access_token, user: data.user }));
   } catch (err) {
     yield put(authActions.loginFailed({ error: getErrorMessage(err) }));
   }
@@ -53,11 +53,25 @@ function* registerOtpWorker(
     });
     if (data?.access_token) {
       tokenStorage.set(data.access_token);
-      yield put(authActions.loginSucceeded({ token: data.access_token }));
+      yield put(authActions.loginSucceeded({ token: data.access_token, user: data.user }));
     }
     yield put(authActions.registerOtpSucceeded());
   } catch (err) {
     yield put(authActions.registerOtpFailed({ error: getErrorMessage(err) }));
+  }
+}
+
+function* resendOtpWorker(
+  action: ReturnType<typeof authActions.resendOtpRequested>,
+): Generator {
+  try {
+    const data: Awaited<ReturnType<typeof authApi.resendOtp>> = yield call(authApi.resendOtp, {
+      email: action.payload.email,
+      purpose: action.payload.purpose,
+    });
+    yield put(authActions.resendOtpSucceeded({ message: data.message }));
+  } catch (err) {
+    yield put(authActions.resendOtpFailed({ error: getErrorMessage(err) }));
   }
 }
 
@@ -95,6 +109,7 @@ export function* authSaga(): Generator {
   yield takeLatest(authActions.loginRequested.type, loginWorker);
   yield takeLatest(authActions.registerRequested.type, registerWorker);
   yield takeLatest(authActions.registerOtpRequested.type, registerOtpWorker);
+  yield takeLatest(authActions.resendOtpRequested.type, resendOtpWorker);
   yield takeLatest(authActions.logout.type, logoutWorker);
   yield takeLatest(authActions.forgotPasswordRequested.type, forgotPasswordWorker);
   yield takeLatest(authActions.resetPasswordRequested.type, resetPasswordWorker);

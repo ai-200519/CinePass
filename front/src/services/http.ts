@@ -17,3 +17,24 @@ http.interceptors.request.use((config) => {
   }
   return config;
 });
+
+http.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const status = error?.response?.status;
+
+    // If the backend returns 401, the JWT is missing/expired/invalid (or user was deleted).
+    // Clear token and force navigation to login so UI doesn't stay stuck on admin pages.
+    if (status === 401) {
+      tokenStorage.clear();
+      if (typeof window !== 'undefined') {
+        const currentPath = window.location?.pathname ?? '';
+        if (!currentPath.startsWith('/login')) {
+          window.location.assign('/login');
+        }
+      }
+    }
+
+    return Promise.reject(error);
+  },
+);
