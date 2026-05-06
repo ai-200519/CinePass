@@ -1,8 +1,9 @@
-import { ChevronsUpDown, Filter, MapPin, Search, SlidersHorizontal, Ticket } from 'lucide-react';
+import { ChevronsUpDown, Filter, MapPin, SlidersHorizontal, Ticket } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import Footer from '../components/Footer';
+import FilmSearchBar from '../components/FilmSearchBar';
 import MovieCard from '../components/MovieCard';
 import Navbar from '../components/Navbar';
 import { selectAuthRole } from '../features/auth/authSelectors';
@@ -41,9 +42,7 @@ export default function HomePage() {
   const cinemasError = useAppSelector(selectCinemasError);
 
   useEffect(() => {
-    if (role === 'ADMIN') {
-      navigate('/admin', { replace: true });
-    }
+    if (role === 'ADMIN') navigate('/admin', { replace: true });
   }, [navigate, role]);
 
   const [selectedCity, setSelectedCity] = useState('');
@@ -72,30 +71,28 @@ export default function HomePage() {
   }, [cities, selectedCity]);
 
   const genres = useMemo(
-    () =>
-      [
-        'Tous',
-        ...Array.from(
-          new Set(
-            films
-              .map((film) => film.genre?.trim())
-              .filter((genre): genre is string => Boolean(genre)),
-          ),
+    () => [
+      'Tous',
+      ...Array.from(
+        new Set(
+          films
+            .map((film) => film.genre?.trim())
+            .filter((genre): genre is string => Boolean(genre)),
         ),
-      ],
+      ),
+    ],
     [films],
   );
 
   const visibleMovies = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
-
     return films.filter((movie) => {
       const matchesQuery =
         !normalizedQuery ||
         movie.title.toLowerCase().includes(normalizedQuery) ||
-        movie.genre.toLowerCase().includes(normalizedQuery);
+        movie.genre.toLowerCase().includes(normalizedQuery) ||
+        movie.director?.toLowerCase().includes(normalizedQuery);
       const matchesGenre = activeGenre === 'Tous' || movie.genre === activeGenre;
-
       return matchesQuery && matchesGenre;
     });
   }, [activeGenre, query, films]);
@@ -107,6 +104,7 @@ export default function HomePage() {
     <div className="min-h-screen bg-[#09090b] text-white">
       <Navbar />
 
+      {/* ── Hero ── */}
       <section className="relative isolate overflow-hidden border-b border-white/10">
         <img
           src="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=2200&q=85"
@@ -142,16 +140,14 @@ export default function HomePage() {
                     <MapPin className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-red-400" />
                     <select
                       value={selectedCity}
-                      onChange={(event) => setSelectedCity(event.target.value)}
+                      onChange={(e) => setSelectedCity(e.target.value)}
                       disabled={cities.length === 0}
                       className="h-14 w-full appearance-none rounded-lg border border-white/10 bg-zinc-900 pl-11 pr-11 text-base font-black text-white outline-none transition focus:border-red-500 focus:ring-4 focus:ring-red-500/10"
                       aria-label="Choisir une ville"
                     >
                       {cities.length === 0 && <option value="">Aucune ville</option>}
                       {cities.map((city) => (
-                        <option key={city} value={city}>
-                          {city}
-                        </option>
+                        <option key={city} value={city}>{city}</option>
                       ))}
                     </select>
                     <ChevronsUpDown className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
@@ -170,6 +166,7 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ── Catalogue ── */}
       <section id="films" className="bg-[#09090b]">
         <div className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
           <div className="mb-6 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
@@ -186,33 +183,32 @@ export default function HomePage() {
               </p>
             </div>
 
+            {/* ── Filtres : ville + recherche ── */}
             <div className="grid w-full gap-3 lg:w-[520px] lg:grid-cols-[180px_1fr]">
               <select
                 value={selectedCity}
-                onChange={(event) => setSelectedCity(event.target.value)}
+                onChange={(e) => setSelectedCity(e.target.value)}
                 disabled={cities.length === 0}
                 className="h-12 rounded-lg border border-white/10 bg-zinc-900 px-4 text-sm font-bold text-white outline-none transition focus:border-red-500 focus:ring-4 focus:ring-red-500/10"
                 aria-label="Filtrer par ville"
               >
                 {cities.length === 0 && <option value="">Aucune ville</option>}
                 {cities.map((city) => (
-                  <option key={city} value={city}>
-                    {city}
-                  </option>
+                  <option key={city} value={city}>{city}</option>
                 ))}
               </select>
-              <div className="relative">
-                <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
-                <input
-                  value={query}
-                  onChange={(event) => setQuery(event.target.value)}
-                  placeholder="Rechercher un film ou un genre"
-                  className="h-12 w-full rounded-lg border border-white/10 bg-zinc-900 pl-11 pr-4 text-sm text-white outline-none transition placeholder:text-zinc-500 focus:border-red-500 focus:ring-4 focus:ring-red-500/10"
-                />
-              </div>
+
+              {/* 🔍 Barre de recherche avec suggestions */}
+              <FilmSearchBar
+                value={query}
+                onChange={setQuery}
+                placeholder="Rechercher un film ou un genre"
+                showSuggestions={true}
+              />
             </div>
           </div>
 
+          {/* ── Filtres genre ── */}
           <div className="sticky top-20 z-10 mb-8 space-y-4 rounded-lg border border-white/10 bg-zinc-950/90 p-4 backdrop-blur-xl">
             <div className="flex items-center gap-3 overflow-x-auto pb-1">
               <SlidersHorizontal className="h-5 w-5 shrink-0 text-zinc-500" />
@@ -230,9 +226,9 @@ export default function HomePage() {
                 </button>
               ))}
             </div>
-
           </div>
 
+          {/* ── Compteur ── */}
           <div className="mb-5 flex items-center justify-between text-sm text-zinc-400">
             <span>
               {visibleMovies.length} film{visibleMovies.length > 1 ? 's' : ''} disponible
@@ -241,36 +237,41 @@ export default function HomePage() {
             <span className="hidden sm:inline-flex">Selection cinema: {cityLabel}</span>
           </div>
 
+          {/* ── Erreurs ── */}
           {(filmsError || cinemasError) && (
             <div className="mb-5 rounded-lg border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-100">
               {filmsError || cinemasError}
             </div>
           )}
 
+          {/* ── Loading ── */}
           {isLoading && (
             <div className="rounded-lg border border-white/10 bg-zinc-900 p-10 text-center text-zinc-400">
               Chargement du catalogue...
             </div>
           )}
 
+          {/* ── Grille films ── */}
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {!isLoading && visibleMovies.map((movie) => (
-              <MovieCard
-                key={movie.id}
-                title={movie.title}
-                genre={movie.genre}
-                rating={String(movie.note ?? 0)}
-                image={movie.poster || fallbackPoster}
-                duration={formatDuration(movie.duration)}
-                badge={movie.isShowing ? 'A l affiche' : 'A venir'}
-                format={movie.statut === 'EN_COURS' ? 'Maintenant' : 'Bientot'}
-                language="Catalogue"
-                times={[]}
-                onDetails={() => navigate(`/films/${movie.id}`)}
-              />
-            ))}
+            {!isLoading &&
+              visibleMovies.map((movie) => (
+                <MovieCard
+                  key={movie.id}
+                  title={movie.title}
+                  genre={movie.genre}
+                  rating={String(movie.note ?? 0)}
+                  image={movie.poster || fallbackPoster}
+                  duration={formatDuration(movie.duration)}
+                  badge={movie.isShowing ? 'A l affiche' : 'A venir'}
+                  format={movie.statut === 'EN_COURS' ? 'Maintenant' : 'Bientot'}
+                  language="Catalogue"
+                  times={[]}
+                  onDetails={() => navigate(`/films/${movie.id}`)}
+                />
+              ))}
           </div>
 
+          {/* ── Empty state ── */}
           {!isLoading && visibleMovies.length === 0 && (
             <div className="rounded-lg border border-white/10 bg-zinc-900 p-10 text-center">
               <h3 className="text-xl font-black text-white">Aucun film trouve</h3>
@@ -282,6 +283,7 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ── Stats ── */}
       <section className="border-y border-white/10 bg-zinc-950">
         <div className="mx-auto grid w-full max-w-7xl gap-4 px-4 py-8 sm:px-6 md:grid-cols-3 lg:px-8">
           {[
