@@ -2,9 +2,9 @@ import { call, put, takeLatest } from 'redux-saga/effects';
 import { filmsApi, type Film } from './filmsApi';
 import { filmsActions } from './filmsSlice';
 
-function* fetchFilmsSaga() {
+function* fetchFilmsSaga(action: ReturnType<typeof filmsActions.fetchFilmsRequested>) {
   try {
-    const films: Film[] = yield call(filmsApi.getAll);
+    const films: Film[] = yield call(filmsApi.getAll, action.payload);
     yield put(filmsActions.fetchFilmsSucceeded(films));
   } catch (error: any) {
     yield put(filmsActions.fetchFilmsFailed({ error: error?.response?.data?.message || error.message }));

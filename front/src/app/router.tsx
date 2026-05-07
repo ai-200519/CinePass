@@ -17,6 +17,7 @@ import RegisterPage from '../pages/auth/RegisterPage';
 import ResetPasswordPage from '../pages/auth/ResetPasswordPage';
 import FilmDetailPage from '../pages/FilmDetailPage';
 import HomePage from '../pages/HomePage';
+import ReservationsPage from '../pages/ReservationsPage';
 import SeatSelectionPage from '../pages/SeatSelectionPage';
 
 
@@ -28,6 +29,7 @@ export const router = createBrowserRouter([
       { index: true, element: <HomePage /> },
       { path: 'films/:id', element: <FilmDetailPage /> },
       { path: 'seances/:id/seats', element: <SeatSelectionPage /> },
+      { path: 'reservations', element: <ReservationsPage /> },
       { path: 'login', element: <LoginPage /> },
       { path: 'register', element: <RegisterPage /> },
       { path: 'forgot-password', element: <ForgotPasswordPage /> },

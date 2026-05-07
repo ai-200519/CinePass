@@ -32,6 +32,12 @@ export type CreateFilmDto = {
 
 export type UpdateFilmDto = Partial<CreateFilmDto>;
 
+export type GetFilmsParams = {
+  page?: number;
+  limit?: number;
+  ville?: string;
+};
+
 const normalizeFilm = (film: any): Film => ({
   ...film,
   note: typeof film.note === 'string' ? parseFloat(film.note) : film.note,
@@ -41,8 +47,8 @@ const normalizeFilm = (film: any): Film => ({
 });
 
 export const filmsApi = {
-  async getAll() {
-    const res = await http.get('/film/all');
+  async getAll(params: GetFilmsParams = {}) {
+    const res = await http.get('/film/all', { params });
     // Backend may return a paginated object { data, meta } or a plain array.
     const payload = res?.data && res.data.data !== undefined ? res.data.data : res.data;
     if (!Array.isArray(payload)) return [];

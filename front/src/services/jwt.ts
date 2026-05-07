@@ -1,6 +1,8 @@
 export type JwtPayload = {
   sub?: number;
   email?: string;
+  nom?: string;
+  prenom?: string;
   role?: string;
   id_cinema?: number | null;
   iat?: number;
