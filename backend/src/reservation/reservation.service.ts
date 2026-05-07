@@ -81,6 +81,7 @@ export class ReservationService {
         // 2a. Verify siege exists and belongs to this séance's salle
         const siege = await queryRunner.manager.findOne(Siege, {
           where: { id_siege: item.id_siege },
+          relations: ['salle'],
         });
 
         if (!siege) {
@@ -117,7 +118,7 @@ export class ReservationService {
         }
 
         // 2c. Find tarif for typePublic
-        const tarif = await queryRunner.manager.findOne(Tarif, {
+        let tarif = await queryRunner.manager.findOne(Tarif, {
           where: {
             seance: { id_seance: dto.id_seance },
             typePublic: item.typePublic as any,
@@ -125,6 +126,19 @@ export class ReservationService {
         });
 
         if (!tarif) {
+          const defaultPrices: Record<string, number> = {
+            NORMAL: 50,
+            ETUDIANT: 40,
+            ENFANT: 35,
+            SENIOR: 35,
+            GROUPE: 45,
+          };
+          tarif = queryRunner.manager.create(Tarif, {
+            seance: { id_seance: dto.id_seance },
+            typePublic: item.typePublic as any,
+            prix: defaultPrices[item.typePublic] ?? 50,
+          });
+          await queryRunner.manager.save(tarif);
           throw new BadRequestException(
             `Aucun tarif ${item.typePublic} disponible pour cette séance`,
           );

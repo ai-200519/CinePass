@@ -1,4 +1,4 @@
-import { ChevronRight, Clock3, Play, Star, Ticket } from 'lucide-react';
+import { ChevronRight, Clock3, Play, Star, Ticket } from "lucide-react";
 
 type MovieCardProps = {
   title: string;
@@ -11,6 +11,8 @@ type MovieCardProps = {
   badge?: string;
   duration?: string;
   times?: string[];
+  onPlay?: () => void;
+  onReserve?: () => void;
   onDetails?: () => void;
 };
 
@@ -19,12 +21,14 @@ export default function MovieCard({
   genre,
   rating,
   image,
-  age = 'TP',
-  language = 'VF',
-  format = '2D',
+  age = "TP",
+  language = "VF",
+  format = "2D",
   badge,
-  duration = '2h00',
+  duration = "2h00",
   times = [],
+  onPlay,
+  onReserve,
   onDetails,
 }: MovieCardProps) {
   const ratingNumber = Number(rating);
@@ -48,6 +52,8 @@ export default function MovieCard({
         )}
 
         <button
+          type="button"
+          onClick={onPlay}
           className="absolute right-3 top-3 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white text-zinc-950 shadow-lg transition hover:scale-105"
           aria-label={`Voir la bande annonce de ${title}`}
         >
@@ -56,7 +62,9 @@ export default function MovieCard({
 
         <div className="absolute inset-x-0 bottom-0 p-4">
           <div className="mb-2 flex flex-wrap gap-2">
-            <span className="rounded-md bg-white px-2 py-1 text-xs font-black text-zinc-950">{format}</span>
+            <span className="rounded-md bg-white px-2 py-1 text-xs font-black text-zinc-950">
+              {format}
+            </span>
             <span className="rounded-md bg-black/70 px-2 py-1 text-xs font-bold text-white backdrop-blur">
               {language}
             </span>
@@ -64,7 +72,9 @@ export default function MovieCard({
               {age}
             </span>
           </div>
-          <h3 className="line-clamp-2 text-2xl font-black leading-tight text-white">{title}</h3>
+          <h3 className="line-clamp-2 text-2xl font-black leading-tight text-white">
+            {title}
+          </h3>
         </div>
       </div>
 
@@ -78,9 +88,14 @@ export default function MovieCard({
         <div className="absolute inset-0 -z-10 bg-gradient-to-b from-zinc-950/95 via-zinc-950/70 to-zinc-950/95" />
 
         <div className="flex items-center justify-between gap-3">
-          <span className="rounded-md bg-white/5 px-3 py-1.5 text-sm font-bold text-zinc-300">{genre}</span>
+          <span className="rounded-md bg-white/5 px-3 py-1.5 text-sm font-bold text-zinc-300">
+            {genre}
+          </span>
           <span className="inline-flex items-center gap-2 rounded-md bg-black/70 px-2.5 py-1 text-sm font-black text-amber-300 backdrop-blur">
-            <Star className="h-4 w-4 fill-amber-300 text-amber-300" aria-hidden="true" />
+            <Star
+              className="h-4 w-4 fill-amber-300 text-amber-300"
+              aria-hidden="true"
+            />
             {safeRating.toFixed(1)}/10
           </span>
         </div>
@@ -102,7 +117,11 @@ export default function MovieCard({
         </div>
 
         <div className="grid grid-cols-[1fr_auto] gap-2 pt-1">
-          <button className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-red-600 px-4 text-sm font-black text-white transition hover:bg-red-500">
+          <button
+            type="button"
+            onClick={onReserve}
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-red-600 px-4 text-sm font-black text-white transition hover:bg-red-500"
+          >
             <Ticket className="h-4 w-4" />
             Reserver
           </button>

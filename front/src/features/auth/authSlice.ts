@@ -54,6 +54,9 @@ const authSlice = createSlice({
       state.role = payload?.role ?? null;
       state.user = payload?.email
         ? {
+            id: payload.sub,
+            nom: payload.nom,
+            prenom: payload.prenom,
             email: payload.email,
             role: payload.role,
             id_cinema: payload.id_cinema ?? null,
@@ -83,7 +86,18 @@ const authSlice = createSlice({
       state.token = action.payload.token;
       const payload = decodeJwtPayload(action.payload.token);
       state.role = action.payload.user?.role ?? payload?.role ?? null;
-      state.user = action.payload.user ?? (payload?.email ? { email: payload.email, role: payload.role } : null);
+      state.user =
+        action.payload.user ??
+        (payload?.email
+          ? {
+              id: payload.sub,
+              nom: payload.nom,
+              prenom: payload.prenom,
+              email: payload.email,
+              role: payload.role,
+              id_cinema: payload.id_cinema ?? null,
+            }
+          : null);
       state.login.status = 'succeeded';
       state.login.error = null;
     },

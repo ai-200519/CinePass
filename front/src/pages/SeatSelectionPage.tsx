@@ -4,11 +4,14 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import Footer from '../components/Footer';
 import Navbar from '../components/Navbar';
 import { filmsApi, type Film } from '../features/films/filmsApi';
+import { reservationsApi } from '../features/reservations/reservationsapi';
 import { seancesApi, type Seance } from '../features/seances/seancesApi';
+import { siegesApi, type Siege as ApiSiege } from '../features/sieges/siegesApi';
 
 type SeatKind = 'available' | 'occupied' | 'vip';
 
 type Seat = {
+  id_siege?: number;
   row: string;
   col: number;
   kind: SeatKind;
@@ -101,6 +104,33 @@ function buildSeatMatrix(seed: number) {
   return matrix;
 }
 
+function buildSeatMatrixFromApi(sieges: ApiSiege[]) {
+  const seatMap = new Map<string, ApiSiege>();
+
+  for (const siege of sieges) {
+    seatMap.set(`${siege.rangee}${siege.numero}`, siege);
+  }
+
+  return ROWS.map((rowLabel) =>
+    COLS.map((colNum) => {
+      const siege = seatMap.get(`${rowLabel}${colNum}`);
+      if (!siege) return null;
+
+      return {
+        id_siege: siege.id_siege,
+        row: siege.rangee,
+        col: siege.numero,
+        kind:
+          siege.statut === 'BLOQUE'
+            ? 'occupied'
+            : siege.categorie === 'VIP'
+              ? 'vip'
+              : 'available',
+      } as Seat;
+    }),
+  );
+}
+
 export default function SeatSelectionPage() {
   const { id } = useParams();
   const seanceId = Number(id);
@@ -112,6 +142,8 @@ export default function SeatSelectionPage() {
   const [film, setFilm] = useState<SeatSelectionNavState['film'] | null>(navState.film ?? null);
   const [loading, setLoading] = useState(!navState.seance || !navState.film);
   const [error, setError] = useState<string | null>(null);
+  const [apiSeats, setApiSeats] = useState<ApiSiege[]>([]);
+  const [reservationLoading, setReservationLoading] = useState(false);
 
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(() => new Set());
   const [toast, setToast] = useState<string | null>(null);
@@ -132,12 +164,6 @@ export default function SeatSelectionPage() {
         return;
       }
 
-      // If we already have both, nothing to fetch
-      if (navState.seance && navState.film) {
-        setLoading(false);
-        return;
-      }
-
       try {
         setLoading(true);
         const fetchedSeance = navState.seance ?? (await seancesApi.getById(seanceId));
@@ -150,6 +176,10 @@ export default function SeatSelectionPage() {
           poster: fetchedFilm.poster,
           duration: fetchedFilm.duration,
         });
+        const idSalle = fetchedSeance.salle?.id_salle;
+        if (idSalle) {
+          setApiSeats(await siegesApi.getBySalle(idSalle));
+        }
         setError(null);
       } catch (e: any) {
         if (cancelled) return;
@@ -165,7 +195,13 @@ export default function SeatSelectionPage() {
     };
   }, [navState.film, navState.seance, seanceId]);
 
-  const seatMatrix = useMemo(() => buildSeatMatrix(Number.isFinite(seanceId) ? seanceId : 1), [seanceId]);
+  const seatMatrix = useMemo(
+    () =>
+      apiSeats.length > 0
+        ? buildSeatMatrixFromApi(apiSeats)
+        : buildSeatMatrix(Number.isFinite(seanceId) ? seanceId : 1),
+    [apiSeats, seanceId],
+  );
 
   const selectedSeats = useMemo(() => {
     const seats: Seat[] = [];
@@ -185,6 +221,31 @@ export default function SeatSelectionPage() {
 
   const bannerTime = seance ? formatTimeFr(seance.dateHeure) : '';
   const bannerDate = seance ? formatDateFr(seance.dateHeure) : '';
+
+  const handleCreateReservation = async () => {
+    if (!seance) return;
+    if (selectedSeats.some((seat) => !seat.id_siege)) {
+      setToast('Impossible de reserver: sieges serveur indisponibles.');
+      return;
+    }
+
+    try {
+      setReservationLoading(true);
+      const reservation = await reservationsApi.create({
+        id_seance: seance.id_seance,
+        sieges: selectedSeats.map((seat) => ({
+          id_siege: seat.id_siege!,
+          typePublic: 'NORMAL',
+        })),
+      });
+      setToast(`Reservation ${reservation.reference} creee.`);
+      window.setTimeout(() => navigate('/reservations'), 700);
+    } catch (e: any) {
+      setToast(e?.response?.data?.message || e?.message || 'Reservation impossible.');
+    } finally {
+      setReservationLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#141414] text-white">
@@ -282,7 +343,7 @@ export default function SeatSelectionPage() {
                       <div className="text-xs font-black text-zinc-500">{rowLabel}</div>
                       <div className="grid grid-cols-12 gap-2">
                         {COLS.map((colNum, colIdx) => {
-                          const seat = seatMatrix[rowIdx][colIdx];
+                          const seat = seatMatrix[rowIdx]?.[colIdx] ?? null;
                           if (!seat) {
                             return <div key={`${rowLabel}${colNum}`} className="h-9 w-9" />;
                           }
@@ -436,14 +497,15 @@ export default function SeatSelectionPage() {
 
                 <button
                   type="button"
-                  disabled={seatCount === 0}
+                  disabled={seatCount === 0 || reservationLoading}
+                  onClick={handleCreateReservation}
                   className={`mt-6 inline-flex h-12 w-full items-center justify-center rounded-xl px-5 text-sm font-black text-white transition ${
-                    seatCount === 0
+                    seatCount === 0 || reservationLoading
                       ? 'cursor-not-allowed bg-white/10 text-zinc-400'
                       : 'bg-[#E50914] hover:brightness-110'
                   }`}
                 >
-                  Continuer vers le paiement
+                  {reservationLoading ? 'Creation...' : 'Continuer vers le paiement'}
                 </button>
               </div>
             )}

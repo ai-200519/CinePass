@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import type { Film } from './filmsApi';
+import type { Film, GetFilmsParams } from './filmsApi';
 
 export type AsyncStatus = 'idle' | 'loading' | 'succeeded' | 'failed';
 export type AsyncState = { status: AsyncStatus; error: string | null };
@@ -24,7 +24,7 @@ const filmsSlice = createSlice({
   name: 'films',
   initialState,
   reducers: {
-    fetchFilmsRequested(state) {
+    fetchFilmsRequested(state, _action: PayloadAction<GetFilmsParams | undefined>) {
       state.fetchFilms.status = 'loading';
       state.fetchFilms.error = null;
     },

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards } from '@nestjs/common';
 import { SiegeService } from './siege.service';
 import { CreateSiegeDto } from './dto/create-siege.dto';
 import { UpdateSiegeDto } from './dto/update-siege.dto';
@@ -48,8 +48,8 @@ export class SiegeController {
   @Get()
   @UseGuards(JwtAuthGuard)
   @Roles(Role.ADMIN, Role.CLIENT, Role.STAFF)
-  findAll() {
-    return this.siegeService.findAll();
+  findAll(@Query('id_salle') idSalle?: string) {
+    return this.siegeService.findAll(idSalle ? +idSalle : undefined);
   }
 
   @ApiOperation({

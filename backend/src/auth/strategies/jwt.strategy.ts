@@ -7,6 +7,8 @@ import { UtilisateurService } from '../../utilisateur/utilisateur.service';
 export interface JwtPayload {
   sub:   number;   // id_utilisateur
   email: string;
+  nom?: string;
+  prenom?: string;
   role:  string;
   id_cinema?: number; // ← optional cinema ID for STAFF users
 }

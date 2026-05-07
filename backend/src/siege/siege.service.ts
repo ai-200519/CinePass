@@ -30,12 +30,19 @@ export class SiegeService {
     return this.siegeRepository.save(siege);
   }
 
-  async findAll() {
-    return this.siegeRepository.find();
+  async findAll(idSalle?: number) {
+    return this.siegeRepository.find({
+      where: idSalle ? { salle: { id_salle: idSalle } } : undefined,
+      relations: ['salle'],
+      order: { rangee: 'ASC', numero: 'ASC' },
+    });
   }
 
   async findOne(id: number) {
-    const siege = await this.siegeRepository.findOne({ where: { id_siege: id } });
+    const siege = await this.siegeRepository.findOne({
+      where: { id_siege: id },
+      relations: ['salle'],
+    });
     if (!siege) {
       throw new NotFoundException(`Siege with ID ${id} not found`);
     }
