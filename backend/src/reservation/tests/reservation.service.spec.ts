@@ -14,6 +14,7 @@ const mockReservationRepo = {
   findOne: jest.fn(),
   find: jest.fn(),
   update: jest.fn(),
+  createQueryBuilder: jest.fn(),
 };
 
 const mockReservationSiegeRepo = {};
@@ -180,5 +181,168 @@ describe('ReservationService', () => {
     } as any);
 
     await expect(service.findOne(1, 7)).rejects.toThrow(ForbiddenException);
+  });
+
+  describe('expireOldReservations', () => {
+    it('should not update anything when no expired reservations exist', async () => {
+      const mockQueryBuilder = {
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        getMany: jest.fn().mockResolvedValue([]),
+      };
+
+      mockReservationRepo.createQueryBuilder = jest.fn().mockReturnValue(mockQueryBuilder);
+
+      const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+
+      await service.expireOldReservations();
+
+      expect(mockQueryBuilder.where).toHaveBeenCalledWith(
+        'r.statut = :statut',
+        { statut: StatutReservation.EN_COURS },
+      );
+      expect(mockQueryBuilder.getMany).toHaveBeenCalled();
+      expect(consoleSpy).not.toHaveBeenCalled();
+
+      consoleSpy.mockRestore();
+    });
+
+    it('should expire old EN_COURS reservations older than 10 minutes', async () => {
+      const now = new Date();
+      const elevenMinutesAgo = new Date(now.getTime() - 11 * 60 * 1000);
+
+      const expiredReservations = [
+        { id_reservation: 1, reference: 'CP-2026-ABC123', statut: StatutReservation.EN_COURS, dateReservation: elevenMinutesAgo },
+        { id_reservation: 2, reference: 'CP-2026-DEF456', statut: StatutReservation.EN_COURS, dateReservation: elevenMinutesAgo },
+      ];
+
+      const mockQueryBuilder = {
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        getMany: jest.fn().mockResolvedValue(expiredReservations),
+      };
+
+      const mockUpdateQueryBuilder = {
+        update: jest.fn().mockReturnThis(),
+        set: jest.fn().mockReturnThis(),
+        whereInIds: jest.fn().mockReturnThis(),
+        execute: jest.fn().mockResolvedValue({ affected: 2 }),
+      };
+
+      mockReservationRepo.createQueryBuilder = jest
+        .fn()
+        .mockReturnValueOnce(mockQueryBuilder)
+        .mockReturnValueOnce(mockUpdateQueryBuilder);
+
+      const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+
+      await service.expireOldReservations();
+
+      expect(mockUpdateQueryBuilder.update).toHaveBeenCalledWith(Reservation);
+      expect(mockUpdateQueryBuilder.set).toHaveBeenCalledWith({
+        statut: StatutReservation.EXPIREE,
+      });
+      expect(mockUpdateQueryBuilder.whereInIds).toHaveBeenCalledWith([1, 2]);
+      expect(mockUpdateQueryBuilder.execute).toHaveBeenCalled();
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining('2 réservation(s) expirée(s)'),
+      );
+
+      consoleSpy.mockRestore();
+    });
+
+    it('should handle single expired reservation', async () => {
+      const now = new Date();
+      const elevenMinutesAgo = new Date(now.getTime() - 11 * 60 * 1000);
+
+      const expiredReservations = [
+        { id_reservation: 5, reference: 'CP-2026-XYZ789', statut: StatutReservation.EN_COURS, dateReservation: elevenMinutesAgo },
+      ];
+
+      const mockQueryBuilder = {
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        getMany: jest.fn().mockResolvedValue(expiredReservations),
+      };
+
+      const mockUpdateQueryBuilder = {
+        update: jest.fn().mockReturnThis(),
+        set: jest.fn().mockReturnThis(),
+        whereInIds: jest.fn().mockReturnThis(),
+        execute: jest.fn().mockResolvedValue({ affected: 1 }),
+      };
+
+      mockReservationRepo.createQueryBuilder = jest
+        .fn()
+        .mockReturnValueOnce(mockQueryBuilder)
+        .mockReturnValueOnce(mockUpdateQueryBuilder);
+
+      const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+
+      await service.expireOldReservations();
+
+      expect(mockUpdateQueryBuilder.whereInIds).toHaveBeenCalledWith([5]);
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining('CP-2026-XYZ789'),
+      );
+
+      consoleSpy.mockRestore();
+    });
+
+    it('should query for EN_COURS reservations with correct time limit', async () => {
+      const mockQueryBuilder = {
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        getMany: jest.fn().mockResolvedValue([]),
+      };
+
+      mockReservationRepo.createQueryBuilder = jest.fn().mockReturnValue(mockQueryBuilder);
+
+      jest.spyOn(console, 'log').mockImplementation();
+
+      await service.expireOldReservations();
+
+      expect(mockQueryBuilder.where).toHaveBeenCalledWith(
+        'r.statut = :statut',
+        { statut: StatutReservation.EN_COURS },
+      );
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
+        'r.dateReservation < :limit',
+        expect.objectContaining({
+          limit: expect.any(Date),
+        }),
+      );
+
+      jest.restoreAllMocks();
+    });
+
+    it('should not throw when database update fails', async () => {
+      const now = new Date();
+      const elevenMinutesAgo = new Date(now.getTime() - 11 * 60 * 1000);
+
+      const expiredReservations = [
+        { id_reservation: 1, reference: 'CP-2026-ABC123', statut: StatutReservation.EN_COURS, dateReservation: elevenMinutesAgo },
+      ];
+
+      const mockQueryBuilder = {
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        getMany: jest.fn().mockResolvedValue(expiredReservations),
+      };
+
+      const mockUpdateQueryBuilder = {
+        update: jest.fn().mockReturnThis(),
+        set: jest.fn().mockReturnThis(),
+        whereInIds: jest.fn().mockReturnThis(),
+        execute: jest.fn().mockRejectedValue(new Error('Database error')),
+      };
+
+      mockReservationRepo.createQueryBuilder = jest
+        .fn()
+        .mockReturnValueOnce(mockQueryBuilder)
+        .mockReturnValueOnce(mockUpdateQueryBuilder);
+
+      await expect(service.expireOldReservations()).rejects.toThrow('Database error');
+    });
   });
 });
