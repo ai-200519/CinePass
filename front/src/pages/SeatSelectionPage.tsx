@@ -105,13 +105,17 @@ function buildSeatMatrix(seed: number) {
 }
 
 function buildSeatMatrixFromApi(sieges: ApiSiege[]) {
-  const rows = Array.from(new Set(sieges.map((s) => s.rangee))).sort();
-  const cols = Array.from(new Set(sieges.map((s) => s.numero))).sort((a, b) => a - b);
+  const seatMap = new Map<string, ApiSiege>();
 
-  return rows.map((rowLabel) =>
-    cols.map((colNum) => {
-      const siege = sieges.find((s) => s.rangee === rowLabel && s.numero === colNum);
+  for (const siege of sieges) {
+    seatMap.set(`${siege.rangee}${siege.numero}`, siege);
+  }
+
+  return ROWS.map((rowLabel) =>
+    COLS.map((colNum) => {
+      const siege = seatMap.get(`${rowLabel}${colNum}`);
       if (!siege) return null;
+
       return {
         id_siege: siege.id_siege,
         row: siege.rangee,
@@ -339,7 +343,7 @@ export default function SeatSelectionPage() {
                       <div className="text-xs font-black text-zinc-500">{rowLabel}</div>
                       <div className="grid grid-cols-12 gap-2">
                         {COLS.map((colNum, colIdx) => {
-                          const seat = seatMatrix[rowIdx][colIdx];
+                          const seat = seatMatrix[rowIdx]?.[colIdx] ?? null;
                           if (!seat) {
                             return <div key={`${rowLabel}${colNum}`} className="h-9 w-9" />;
                           }
