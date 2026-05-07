@@ -8,6 +8,7 @@ import { ReservationSiege }     from './entities/reservation-siege.entity';
 import { Seance }               from '../seance/entities/seance.entity';
 import { Siege }                from '../siege/entities/siege.entity';
 import { Tarif }                from '../tarif/entities/tarif.entity';
+import { ExpirationScheduler } from './scheduler/expiration.scheduler';
 
 @Module({
   imports: [
@@ -20,7 +21,7 @@ import { Tarif }                from '../tarif/entities/tarif.entity';
     ]),
   ],
   controllers: [ReservationController],
-  providers:   [ReservationService],
+  providers:   [ReservationService, ExpirationScheduler,],
   exports:     [ReservationService],
 })
 export class ReservationModule {}
