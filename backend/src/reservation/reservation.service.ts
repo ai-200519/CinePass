@@ -5,6 +5,7 @@ import {
   BadRequestException,
   ForbiddenException,
 } from '@nestjs/common';
+import * as QRCode from 'qrcode';
 import { InjectRepository } from '@nestjs/typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
@@ -349,6 +350,23 @@ export class ReservationService {
         })) || [],
       nbSieges: reservation.reservationSieges?.length || 0,
     };
+  }
+
+  // ── Generate QR code after payment ──────────────────────────────────────
+  async genererQRCode(reference: string): Promise<string> {
+    const reservation = await this.reservationRepo.findOne({
+      where: { reference },
+    });
+
+    if (!reservation) {
+      throw new NotFoundException('Réservation introuvable');
+    }
+
+    const qrCode = await QRCode.toDataURL(reference);
+    reservation.qrCode = qrCode;
+    await this.reservationRepo.save(reservation);
+
+    return qrCode;
   }
   
   // ── Expire old reservations — called by scheduler ─────────────────────────
