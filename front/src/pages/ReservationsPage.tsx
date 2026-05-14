@@ -1,4 +1,5 @@
 import { Calendar, DoorOpen, Eye, Trash2 } from 'lucide-react';
+import QRCode from 'qrcode';
 import { useEffect, useState } from 'react';
 import Footer from '../components/Footer';
 import Navbar from '../components/Navbar';
@@ -20,6 +21,7 @@ const formatDateTime = (iso: string) =>
 export default function ReservationsPage() {
   const [reservations, setReservations] = useState<ReservationSummary[]>([]);
   const [selected, setSelected] = useState<ReservationDetail | null>(null);
+  const [selectedQr, setSelectedQr] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,6 +41,23 @@ export default function ReservationsPage() {
   useEffect(() => {
     void loadReservations();
   }, []);
+
+  useEffect(() => {
+    if (!selected) {
+      setSelectedQr(null);
+      return;
+    }
+
+    const payload = selected.qrCode || JSON.stringify({ reference: selected.reference });
+    void QRCode.toDataURL(payload, {
+      margin: 2,
+      width: 220,
+      color: {
+        dark: '#09090b',
+        light: '#ffffff',
+      },
+    }).then(setSelectedQr);
+  }, [selected]);
 
   const cancelReservation = async (id: number) => {
     try {
@@ -140,7 +159,7 @@ export default function ReservationsPage() {
 
       {selected && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-xl rounded-2xl border border-white/10 bg-zinc-950 p-6">
+          <div className="w-full max-w-2xl rounded-2xl border border-white/10 bg-zinc-950 p-6">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h2 className="text-2xl font-black">{selected.film?.title}</h2>
@@ -150,19 +169,38 @@ export default function ReservationsPage() {
                 Fermer
               </button>
             </div>
-            <div className="mt-5 space-y-3 text-sm font-bold text-zinc-300">
-              <p>{formatDateTime(selected.seance.dateHeure)}</p>
-              <p>
-                {selected.seance.salle} - {selected.seance.technologie}
-              </p>
-              <p>
-                Sieges:{' '}
-                {selected.sieges.map((s) => `${s.rangee}${s.numero}`).join(', ')}
-              </p>
-              <p>
-                Total: {selected.sieges.reduce((sum, s) => sum + Number(s.prix), 0).toFixed(2)}{' '}
-                {selected.devise}
-              </p>
+            <div className="mt-5 grid gap-6 md:grid-cols-[220px_1fr]">
+              <div className="rounded-2xl bg-white p-3">
+                {selectedQr ? (
+                  <img
+                    src={selectedQr}
+                    alt={`QR reservation ${selected.reference}`}
+                    className="h-full w-full"
+                  />
+                ) : (
+                  <div className="flex aspect-square items-center justify-center text-sm font-black text-zinc-900">
+                    QR...
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-3 text-sm font-bold text-zinc-300">
+                <p>{formatDateTime(selected.seance.dateHeure)}</p>
+                <p>
+                  {selected.seance.salle} - {selected.seance.technologie}
+                </p>
+                <p>
+                  Sieges:{' '}
+                  {selected.sieges.map((s) => `${s.rangee}${s.numero}`).join(', ')}
+                </p>
+                <p>
+                  Total: {selected.sieges.reduce((sum, s) => sum + Number(s.prix), 0).toFixed(2)}{' '}
+                  {selected.devise}
+                </p>
+                <p className="rounded-xl border border-white/10 bg-white/5 p-3 text-xs text-zinc-400">
+                  A scanner par le staff: {selected.qrCode || JSON.stringify({ reference: selected.reference })}
+                </p>
+              </div>
             </div>
           </div>
         </div>

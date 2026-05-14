@@ -6,13 +6,16 @@ import Card from '../components/Card';
 import PrimaryButton from '../components/PrimaryButton';
 import { staffTheme } from '../theme';
 
+function formatSeats(seats = []) {
+  if (!seats.length) return '-';
+  return seats.map((seat) => `${seat.rangee}${seat.numero}`).join(', ');
+}
+
 export default function ResultatValideScreen({ navigation, route }) {
   const insets = useSafeAreaInsets();
-  const session = route?.params?.session ?? {
-    title: 'Inception',
-    time: '20:45',
-    room: 'Salle 2',
-  };
+  const session = route?.params?.session ?? {};
+  const reservation = route?.params?.result?.reservation;
+  const resultSession = reservation?.seance;
 
   return (
     <View style={{ flex: 1, backgroundColor: staffTheme.colors.bg }}>
@@ -43,40 +46,40 @@ export default function ResultatValideScreen({ navigation, route }) {
         </View>
 
         <Text style={{ marginTop: 16, color: staffTheme.colors.text, fontWeight: '900', fontSize: 22 }}>
-          ENTRÉE VALIDÉE
+          ENTREE VALIDEE
         </Text>
 
         <Card style={{ width: '100%', marginTop: 16 }}>
           <Text style={{ color: staffTheme.colors.textSecondary, fontWeight: '700' }}>Movie</Text>
           <Text style={{ color: staffTheme.colors.text, fontWeight: '900', fontSize: 18, marginTop: 6 }}>
-            {session.title ?? 'Inception'}
+            {reservation?.film?.title ?? session.title ?? 'Film'}
           </Text>
 
           <Text style={{ color: staffTheme.colors.textSecondary, fontWeight: '700', marginTop: 14 }}>
-            Séance
+            Seance
           </Text>
           <Text style={{ color: staffTheme.colors.text, fontWeight: '800', marginTop: 6 }}>
-            {(session.time ?? '14:30') + ' — ' + (session.room ?? 'Salle 2')}
+            {(session.time ?? '') + ' - ' + (resultSession?.salle ?? session.room ?? '')}
           </Text>
 
           <Text style={{ color: staffTheme.colors.textSecondary, fontWeight: '700', marginTop: 14 }}>
-            Siège(s)
+            Siege(s)
           </Text>
           <Text style={{ color: staffTheme.colors.text, fontWeight: '800', marginTop: 6 }}>
-            Rangée C — Siège 12, 13
+            {formatSeats(reservation?.sieges)}
           </Text>
 
           <Text style={{ color: staffTheme.colors.textSecondary, fontWeight: '700', marginTop: 14 }}>
             Ref
           </Text>
           <Text style={{ color: staffTheme.colors.text, fontWeight: '800', marginTop: 6 }}>
-            CIN-2026-4872
+            {reservation?.reference ?? '-'}
           </Text>
         </Card>
 
         <View style={{ width: '100%', marginTop: 22 }}>
           <PrimaryButton
-            title="Scanner le suivant ✓"
+            title="Scanner le suivant"
             onPress={() => navigation.replace('ValidationEntrees', { session })}
             tone="green"
           />

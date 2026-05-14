@@ -1,28 +1,31 @@
 import { useState } from 'react';
 import { Alert, Image, KeyboardAvoidingView, Platform, Text, TextInput, View } from 'react-native';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Card from '../components/Card';
 import PrimaryButton from '../components/PrimaryButton';
-import { login } from '../store/store';
+import { loginStaff, selectAuthStatus } from '../store/store';
 import { staffTheme } from '../theme';
 
 export default function StaffLoginScreen({ navigation }) {
   const dispatch = useDispatch();
-  const MOCK_EMAIL = 'staff@cinepass.com';
-  const MOCK_PASSWORD = 'cinepass';
+  const authStatus = useSelector(selectAuthStatus);
 
-  const [email, setEmail] = useState(MOCK_EMAIL);
-  const [password, setPassword] = useState(MOCK_PASSWORD);
+  const [email, setEmail] = useState('staff@cinepass.com');
+  const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     const normalizedEmail = email.trim().toLowerCase();
-    if (normalizedEmail !== MOCK_EMAIL || password !== MOCK_PASSWORD) {
-      Alert.alert('Identifiants invalides', `Mock login: ${MOCK_EMAIL} / ${MOCK_PASSWORD}`);
+    if (!normalizedEmail || !password) {
+      Alert.alert('Champs requis', 'Email et mot de passe sont requis.');
       return;
     }
 
-    dispatch(login({ email: normalizedEmail }));
-    navigation.replace('SeancesDuJour');
+    try {
+      await dispatch(loginStaff({ email: normalizedEmail, password })).unwrap();
+      navigation.replace('SeancesDuJour');
+    } catch (error) {
+      Alert.alert('Connexion impossible', error?.message ?? 'Identifiants invalides');
+    }
   };
 
   return (
@@ -99,8 +102,9 @@ export default function StaffLoginScreen({ navigation }) {
 
               <View style={{ marginTop: 18 }}>
                 <PrimaryButton
-                  title="Se connecter"
+                  title={authStatus === 'loading' ? 'Connexion...' : 'Se connecter'}
                   onPress={handleLogin}
+                  disabled={authStatus === 'loading'}
                 />
               </View>
             </Card>

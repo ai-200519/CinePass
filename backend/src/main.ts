@@ -35,6 +35,7 @@ async function bootstrap() {
     .addTag('Paiement', 'Paiement en ligne')
     .addTag('Notification', 'Notifications client')
     .addTag('Admin', 'Back office administrateur')
+    .addTag('Staff', 'Validation des entrees')
     .build();
 
   // Global validation
@@ -60,6 +61,6 @@ async function bootstrap() {
     },
   });
 
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.PORT ?? 3000, '0.0.0.0');
 }
 bootstrap();
