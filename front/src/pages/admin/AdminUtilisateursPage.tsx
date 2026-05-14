@@ -19,6 +19,12 @@ interface Utilisateur {
   cinema?: { id_cinema: number; nom: string } | null;
 }
 
+interface CinemaOption {
+  id_cinema: number;
+  nom: string;
+  ville?: string | null;
+}
+
 // ─── Helpers visuels ──────────────────────────────────────────────────────────
 const STATUT_STYLE: Record<Statut, string> = {
   PENDING:  'bg-amber-500/15 text-amber-400 border border-amber-500/30',
@@ -44,6 +50,7 @@ const fmtDate = (iso: string) =>
 // ─── Composant principal ──────────────────────────────────────────────────────
 export default function AdminUtilisateursPage() {
   const [users, setUsers] = useState<Utilisateur[]>([]);
+  const [cinemas, setCinemas] = useState<CinemaOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -61,14 +68,19 @@ export default function AdminUtilisateursPage() {
   // Modal changement de rôle
   const [roleTarget, setRoleTarget] = useState<Utilisateur | null>(null);
   const [roleSelected, setRoleSelected] = useState<Role>('CLIENT');
+  const [roleCinemaSelected, setRoleCinemaSelected] = useState('');
 
   // ── Chargement initial ──────────────────────────────────────────────────────
   const loadUsers = async () => {
     try {
       setLoading(true);
       setError(null);
-      const res = await http.get<Utilisateur[]>('/utilisateur');
-      setUsers(res.data);
+      const [usersRes, cinemasRes] = await Promise.all([
+        http.get<Utilisateur[]>('/utilisateur'),
+        http.get<CinemaOption[]>('/cinema'),
+      ]);
+      setUsers(usersRes.data);
+      setCinemas(cinemasRes.data);
     } catch {
       setError('Impossible de charger les utilisateurs.');
     } finally {
@@ -110,11 +122,19 @@ export default function AdminUtilisateursPage() {
 
   const confirmerRole = async () => {
     if (!roleTarget) return;
+    if (roleSelected === 'STAFF' && !roleCinemaSelected) {
+      setError('Selectionnez un cinema pour ce staff.');
+      return;
+    }
     setActionLoading(roleTarget.id_utilisateur);
     try {
-      const res = await http.patch<Utilisateur>(`/utilisateur/${roleTarget.id_utilisateur}/role`, { role: roleSelected });
+      const res = await http.patch<Utilisateur>(`/utilisateur/${roleTarget.id_utilisateur}/role`, {
+        role: roleSelected,
+        id_cinema: roleSelected === 'STAFF' ? Number(roleCinemaSelected) : null,
+      });
       setUsers((prev) => prev.map((u) => (u.id_utilisateur === roleTarget.id_utilisateur ? res.data : u)));
       setRoleTarget(null);
+      setRoleCinemaSelected('');
     } catch { setError('Impossible de changer le rôle.'); }
     finally { setActionLoading(null); }
   };
@@ -263,6 +283,11 @@ export default function AdminUtilisateursPage() {
                       <span className={`rounded-full px-3 py-1 text-xs font-semibold ${ROLE_STYLE[user.role]}`}>
                         {user.role}
                       </span>
+                      {user.role === 'STAFF' && (
+                        <p className="mt-1 text-xs text-zinc-500">
+                          {user.cinema?.nom ?? 'Aucun cinema'}
+                        </p>
+                      )}
                     </td>
 
                     {/* Statut */}
@@ -306,7 +331,11 @@ export default function AdminUtilisateursPage() {
 
                         {/* Changer rôle */}
                         <button
-                          onClick={() => { setRoleTarget(user); setRoleSelected(user.role); }}
+                          onClick={() => {
+                            setRoleTarget(user);
+                            setRoleSelected(user.role);
+                            setRoleCinemaSelected(user.cinema?.id_cinema ? String(user.cinema.id_cinema) : '');
+                          }}
                           disabled={isActing}
                           title="Changer le rôle"
                           className="flex h-8 w-8 items-center justify-center rounded-xl border border-purple-500/30 bg-purple-500/10 text-purple-400 transition hover:bg-purple-500/20 disabled:opacity-40"
@@ -386,7 +415,11 @@ export default function AdminUtilisateursPage() {
               <div className="relative">
                 <select
                   value={roleSelected}
-                  onChange={(e) => setRoleSelected(e.target.value as Role)}
+                  onChange={(e) => {
+                    const nextRole = e.target.value as Role;
+                    setRoleSelected(nextRole);
+                    if (nextRole !== 'STAFF') setRoleCinemaSelected('');
+                  }}
                   className="w-full appearance-none rounded-2xl border border-white/10 bg-zinc-800/70 px-4 py-3 text-white outline-none ring-purple-500/60 transition focus:ring-2"
                 >
                   <option value="CLIENT">CLIENT</option>
@@ -397,6 +430,29 @@ export default function AdminUtilisateursPage() {
               </div>
             </div>
 
+            {roleSelected === 'STAFF' && (
+              <div className="mt-4">
+                <label className="mb-1.5 block text-xs font-medium uppercase tracking-widest text-zinc-500">
+                  Cinema assigne
+                </label>
+                <div className="relative">
+                  <select
+                    value={roleCinemaSelected}
+                    onChange={(e) => setRoleCinemaSelected(e.target.value)}
+                    className="w-full appearance-none rounded-2xl border border-white/10 bg-zinc-800/70 px-4 py-3 text-white outline-none ring-purple-500/60 transition focus:ring-2"
+                  >
+                    <option value="">Selectionner un cinema</option>
+                    {cinemas.map((cinema) => (
+                      <option key={cinema.id_cinema} value={cinema.id_cinema}>
+                        {cinema.nom}{cinema.ville ? ` - ${cinema.ville}` : ''}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
+                </div>
+              </div>
+            )}
+
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={() => setRoleTarget(null)}
@@ -406,7 +462,13 @@ export default function AdminUtilisateursPage() {
               </button>
               <button
                 onClick={confirmerRole}
-                disabled={actionLoading === roleTarget.id_utilisateur || roleSelected === roleTarget.role}
+                disabled={
+                  actionLoading === roleTarget.id_utilisateur ||
+                  (roleSelected === roleTarget.role &&
+                    (roleSelected !== 'STAFF' ||
+                      roleCinemaSelected === (roleTarget.cinema?.id_cinema ? String(roleTarget.cinema.id_cinema) : ''))) ||
+                  (roleSelected === 'STAFF' && !roleCinemaSelected)
+                }
                 className="rounded-2xl bg-purple-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-purple-500 disabled:opacity-40"
               >
                 {actionLoading === roleTarget.id_utilisateur ? 'Enregistrement...' : 'Confirmer'}

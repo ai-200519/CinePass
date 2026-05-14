@@ -8,6 +8,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, ILike, FindManyOptions } from 'typeorm';
 import { Utilisateur } from './entities/utilisateur.entity';
+import { Cinema } from '../cinema/entities/cinema.entity';
 import { Role } from '../common/enums/role.enum';
 import { StatutUtilisateur } from '../common/enums/statut-utilisateur.enum';
 import { RegisterDto } from '../auth/dto/register.dto';
@@ -21,6 +22,9 @@ export class UtilisateurService {
   constructor(
     @InjectRepository(Utilisateur)
     private readonly utilisateurRepository: Repository<Utilisateur>,
+
+    @InjectRepository(Cinema)
+    private readonly cinemaRepository: Repository<Cinema>,
   ) {}
 
   // ── Find by email ─────────────────────────────────────────────────────────
@@ -105,6 +109,7 @@ export class UtilisateurService {
   async update(id: number, dto: UpdateUtilisateurDto): Promise<any> {
     const user = await this.utilisateurRepository.findOne({
       where: { id_utilisateur: id },
+      relations: ['cinema'],
     });
     if (!user) throw new NotFoundException(`Utilisateur #${id} introuvable`);
 
@@ -113,7 +118,29 @@ export class UtilisateurService {
       if (emailTaken) throw new ConflictException('Cet email est déjà utilisé');
     }
 
-    Object.assign(user, dto);
+    const { id_cinema, ...userFields } = dto;
+    Object.assign(user, userFields);
+
+    if (id_cinema !== undefined) {
+      if (id_cinema === null) {
+        user.cinema = null;
+      } else {
+        const cinema = await this.cinemaRepository.findOne({
+          where: { id_cinema },
+        });
+
+        if (!cinema) {
+          throw new NotFoundException(`Cinema #${id_cinema} introuvable`);
+        }
+
+        user.cinema = cinema;
+      }
+    }
+
+    if (user.role !== Role.STAFF) {
+      user.cinema = null;
+    }
+
     await this.utilisateurRepository.save(user);
     return this.findOne(id);
   }
@@ -146,8 +173,12 @@ export class UtilisateurService {
   }
 
   // ── Change role — ADMIN ───────────────────────────────────────────────────
-  async changerRole(id: number, role: Role): Promise<any> {
-    return this.update(id, { role });
+  async changerRole(
+    id: number,
+    role: Role,
+    id_cinema?: number | null,
+  ): Promise<any> {
+    return this.update(id, { role, id_cinema });
   }
 
   // ── Delete — ADMIN ────────────────────────────────────────────────────────

@@ -6,8 +6,9 @@ import Card from '../components/Card';
 import PrimaryButton from '../components/PrimaryButton';
 import { staffTheme } from '../theme';
 
-export default function ResultatInvalideScreen({ navigation }) {
+export default function ResultatInvalideScreen({ navigation, route }) {
   const insets = useSafeAreaInsets();
+  const result = route?.params?.result;
 
   return (
     <View style={{ flex: 1, backgroundColor: staffTheme.colors.bg }}>
@@ -51,12 +52,23 @@ export default function ResultatInvalideScreen({ navigation }) {
         >
           <Text style={{ color: staffTheme.colors.textSecondary, fontWeight: '700' }}>Raison</Text>
           <Text style={{ color: staffTheme.colors.text, fontWeight: '900', fontSize: 16, marginTop: 8 }}>
-            Ce billet a déjà été utilisé
+            {result?.reason ?? 'Reservation non valide'}
           </Text>
+
+          {result?.reference ? (
+            <>
+              <Text style={{ color: staffTheme.colors.textSecondary, fontWeight: '700', marginTop: 14 }}>
+                Ref
+              </Text>
+              <Text style={{ color: staffTheme.colors.text, fontWeight: '800', marginTop: 6 }}>
+                {result.reference}
+              </Text>
+            </>
+          ) : null}
         </Card>
 
         <View style={{ width: '100%', marginTop: 22 }}>
-          <PrimaryButton title="Réessayer" variant="outline" onPress={() => navigation.goBack()} />
+          <PrimaryButton title="Reessayer" variant="outline" onPress={() => navigation.goBack()} />
         </View>
       </ScrollView>
     </View>

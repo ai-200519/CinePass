@@ -197,8 +197,11 @@ export class UtilisateurController {
   @ApiOperation({ summary: "🔒 ADMIN — Changer le rôle d'un utilisateur" })
   @ApiParam({ name: 'id', type: Number })
   @ApiResponse({ status: 200, description: 'Rôle mis à jour' })
-  changerRole(@Param('id', ParseIntPipe) id: number, @Body('role') role: Role) {
-    return this.utilisateurService.changerRole(id, role);
+  changerRole(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: { role: Role; id_cinema?: number | null },
+  ) {
+    return this.utilisateurService.changerRole(id, body.role, body.id_cinema);
   }
 
   // ── DELETE /utilisateur/:id — ADMIN ──────────────────────────────────────

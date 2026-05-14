@@ -2,16 +2,19 @@ import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { useIsFocused } from '@react-navigation/native';
 import { CameraView, useCameraPermissions } from 'expo-camera/next';
 import { useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useDispatch } from 'react-redux';
 import BrandHeader from '../components/BrandHeader';
 import Card from '../components/Card';
 import PrimaryButton from '../components/PrimaryButton';
 import ProgressBar from '../components/ProgressBar';
+import { validateTicket } from '../store/store';
 import { staffTheme } from '../theme';
 
 export default function ValidationEntreesScreen({ navigation, route }) {
   const insets = useSafeAreaInsets();
+  const dispatch = useDispatch();
   const isFocused = useIsFocused();
   const [permission, requestPermission] = useCameraPermissions();
   const [hasScanned, setHasScanned] = useState(false);
@@ -23,6 +26,29 @@ export default function ValidationEntreesScreen({ navigation, route }) {
     total: 80,
   };
   const [ref, setRef] = useState('');
+
+  const handleValidation = async ({ reference, qrCode }) => {
+    try {
+      const result = await dispatch(
+        validateTicket({
+          sessionId: session.id_seance,
+          reference,
+          qrCode,
+        }),
+      ).unwrap();
+
+      if (result.valid) {
+        navigation.navigate('ResultatValide', { session, result });
+        return;
+      }
+
+      setHasScanned(false);
+      navigation.navigate('ResultatInvalide', { result });
+    } catch (error) {
+      setHasScanned(false);
+      Alert.alert('Validation impossible', error?.message ?? 'Erreur API');
+    }
+  };
 
   const occupancy = useMemo(() => {
     const ratio = session.used / session.total;
@@ -115,10 +141,7 @@ export default function ValidationEntreesScreen({ navigation, route }) {
                     onBarcodeScanned={(result) => {
                       if (hasScanned) return;
                       setHasScanned(true);
-                      navigation.navigate('ResultatValide', {
-                        session,
-                        scan: { type: result.type, data: result.data },
-                      });
+                      handleValidation({ qrCode: result.data });
                     }}
                     barcodeScannerSettings={{
                       barcodeTypes: ['qr'],
@@ -153,7 +176,7 @@ export default function ValidationEntreesScreen({ navigation, route }) {
             icon={<MaterialCommunityIcons name="qrcode" size={18} color={staffTheme.colors.text} />}
             onPress={() => {
               setHasScanned(true);
-              navigation.navigate('ResultatValide', { session, scan: { type: 'qr', data: 'MOCK-QR' } });
+              handleValidation({ qrCode: 'MOCK-QR' });
             }}
           />
         </View>

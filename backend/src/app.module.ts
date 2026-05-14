@@ -15,6 +15,7 @@ import { ReservationModule } from './reservation/reservation.module';
 import { PaiementModule } from './paiement/paiement.module';
 import { NotificationModule } from './notification/notification.module';
 import { AdminModule } from './admin/admin.module';
+import { StaffModule } from './staff/staff.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppService } from './app.service';
 import { AppController } from './app.controller';
@@ -42,7 +43,7 @@ import { ScheduleModule } from '@nestjs/schedule/dist/schedule.module';
       }),
     }),
     ScheduleModule.forRoot(),    
-    AuthModule, UtilisateurModule, CinemaModule, SalleModule, SiegeModule, FilmModule, SeanceModule, TarifModule, ReservationModule, PaiementModule, NotificationModule, AdminModule],
+    AuthModule, UtilisateurModule, CinemaModule, SalleModule, SiegeModule, FilmModule, SeanceModule, TarifModule, ReservationModule, PaiementModule, NotificationModule, AdminModule, StaffModule],
   controllers: [AppController],
   providers: [AppService],
 })
