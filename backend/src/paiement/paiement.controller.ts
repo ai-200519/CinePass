@@ -1,90 +1,111 @@
+// src/paiement/paiement.controller.ts
 import {
-  Body,
-  Controller,
-  Get,
-  Headers,
-  HttpCode,
-  HttpStatus,
-  Param,
-  ParseIntPipe,
-  Post,
-  Req,
-  UseGuards,
+  Controller, Post, Get, Body,
+  Param, ParseIntPipe, UseGuards,
+  Req, Headers, HttpCode, HttpStatus,
+  RawBodyRequest,
 } from '@nestjs/common';
 import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiParam,
-  ApiResponse,
-  ApiTags,
+  ApiTags, ApiOperation, ApiResponse,
+  ApiBearerAuth, ApiParam, ApiExcludeEndpoint,
 } from '@nestjs/swagger';
-import { Request } from 'express';
-import { PaiementService } from './paiement.service';
-import { InitierPaiementDto } from './dto/initier-paiement.dto';
-import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
-import { RolesGuard } from '../common/guards/roles.guard';
-import { Roles } from '../common/decorators/roles.decorator';
-import { Role } from '../common/enums/role.enum';
-import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { Request }             from 'express';
+import { PaiementService }     from './paiement.service';
+import { InitierPaiementDto }  from './dto/initier-paiement.dto';
+import { JwtAuthGuard }        from '../common/guards/jwt-auth.guard';
+import { RolesGuard }          from '../common/guards/roles.guard';
+import { Roles }               from '../common/decorators/roles.decorator';
+import { Role }                from '../common/enums/role.enum';
+import { CurrentUser }         from '../common/decorators/current-user.decorator';
 
 @ApiTags('Paiement')
 @Controller('paiement')
 export class PaiementController {
+
   constructor(private readonly paiementService: PaiementService) {}
 
-  // ── POST /paiement/initier — CLIENT ─────────────────────────────────────
+  // ── POST /paiement/initier — CLIENT ───────────────────────────────────────
   @Post('initier')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.CLIENT)
   @ApiBearerAuth('JWT-auth')
+  @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
-    summary: '🔒 CLIENT — Initier un paiement Stripe',
+    summary:     '🔒 CLIENT — Initier un paiement Stripe',
     description:
-      'Cree une session Stripe Checkout et retourne l URL de paiement.',
+      'Crée une session de paiement Stripe. ' +
+      'Retourne l\'URL de redirection vers la page de paiement Stripe. ' +
+      'Le frontend doit rediriger le client vers cette URL.',
   })
-  @ApiResponse({ status: 201, description: 'Session Stripe creee' })
+  @ApiResponse({
+    status: 201,
+    schema: {
+      example: {
+        id_paiement:     1,
+        stripeSessionId: 'cs_test_xxxxxxxxxxxxx',
+        url:             'https://checkout.stripe.com/pay/cs_test_xxx',
+        montantTotal:    100,
+        devise:          'MAD',
+        statut:          'EN_ATTENTE',
+        message:         'Redirigez le client vers l\'URL Stripe pour le paiement',
+      },
+    },
+  })
+  @ApiResponse({ status: 400, description: 'Réservation déjà payée ou expirée' })
+  @ApiResponse({ status: 403, description: 'Réservation d\'un autre client' })
+  @ApiResponse({ status: 404, description: 'Réservation introuvable' })
   initier(
     @Body() dto: InitierPaiementDto,
     @CurrentUser() user: any,
   ) {
-    return this.paiementService.initierPaiement(dto, user);
+    return this.paiementService.initier(dto, user.id_utilisateur);
   }
 
-  // ── GET /paiement/:id_reservation — CLIENT ──────────────────────────────
+  // ── GET /paiement/:id_reservation — CLIENT ────────────────────────────────
   @Get(':id_reservation')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.CLIENT)
   @ApiBearerAuth('JWT-auth')
-  @ApiParam({ name: 'id_reservation', description: 'ID de la reservation' })
   @ApiOperation({
-    summary: '🔒 CLIENT — Statut de paiement',
-    description: 'Retourne le statut du paiement pour une reservation.',
+    summary:     '🔒 CLIENT — Statut du paiement',
+    description: 'Retourne le statut actuel du paiement pour une réservation.',
   })
-  @ApiResponse({ status: 200, description: 'Statut retourne' })
+  @ApiParam({ name: 'id_reservation', description: 'ID de la réservation' })
+  @ApiResponse({
+    status: 200,
+    schema: {
+      example: {
+        id_paiement:          1,
+        statut:               'ACCEPTE',
+        montantTotal:         100,
+        devise:               'MAD',
+        methode:              'STRIPE',
+        referenceTransaction: 'pi_xxxxxxxxxxxxxxxxxx',
+        datePaiement:         '2026-05-15T20:00:00.000Z',
+      },
+    },
+  })
+  @ApiResponse({ status: 404, description: 'Aucun paiement trouvé' })
   getStatus(
     @Param('id_reservation', ParseIntPipe) id_reservation: number,
     @CurrentUser() user: any,
   ) {
-    return this.paiementService.getStatus(id_reservation, user);
+    return this.paiementService.getStatus(id_reservation, user.id_utilisateur);
   }
 
-  // ── POST /paiement/webhook — Stripe ─────────────────────────────────────
+  // ── POST /paiement/webhook — Stripe calls this ────────────────────────────
+  // No JWT — Stripe calls this directly
   @Post('webhook')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({
-    summary: 'Webhook Stripe',
-    description: 'Recoil des evenements Stripe (paiement confirme).',
-  })
-  @ApiResponse({ status: 200, description: 'Webhook traite' })
-  webhook(
-    @Req() req: Request,
+  @ApiExcludeEndpoint()   // hide from Swagger — not for frontend devs
+  async webhook(
+    @Req() req: RawBodyRequest<Request>,
     @Headers('stripe-signature') signature: string,
   ) {
-    const rawBody = (req as any).rawBody as Buffer | undefined;
-    if (!rawBody) {
-      return { received: false, reason: 'Raw body manquant' };
-    }
-
-    return this.paiementService.handleWebhook(rawBody, signature);
+    await this.paiementService.handleWebhook(
+      req.rawBody,   // raw body needed for Stripe signature verification
+      signature,
+    );
+    return { received: true };
   }
 }

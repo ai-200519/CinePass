@@ -368,7 +368,31 @@ export class ReservationService {
 
     return qrCode;
   }
-  
+
+  async confirmerPaiement(
+    id_reservation: number,
+    referenceTransaction: string,
+  ): Promise<void> {
+    const reservation = await this.reservationRepo.findOne({
+      where: { id_reservation },
+      relations: ['utilisateur'],
+    });
+
+    if (!reservation) return;
+
+    // Generate QR Code
+    const qrCode = await this.genererQRCode(reservation.reference);
+
+    // Update reservation → PAYEE + save QR Code
+    await this.reservationRepo.update(
+      { id_reservation },
+      {
+        statut: StatutReservation.PAYEE,
+        qrCode,
+      },
+    );
+  }
+
   // ── Expire old reservations — called by scheduler ─────────────────────────
   async expireOldReservations(): Promise<void> {
     // Find all EN_COURS reservations older than 10 minutes

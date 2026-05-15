@@ -1,74 +1,80 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import Stripe from 'stripe';
+// src/paiement/gateways/stripe.gateway.ts
+import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService }      from '@nestjs/config';
+import Stripe                 from 'stripe';
+
+type StripeClient = InstanceType<typeof Stripe>;
+type StripeEvent = ReturnType<StripeClient['webhooks']['constructEvent']>;
+type StripeSession = Awaited<ReturnType<StripeClient['checkout']['sessions']['retrieve']>>;
 
 @Injectable()
 export class StripeGateway {
-	private readonly stripe: any;
 
-	constructor(private readonly configService: ConfigService) {
-		const secretKey = this.configService.get<string>('STRIPE_SECRET_KEY');
-		if (!secretKey) {
-			throw new BadRequestException('STRIPE_SECRET_KEY manquant');
-		}
+  private readonly stripe: StripeClient;
+  private readonly logger = new Logger(StripeGateway.name);
 
-		this.stripe = new Stripe(secretKey);
-	}
+  constructor(private readonly config: ConfigService) {
+    this.stripe = new Stripe(
+      this.config.get<string>('STRIPE_SECRET_KEY'),
+      { apiVersion: '2026-04-22.dahlia' },
+    );
+  }
 
-	async createCheckoutSession(params: {
-		amount: number;
-		currency: string;
-		reservationId: number;
-		reference: string;
-	}) {
-		const successUrl = this.configService.get<string>('STRIPE_SUCCESS_URL');
-		const cancelUrl = this.configService.get<string>('STRIPE_CANCEL_URL');
+  // ── Create checkout session ─────────────────────────────────────────────
+  async createCheckoutSession(
+    montant:      number,
+    devise:       string,
+    reference:    string,
+    id_paiement:  number,
+    filmTitle:    string,
+  ): Promise<{ sessionId: string; url: string }> {
 
-		if (!successUrl || !cancelUrl) {
-			throw new BadRequestException(
-				'STRIPE_SUCCESS_URL ou STRIPE_CANCEL_URL manquant',
-			);
-		}
+    const session = await this.stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      mode:                 'payment',
+      line_items: [
+        {
+          price_data: {
+            currency:     devise.toLowerCase(),
+            unit_amount:  Math.round(montant * 100), // Stripe uses cents
+            product_data: {
+              name:        `CinePass — ${filmTitle}`,
+              description: `Réservation ${reference}`,
+            },
+          },
+          quantity: 1,
+        },
+      ],
+      metadata: {
+        id_paiement: id_paiement.toString(),
+        reference,
+      },
+      success_url: `${process.env.FRONTEND_URL}/paiement/succes?reference=${reference}`,
+      cancel_url:  `${process.env.FRONTEND_URL}/paiement/annule?reference=${reference}`,
+    });
 
-		return this.stripe.checkout.sessions.create({
-			mode: 'payment',
-			success_url: successUrl,
-			cancel_url: cancelUrl,
-			payment_method_types: ['card'],
-			line_items: [
-				{
-					price_data: {
-						currency: params.currency,
-						unit_amount: params.amount,
-						product_data: {
-							name: 'Reservation CinePass',
-							description: `Reference ${params.reference}`,
-						},
-					},
-					quantity: 1,
-				},
-			],
-			client_reference_id: String(params.reservationId),
-			metadata: {
-				reservationId: String(params.reservationId),
-				reference: params.reference,
-			},
-		});
-	}
+    this.logger.log(`✅ Stripe session created : ${session.id}`);
 
-	constructEvent(rawBody: Buffer, signature: string | string[]) {
-		const webhookSecret = this.configService.get<string>(
-			'STRIPE_WEBHOOK_SECRET',
-		);
-		if (!webhookSecret) {
-			throw new BadRequestException('STRIPE_WEBHOOK_SECRET manquant');
-		}
+    return {
+      sessionId: session.id,
+      url:       session.url,
+    };
+  }
 
-		const sig = Array.isArray(signature) ? signature[0] : signature;
-		if (!sig) {
-			throw new BadRequestException('Signature Stripe manquante');
-		}
+  // ── Verify webhook signature ────────────────────────────────────────────
+  verifyWebhook(
+    payload:   Buffer,
+    signature: string,
+  ): StripeEvent {
+    return this.stripe.webhooks.constructEvent(
+      payload,
+      signature,
+      process.env.STRIPE_WEBHOOK_SECRET,
+    );
+  }
 
-		return this.stripe.webhooks.constructEvent(rawBody, sig, webhookSecret);
-	}
+  // ── Retrieve session ────────────────────────────────────────────────────
+  async getSession(sessionId: string): Promise<StripeSession> {
+    return this.stripe.checkout.sessions.retrieve(sessionId);
+  }
 }
