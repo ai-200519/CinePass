@@ -15,11 +15,13 @@ import ForgotPasswordPage from '../pages/auth/ForgotPasswordPage';
 import LoginPage from '../pages/auth/LoginPage';
 import RegisterPage from '../pages/auth/RegisterPage';
 import ResetPasswordPage from '../pages/auth/ResetPasswordPage';
+import BookingHistoryPage from '../pages/BookingHistoryPage';
 import FilmDetailPage from '../pages/FilmDetailPage';
 import HomePage from '../pages/HomePage';
 import ReservationsPage from '../pages/ReservationsPage';
 import SeatSelectionPage from '../pages/SeatSelectionPage';
-
+import TicketPage from '../pages/TicketPage';
+import UserProfilePage from '../pages/UserProfilePage';
 
 export const router = createBrowserRouter([
   {
@@ -30,6 +32,9 @@ export const router = createBrowserRouter([
       { path: 'films/:id', element: <FilmDetailPage /> },
       { path: 'seances/:id/seats', element: <SeatSelectionPage /> },
       { path: 'reservations', element: <ReservationsPage /> },
+      { path: 'historique', element: <BookingHistoryPage /> },
+      { path: 'reservations/:id/ticket', element: <TicketPage /> },
+      { path: 'profil', element: <UserProfilePage /> },
       { path: 'login', element: <LoginPage /> },
       { path: 'register', element: <RegisterPage /> },
       { path: 'forgot-password', element: <ForgotPasswordPage /> },
