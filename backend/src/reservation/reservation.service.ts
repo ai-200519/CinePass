@@ -5,6 +5,7 @@ import {
   BadRequestException,
   ForbiddenException,
 } from '@nestjs/common';
+import * as QRCode from 'qrcode';
 import { InjectRepository } from '@nestjs/typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
@@ -350,7 +351,48 @@ export class ReservationService {
       nbSieges: reservation.reservationSieges?.length || 0,
     };
   }
-  
+
+  // ── Generate QR code after payment ──────────────────────────────────────
+  async genererQRCode(reference: string): Promise<string> {
+    const reservation = await this.reservationRepo.findOne({
+      where: { reference },
+    });
+
+    if (!reservation) {
+      throw new NotFoundException('Réservation introuvable');
+    }
+
+    const qrCode = await QRCode.toDataURL(reference);
+    reservation.qrCode = qrCode;
+    await this.reservationRepo.save(reservation);
+
+    return qrCode;
+  }
+
+  async confirmerPaiement(
+    id_reservation: number,
+    referenceTransaction: string,
+  ): Promise<void> {
+    const reservation = await this.reservationRepo.findOne({
+      where: { id_reservation },
+      relations: ['utilisateur'],
+    });
+
+    if (!reservation) return;
+
+    // Generate QR Code
+    const qrCode = await this.genererQRCode(reservation.reference);
+
+    // Update reservation → PAYEE + save QR Code
+    await this.reservationRepo.update(
+      { id_reservation },
+      {
+        statut: StatutReservation.PAYEE,
+        qrCode,
+      },
+    );
+  }
+
   // ── Expire old reservations — called by scheduler ─────────────────────────
   async expireOldReservations(): Promise<void> {
     // Find all EN_COURS reservations older than 10 minutes
