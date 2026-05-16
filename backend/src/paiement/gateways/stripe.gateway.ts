@@ -49,8 +49,8 @@ export class StripeGateway {
         id_paiement: id_paiement.toString(),
         reference,
       },
-      success_url: `${process.env.FRONTEND_URL}/paiement/succes?reference=${reference}`,
-      cancel_url:  `${process.env.FRONTEND_URL}/paiement/annule?reference=${reference}`,
+      success_url: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/paiement/succes?reference=${reference}`,
+      cancel_url:  `${process.env.FRONTEND_URL || 'http://localhost:5173'}/paiement/annule?reference=${reference}`,
     });
 
     this.logger.log(`✅ Stripe session created : ${session.id}`);
