@@ -345,6 +345,98 @@ async function cleanupStatsSeed(dataSource: DataSource): Promise<void> {
     DELETE FROM reservation
     WHERE reference LIKE 'SEED-%';
 
+    DELETE FROM notification
+    WHERE id_reservation IN (
+      SELECT r.id_reservation
+      FROM reservation r
+      JOIN seance s ON s.id_seance = r.id_seance
+      JOIN film f ON f.id = s.id_film
+      WHERE f.title LIKE '% - Errachidia' 
+         OR f.title LIKE '% - Casablanca'
+         OR f.title LIKE '% - Rabat'
+         OR f.title LIKE '% - Marrakech'
+         OR LOWER(f.title) IN ('sex with love', 'fatal conspiracy')
+         OR f.title IN (
+          'Dune: Deuxieme Partie',
+          'Oppenheimer',
+          'Spider-Man: Across the Spider-Verse',
+          'The Batman',
+          'Inside Out 2',
+          'Mission: Impossible - Dead Reckoning',
+          'Wonka',
+          'Avatar: La Voie de l Eau'
+        )
+    );
+
+    DELETE FROM paiement
+    WHERE id_reservation IN (
+      SELECT r.id_reservation
+      FROM reservation r
+      JOIN seance s ON s.id_seance = r.id_seance
+      JOIN film f ON f.id = s.id_film
+      WHERE f.title LIKE '% - Errachidia'
+         OR f.title LIKE '% - Casablanca'
+         OR f.title LIKE '% - Rabat'
+         OR f.title LIKE '% - Marrakech'
+         OR LOWER(f.title) IN ('sex with love', 'fatal conspiracy')
+         OR f.title IN (
+          'Dune: Deuxieme Partie',
+          'Oppenheimer',
+          'Spider-Man: Across the Spider-Verse',
+          'The Batman',
+          'Inside Out 2',
+          'Mission: Impossible - Dead Reckoning',
+          'Wonka',
+          'Avatar: La Voie de l Eau'
+        )
+    );
+
+    DELETE FROM reservation_siege
+    WHERE id_reservation IN (
+      SELECT r.id_reservation
+      FROM reservation r
+      JOIN seance s ON s.id_seance = r.id_seance
+      JOIN film f ON f.id = s.id_film
+      WHERE f.title LIKE '% - Errachidia'
+         OR f.title LIKE '% - Casablanca'
+         OR f.title LIKE '% - Rabat'
+         OR f.title LIKE '% - Marrakech'
+         OR LOWER(f.title) IN ('sex with love', 'fatal conspiracy')
+         OR f.title IN (
+          'Dune: Deuxieme Partie',
+          'Oppenheimer',
+          'Spider-Man: Across the Spider-Verse',
+          'The Batman',
+          'Inside Out 2',
+          'Mission: Impossible - Dead Reckoning',
+          'Wonka',
+          'Avatar: La Voie de l Eau'
+        )
+    );
+
+    DELETE FROM reservation
+    WHERE id_reservation IN (
+      SELECT r.id_reservation
+      FROM reservation r
+      JOIN seance s ON s.id_seance = r.id_seance
+      JOIN film f ON f.id = s.id_film
+      WHERE f.title LIKE '% - Errachidia'
+         OR f.title LIKE '% - Casablanca'
+         OR f.title LIKE '% - Rabat'
+         OR f.title LIKE '% - Marrakech'
+         OR LOWER(f.title) IN ('sex with love', 'fatal conspiracy')
+         OR f.title IN (
+          'Dune: Deuxieme Partie',
+          'Oppenheimer',
+          'Spider-Man: Across the Spider-Verse',
+          'The Batman',
+          'Inside Out 2',
+          'Mission: Impossible - Dead Reckoning',
+          'Wonka',
+          'Avatar: La Voie de l Eau'
+        )
+    );
+
     DELETE FROM tarif
     WHERE id_seance IN (
       SELECT s.id_seance
@@ -550,24 +642,28 @@ async function ensureSallesAndSeats(
   siegeRepo: any,
   cinema: Cinema,
 ): Promise<Salle[]> {
+  const rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'];
+  const seatsPerRow = 12;
+  const vipRows = new Set(['E', 'F']);
+  const vipSeats = new Set([5, 6, 7, 8]);
   const salleSeeds = [
     {
       numero: 1,
       nom: 'Salle Atlas',
       equipements: '2D, Dolby 7.1',
-      rows: ['A', 'B', 'C', 'D'],
+      rows,
     },
     {
       numero: 2,
       nom: 'Salle Oasis',
       equipements: '3D, Dolby Atmos',
-      rows: ['A', 'B', 'C', 'D'],
+      rows,
     },
     {
       numero: 3,
       nom: 'Salle Premium',
       equipements: '4DX, sieges premium',
-      rows: ['A', 'B', 'C'],
+      rows,
     },
   ];
   const salles: Salle[] = [];
@@ -584,7 +680,7 @@ async function ensureSallesAndSeats(
         salleRepo.create({
           numero: salleSeed.numero,
           nom: salleSeed.nom,
-          capaciteTotale: salleSeed.rows.length * 10,
+          capaciteTotale: salleSeed.rows.length * seatsPerRow,
           equipements: salleSeed.equipements,
           cinema,
         }),
@@ -599,13 +695,14 @@ async function ensureSallesAndSeats(
 
     const seats: Siege[] = [];
     for (const rangee of salleSeed.rows) {
-      for (let numero = 1; numero <= 10; numero += 1) {
+      for (let numero = 1; numero <= seatsPerRow; numero += 1) {
+        const isVip = vipRows.has(rangee) && vipSeats.has(numero);
         seats.push(
           siegeRepo.create({
             rangee,
             numero,
             categorie:
-              rangee === 'A' ? CategorieSiege.VIP : CategorieSiege.STANDARD,
+              isVip ? CategorieSiege.VIP : CategorieSiege.STANDARD,
             salle,
           }),
         );
