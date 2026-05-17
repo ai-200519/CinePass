@@ -41,33 +41,136 @@
 \tableofcontents
 \listoffigures
 \listoftables
-
 %============================================================
 \chapter*{Introduction générale}
 \addcontentsline{toc}{chapter}{Introduction générale}
-CinePass est une plateforme dédiée à la réservation de billets de cinéma, à la gestion des séances et à la sélection des sièges en ligne. Ce rapport présente le contexte du projet, les besoins, la conception et la réalisation de la solution.
 
+Avec l’évolution rapide des technologies numériques et la généralisation des services en ligne, les habitudes des utilisateurs ont considérablement changé dans plusieurs domaines, notamment celui du divertissement. Aujourd’hui, les consommateurs recherchent des solutions simples, rapides et accessibles leur permettant d’effectuer diverses opérations à distance, telles que les achats, les réservations ou les paiements en ligne. Dans ce contexte, le secteur cinématographique n’échappe pas à cette transformation digitale.
+
+La réservation traditionnelle de billets de cinéma présente plusieurs contraintes, notamment les longues files d’attente, les difficultés liées à la disponibilité des places, ainsi que l’absence d’une vision claire sur les séances et les sièges disponibles. Ces problématiques affectent à la fois l’expérience des spectateurs et l’efficacité de gestion des établissements cinématographiques.
+
+Afin de répondre à ces enjeux, le projet \textbf{CinePass} a été conçu comme une plateforme web moderne permettant aux utilisateurs de consulter les films disponibles, choisir une séance, sélectionner leurs sièges et effectuer une réservation en ligne de manière simple et sécurisée. En parallèle, la plateforme offre un espace d’administration destiné à la gestion des films, des salles, des séances et des réservations.
+
+L’objectif principal de ce projet est de proposer une solution numérique capable d’améliorer l’expérience utilisateur tout en optimisant la gestion opérationnelle des cinémas. La plateforme vise également à garantir une meilleure organisation des réservations, une réduction des erreurs liées à la gestion manuelle et une accessibilité permanente aux informations des séances.
+
+Pour assurer la réussite du projet, une méthodologie structurée a été adoptée, combinant des approches d’analyse, de conception et de développement logiciel. Plusieurs outils et technologies ont été mobilisés afin d’assurer un suivi rigoureux du projet, une bonne collaboration entre les différentes phases de développement et une implémentation cohérente de la solution.
+
+Ce rapport est structuré en plusieurs chapitres. Le premier chapitre présente le cadre méthodologique adopté ainsi que l’organisation du projet. Le deuxième chapitre est consacré à l’analyse et à la spécification des besoins fonctionnels et non fonctionnels. Le troisième chapitre décrit la conception du système à travers les différents modèles et diagrammes UML. Enfin, le dernier chapitre détaille la réalisation technique, les fonctionnalités développées ainsi que les tests effectués pour valider la solution proposée.
 %============================================================
 \chapter{Cadre méthodologique et organisation du projet}
 
+\section{Introduction}
+
+La réalisation d’un projet informatique nécessite une organisation rigoureuse, une méthodologie adaptée ainsi qu’un suivi structuré des différentes étapes de développement. En effet, le succès d’un système logiciel ne dépend pas uniquement de ses fonctionnalités, mais également de la manière dont le projet est planifié, conçu et implémenté.
+
+Dans le cadre du projet \textbf{CinePass}, une approche méthodologique claire a été adoptée afin de garantir une bonne gestion des besoins, une meilleure coordination du développement et une évolution progressive de la solution proposée. Ce chapitre présente les méthodologies choisies, les outils utilisés pour la gestion du projet, le cycle de développement adopté ainsi que les moyens de collaboration et d’organisation mis en place.
+
 \section{Présentation de la méthodologie adoptée}
-Ce chapitre présente l'approche de travail retenue pour organiser le projet et assurer sa progression.
 
-\subsection{Méthodologie 2TUP}
-La méthode 2TUP permet de séparer les besoins fonctionnels et les contraintes techniques afin de construire une architecture adaptée au projet.
+Afin d’assurer une bonne organisation du projet, une combinaison de méthodes complémentaires a été retenue. La méthodologie \textbf{2TUP} a été utilisée pour structurer les phases d’analyse et de conception du système, tandis que la méthode agile \textbf{Scrum} a permis d’encadrer le développement progressif du projet.
 
-\subsection{Méthodologie Scrum}
-Scrum a servi à structurer le développement en itérations courtes avec suivi régulier des tâches et adaptation continue.
+Cette combinaison a permis d’allier une vision structurée du système à une approche flexible facilitant les adaptations et les améliorations tout au long du développement.
 
-\section{Gestion du projet avec Scrum et Jira}
-Jira a été utilisé pour planifier les tâches, suivre les sprints et contrôler l'avancement des livrables.
+\section{Justification du choix méthodologique}
 
-\section{Collaboration et workflow Git/GitHub}
-Git et GitHub ont servi à gérer les versions du code, à collaborer efficacement et à valider les évolutions du projet.
+Le choix des méthodologies utilisées dans ce projet n’a pas été effectué au hasard. Il répond principalement aux besoins organisationnels et techniques du système à développer.
 
-\section{Conclusion du chapitre}
-Ce cadre méthodologique a permis d'organiser le travail de manière progressive, claire et collaborative.
+La méthode \textbf{2TUP} a été retenue car elle facilite la séparation entre les besoins fonctionnels du métier et les contraintes techniques de l’application. Cette approche permet d’obtenir une meilleure compréhension du système avant la phase d’implémentation.
 
+D’autre part, \textbf{Scrum} a été choisie afin d’adopter une méthode de travail agile favorisant l’évolution progressive du projet. Grâce à cette approche, il a été possible de développer les fonctionnalités de manière incrémentale, tout en assurant un suivi régulier de l’avancement et une adaptation rapide aux nouvelles exigences.
+
+\section{Présentation de la méthodologie 2TUP}
+
+La méthode \textbf{2TUP (Two Tracks Unified Process)} est une méthodologie de développement logiciel dérivée du processus unifié. Elle repose sur la séparation entre deux axes principaux :
+
+\begin{itemize}
+    \item le processus fonctionnel, centré sur les besoins des utilisateurs ;
+    \item le processus technique, orienté vers les choix technologiques et architecturaux.
+\end{itemize}
+
+L’objectif principal de cette méthode est de permettre une évolution parallèle entre les besoins métier et les contraintes techniques du projet.
+
+Dans le cadre de \textbf{CinePass}, cette méthodologie a permis :
+
+\begin{itemize}
+    \item d’identifier les besoins des utilisateurs liés à la réservation de billets ;
+    \item de définir les règles de gestion des séances et des salles ;
+    \item de concevoir une architecture adaptée au système ;
+    \item de mieux structurer les différentes étapes de conception.
+\end{itemize}
+
+\subsection{Cycle de la méthode 2TUP}
+
+La méthode 2TUP est généralement organisée autour de plusieurs étapes :
+
+\begin{enumerate}
+    \item Analyse des besoins ;
+    \item Étude technique ;
+    \item Conception du système ;
+    \item Développement ;
+    \item Validation et tests.
+\end{enumerate}
+
+Ces étapes ont servi de référence pour structurer les différentes phases du projet.
+
+\section{Présentation de la méthodologie Scrum}
+
+La méthode \textbf{Scrum} est une approche agile basée sur un développement itératif et incrémental. Elle permet de diviser le projet en cycles courts appelés \textit{Sprints}, chacun aboutissant à une version améliorée du produit.
+
+L’adoption de Scrum dans le cadre du projet \textbf{CinePass} a permis :
+
+\begin{itemize}
+    \item une meilleure organisation des tâches ;
+    \item une planification progressive des fonctionnalités ;
+    \item une meilleure adaptation aux changements ;
+    \item un suivi régulier de l’avancement du projet.
+\end{itemize}
+
+\subsection{Les rôles Scrum}
+
+Même dans un projet académique, certains rôles inspirés de Scrum ont été adoptés :
+
+\begin{itemize}
+    \item \textbf{Product Owner :} responsable de la définition des besoins fonctionnels ;
+    \item \textbf{Scrum Master :} chargé d’assurer le bon déroulement du projet ;
+    \item \textbf{Équipe de développement :} responsable de l’implémentation des fonctionnalités.
+\end{itemize}
+
+
+\section{Organisation et répartition des tâches}
+
+Afin d’assurer une progression cohérente du projet, les tâches ont été réparties selon les différentes phases de développement :
+
+\begin{itemize}
+    \item analyse et spécification des besoins ;
+    \item conception des diagrammes UML ;
+    \item développement du backend ;
+    \item développement du frontend ;
+    \item intégration des services ;
+    \item phase de tests et validation.
+\end{itemize}
+
+Cette organisation a permis une meilleure maîtrise du déroulement du projet et une gestion progressive des priorités.
+
+
+\section{Difficultés rencontrées et solutions apportées}
+
+Durant le développement du projet, plusieurs difficultés techniques et organisationnelles ont été rencontrées.
+
+Parmi les principaux défis :
+
+\begin{itemize}
+    \item la gestion de la disponibilité des sièges en temps réel ;
+    \item la synchronisation entre le frontend et le backend ;
+    \item la structuration correcte de la base de données ;
+    \item la gestion des conflits de versions du code.
+\end{itemize}
+
+Ces difficultés ont été surmontées grâce à une meilleure planification des tâches, des tests réguliers ainsi qu’à l’utilisation d’outils de collaboration adaptés.
+
+\section{Conclusion}
+
+Dans ce chapitre, nous avons présenté le cadre méthodologique adopté pour le développement du projet \textbf{CinePass}. La combinaison des approches \textbf{2TUP} et \textbf{Scrum} a permis d’assurer une organisation structurée et flexible du projet. De plus, l’utilisation d’outils tels que Jira, Git et GitHub a facilité le suivi des tâches, la gestion des versions ainsi que la collaboration durant le processus de développement. Le chapitre suivant sera consacré à l’analyse détaillée des besoins du système.
 %============================================================
 \chapter{Analyse et spécification des besoins}
 
@@ -158,6 +261,8 @@ Les choix de conception ont été faits pour garantir une architecture claire, �
 
 \section{Conclusion du chapitre}
 La conception retenue assure une bonne séparation des responsabilités et prépare l'implémentation.
+
+\chapter{Gestion et Collaboration}
 
 %============================================================
 \chapter{Réalisation et implémentation}

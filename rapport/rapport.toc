@@ -1,35 +1,40 @@
 \babel@toc {french}{}\relax 
-\contentsline {chapter}{Introduction générale}{4}{chapter*.4}%
-\contentsline {chapter}{\numberline {1}Cadre méthodologique et organisation du projet}{5}{chapter.1}%
-\contentsline {section}{\numberline {1.1}Présentation de la méthodologie adoptée}{5}{section.1.1}%
-\contentsline {subsection}{\numberline {1.1.1}Méthodologie 2TUP}{5}{subsection.1.1.1}%
-\contentsline {subsection}{\numberline {1.1.2}Méthodologie Scrum}{5}{subsection.1.1.2}%
-\contentsline {section}{\numberline {1.2}Gestion du projet avec Scrum et Jira}{5}{section.1.2}%
-\contentsline {section}{\numberline {1.3}Collaboration et workflow Git/GitHub}{5}{section.1.3}%
-\contentsline {section}{\numberline {1.4}Conclusion du chapitre}{5}{section.1.4}%
-\contentsline {chapter}{\numberline {2}Analyse et spécification des besoins}{6}{chapter.2}%
-\contentsline {section}{\numberline {2.1}Présentation du contexte et des objectifs du projet}{6}{section.2.1}%
-\contentsline {section}{\numberline {2.2}Identification des acteurs}{6}{section.2.2}%
-\contentsline {section}{\numberline {2.3}Équipe du projet}{6}{section.2.3}%
-\contentsline {section}{\numberline {2.4}Analyse concurrentielle}{7}{section.2.4}%
-\contentsline {section}{\numberline {2.5}Analyse SWOT}{7}{section.2.5}%
-\contentsline {section}{\numberline {2.6}Besoins fonctionnels}{7}{section.2.6}%
-\contentsline {section}{\numberline {2.7}Besoins non fonctionnels}{8}{section.2.7}%
-\contentsline {chapter}{\numberline {3}Conception du système}{9}{chapter.3}%
-\contentsline {section}{\numberline {3.1}Architecture globale du système}{9}{section.3.1}%
-\contentsline {section}{\numberline {3.2}Conception de la base de données}{9}{section.3.2}%
-\contentsline {section}{\numberline {3.3}Diagrammes UML}{9}{section.3.3}%
-\contentsline {subsection}{\numberline {3.3.1}Diagramme de cas d'utilisation}{9}{subsection.3.3.1}%
-\contentsline {subsection}{\numberline {3.3.2}Diagramme de classes}{9}{subsection.3.3.2}%
-\contentsline {subsection}{\numberline {3.3.3}Diagrammes de séquence}{9}{subsection.3.3.3}%
-\contentsline {section}{\numberline {3.4}Choix de conception}{9}{section.3.4}%
-\contentsline {section}{\numberline {3.5}Conclusion du chapitre}{10}{section.3.5}%
-\contentsline {chapter}{\numberline {4}Réalisation et implémentation}{11}{chapter.4}%
-\contentsline {section}{\numberline {4.1}Environnement de développement}{11}{section.4.1}%
-\contentsline {section}{\numberline {4.2}Implémentation du backend}{11}{section.4.2}%
-\contentsline {section}{\numberline {4.3}Implémentation du frontend}{11}{section.4.3}%
-\contentsline {section}{\numberline {4.4}Intégration des services et APIs}{11}{section.4.4}%
-\contentsline {section}{\numberline {4.5}Fonctionnalités réalisées}{11}{section.4.5}%
-\contentsline {section}{\numberline {4.6}Tests et validation}{11}{section.4.6}%
-\contentsline {section}{\numberline {4.7}Conclusion du chapitre}{12}{section.4.7}%
-\contentsline {chapter}{Conclusion générale}{13}{chapter*.6}%
+\contentsline {chapter}{Introduction générale}{5}{chapter*.4}%
+\contentsline {chapter}{\numberline {1}Cadre méthodologique et organisation du projet}{6}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Introduction}{6}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Présentation de la méthodologie adoptée}{6}{section.1.2}%
+\contentsline {section}{\numberline {1.3}Justification du choix méthodologique}{6}{section.1.3}%
+\contentsline {section}{\numberline {1.4}Présentation de la méthodologie 2TUP}{7}{section.1.4}%
+\contentsline {subsection}{\numberline {1.4.1}Cycle de la méthode 2TUP}{7}{subsection.1.4.1}%
+\contentsline {section}{\numberline {1.5}Présentation de la méthodologie Scrum}{7}{section.1.5}%
+\contentsline {subsection}{\numberline {1.5.1}Les rôles Scrum}{8}{subsection.1.5.1}%
+\contentsline {section}{\numberline {1.6}Organisation et répartition des tâches}{8}{section.1.6}%
+\contentsline {section}{\numberline {1.7}Difficultés rencontrées et solutions apportées}{8}{section.1.7}%
+\contentsline {section}{\numberline {1.8}Conclusion}{8}{section.1.8}%
+\contentsline {chapter}{\numberline {2}Analyse et spécification des besoins}{9}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Présentation du contexte et des objectifs du projet}{9}{section.2.1}%
+\contentsline {section}{\numberline {2.2}Identification des acteurs}{9}{section.2.2}%
+\contentsline {section}{\numberline {2.3}Équipe du projet}{9}{section.2.3}%
+\contentsline {section}{\numberline {2.4}Analyse concurrentielle}{10}{section.2.4}%
+\contentsline {section}{\numberline {2.5}Analyse SWOT}{10}{section.2.5}%
+\contentsline {section}{\numberline {2.6}Besoins fonctionnels}{10}{section.2.6}%
+\contentsline {section}{\numberline {2.7}Besoins non fonctionnels}{11}{section.2.7}%
+\contentsline {chapter}{\numberline {3}Conception du système}{12}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Architecture globale du système}{12}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Conception de la base de données}{12}{section.3.2}%
+\contentsline {section}{\numberline {3.3}Diagrammes UML}{12}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}Diagramme de cas d'utilisation}{12}{subsection.3.3.1}%
+\contentsline {subsection}{\numberline {3.3.2}Diagramme de classes}{12}{subsection.3.3.2}%
+\contentsline {subsection}{\numberline {3.3.3}Diagrammes de séquence}{12}{subsection.3.3.3}%
+\contentsline {section}{\numberline {3.4}Choix de conception}{12}{section.3.4}%
+\contentsline {section}{\numberline {3.5}Conclusion du chapitre}{13}{section.3.5}%
+\contentsline {chapter}{\numberline {4}Gestion et Collaboration}{14}{chapter.4}%
+\contentsline {chapter}{\numberline {5}Réalisation et implémentation}{15}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Environnement de développement}{15}{section.5.1}%
+\contentsline {section}{\numberline {5.2}Implémentation du backend}{15}{section.5.2}%
+\contentsline {section}{\numberline {5.3}Implémentation du frontend}{15}{section.5.3}%
+\contentsline {section}{\numberline {5.4}Intégration des services et APIs}{15}{section.5.4}%
+\contentsline {section}{\numberline {5.5}Fonctionnalités réalisées}{15}{section.5.5}%
+\contentsline {section}{\numberline {5.6}Tests et validation}{15}{section.5.6}%
+\contentsline {section}{\numberline {5.7}Conclusion du chapitre}{16}{section.5.7}%
+\contentsline {chapter}{Conclusion générale}{17}{chapter*.6}%

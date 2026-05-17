@@ -64,6 +64,29 @@ npm-debug.*
 *.orig.*
 web-build/
 
+# latex files
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+*.lof
+*.lot
+*.nav
+*.snm
+*.vrb
+*.xdv
+
+# Generated PDFs if they should not be committed
+*.pdf
+
 # If using EAS secret file injection, keep google-services.json out of git
 # Uncomment the next line if you will supply it via GOOGLE_SERVICES_JSON environment variable
 # google-services.json
