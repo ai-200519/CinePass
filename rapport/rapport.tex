@@ -8,10 +8,12 @@
 \usepackage{hyperref}
 \usepackage{float}
 \usepackage{array}
+\usepackage{xcolor}
 \usepackage{booktabs}
 \usepackage{caption}
 \usepackage{enumitem}
 \usepackage{titlesec}
+\usepackage{tabularx}
 
 \geometry{a4paper, left=2cm, right=2cm, top=2cm, bottom=2cm}
 \setstretch{1.2}
@@ -70,36 +72,67 @@ Ce cadre méthodologique a permis d'organiser le travail de manière progressive
 \chapter{Analyse et spécification des besoins}
 
 \section{Présentation du contexte et des objectifs du projet}
-CinePass vise à simplifier la réservation de places de cinéma et à fluidifier la gestion des séances pour les utilisateurs et les exploitants.
+Dans un contexte où les utilisateurs recherchent des parcours d'achat rapides et fiables, la billetterie cinéma nécessite une solution capable de centraliser la consultation des films, la sélection des séances et la réservation des places. Le projet \textbf{CinePass} s'inscrit dans cette logique en proposant une plateforme unifiée permettant d'accéder aux informations des films, de visualiser les horaires, de choisir des sièges et de finaliser une réservation avec un paiement sécurisé. L'objectif principal est d'améliorer l'expérience du spectateur en réduisant les frictions (files d'attente, indisponibilités non mises à jour, manque de visibilité sur les places), tout en fournissant aux gestionnaires des outils de pilotage pour organiser les séances et suivre l'activité.
 
 \section{Identification des acteurs}
-Les acteurs principaux sont l'utilisateur, l'administrateur et le gestionnaire de salle.
+Le système CinePass implique des acteurs métier clairement définis. L'\textbf{Utilisateur} (spectateur) est l'acteur principal : il consulte le catalogue, choisit une séance, réserve ses places et accède à son historique. Le \textbf{Staff} (personnel d'accueil/contrôle) intervient sur le terrain : il valide les entrées, scanne les QR codes, vérifie manuellement une référence si nécessaire et assiste les clients en cas de problème. Le \textbf{Gestionnaire de cinéma} (ou \textbf{Admin}) pilote l'exploitation : création et planification des séances, association des salles, configuration des tarifs, suivi des réservations et supervision des indicateurs d'activité.
+
+\section{Équipe du projet}
+L'équipe CinePass est composée de quatre professionnels aux profils complémentaires, assurant une couverture transversale de la conception, du développement et de la gestion du projet. \textbf{Yassine El Aouni} intervient comme Product Manager et développeur frontend ; il définit la roadmap produit, pilote le projet et prend en charge la validation des livrables. \textbf{Abdessami Aglagal} occupe un rôle de Solutions Architect et de développeur frontend ; il contribue à la conception de l'architecture système, au choix technologique et à la modélisation des API. \textbf{Ayoub Bouaik} agit comme QA Engineer et développeur backend ; il est responsable des tests fonctionnels et automatisés, de la détection des anomalies et du contrôle qualité. Enfin, \textbf{Ayman Alahyane} assure les tâches d'Integration Dev et de développeur backend ; il prend en charge l'intégration des services tiers, le déploiement et la gestion des environnements.
+
+\section{Analyse concurrentielle}
+CinePass s'inscrit dans un paysage concurrentiel marqué par plusieurs acteurs établis. Cette analyse positionne le projet par rapport aux solutions existantes.
+
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{2.5pt}
+\renewcommand{\arraystretch}{1.02}
+\begin{tabularx}{\textwidth}{|p{2.2cm}|p{1.8cm}|X|X|p{1.8cm}|}
+\hline
+\textbf{Plateforme} & \textbf{Marché} & \textbf{Points forts} & \textbf{Points faibles} & \textbf{Présence Maroc} \\
+\hline
+AlloCiné & France / Maroc & Forte notoriété, large base d'utilisateurs, critiques et bandes-annonces intégrées & Interface vieillissante, UX mobile imparfait, pas d'interface arabe & Partielle \\
+\hline
+MK2 / UGC App & France & App native fluide, programme de fidélité propre & Limité aux salles du groupe, non disponible hors France & Non \\
+\hline
+Fandango & USA & IA de recommandations, paiement ultra rapide, large catalogue & Inconnu au Maroc, pas de support AR/FR & Non \\
+\hline
+Ticketmaster & Mondial & Scalabilité prouvée, multi-événements, API robuste & Frais élevés, complexité d'intégration, non adapté aux PME & Non \\
+\hline
+\textbf{CinePass} & \textbf{Maroc} & \textbf{Solution locale sur mesure, billet QR, administration centralisée} & \textbf{Marque émergente, adoption et visibilité à consolider} & \textbf{Natif} \\
+\hline
+\end{tabularx}
+\caption{Analyse concurrentielle : positionnement de CinePass}
+\label{tab:analyse-concurrentielle}
+\end{table}
+
+\section{Analyse SWOT}
+L'analyse SWOT identifie les forces, faiblesses, opportunités et menaces du projet CinePass dans son contexte de marché.
+Les \textbf{forces} de CinePass résident dans son adaptation au marché marocain, son interface en français, l'intégration de solutions de paiement locales, l'usage du QR code à l'entrée, la présence d'un espace administrateur complet et une équipe technique locale, réactive et peu coûteuse. Les \textbf{faiblesses} concernent surtout la jeunesse du projet : absence d'historique de marque, budget marketing limité, dépendance aux partenariats avec les cinémas, charge concentrée sur une équipe réduite et notoriété encore à construire. Les \textbf{opportunités} sont liées à la croissance du secteur cinéma au Maroc, à la faible pénétration des solutions locales, au potentiel d'expansion vers d'autres pays de la région et aux partenariats possibles avec les opérateurs télécoms. Enfin, les \textbf{menaces} incluent l'arrivée d'acteurs internationaux, les risques de cybersécurité, la volatilité du marché post-COVID, la dépendance aux distributeurs et les évolutions réglementaires.
 
 \section{Besoins fonctionnels}
+Les besoins fonctionnels décrivent les services que la plateforme doit fournir aux utilisateurs et aux gestionnaires.
 \begin{itemize}[leftmargin=1.2cm]
-  \item consulter les films et les séances disponibles ;
-  \item choisir une séance et réserver des sièges ;
-  \item effectuer un paiement sécurisé ;
-  \item consulter l'historique des réservations ;
-  \item gérer les films, salles et séances côté administration.
+  \item \textbf{Consulter le catalogue} : permettre la visualisation des films et des séances disponibles selon le cinéma, la date et l'horaire.
+  \item \textbf{Réserver des places} : permettre à l'utilisateur de choisir une séance, sélectionner les sièges disponibles et confirmer la réservation.
+  \item \textbf{Gérer le paiement} : prendre en charge le paiement en ligne et retourner un statut clair de transaction.
+  \item \textbf{Générer la confirmation} : produire une confirmation de commande avec référence, détails de séance et sièges réservés.
+  \item \textbf{Consulter l'historique} : offrir un espace utilisateur centralisant les commandes passées et les informations liées aux billets.
+  \item \textbf{Administrer l'exploitation} : permettre la gestion des films, salles, séances et paramètres de tarification pour un fonctionnement cohérent.
 \end{itemize}
 
 \section{Besoins non fonctionnels}
+Au-delà des fonctionnalités, CinePass doit respecter des contraintes de qualité qui garantissent la robustesse et la pérennité du système.
 \begin{itemize}[leftmargin=1.2cm]
-  \item performance et rapidité d'affichage ;
-  \item sécurité des données et des paiements ;
-  \item fiabilité des réservations ;
-  \item interface responsive ;
-  \item maintenabilité du code.
+  \item \textbf{Performance} : assurer un affichage rapide du plan de salle et une validation fluide des disponibilités.
+  \item \textbf{Fiabilité} : éviter les incohérences (ex. double réservation d'un siège) et préserver l'intégrité des commandes.
+  \item \textbf{Sécurité} : protéger l'authentification, les données personnelles et les échanges avec le service de paiement.
+  \item \textbf{Utilisabilité} : proposer une interface claire, intuitive et responsive sur desktop et mobile.
+  \item \textbf{Maintenabilité} : garder une architecture modulaire et un code structuré pour faciliter les évolutions futures.
 \end{itemize}
 
-\section{Cas d'utilisation}
-Les cas d'utilisation décrivent les interactions entre les acteurs et le système, notamment la consultation, la réservation, le paiement et l'administration.
 
-\section{Conclusion du chapitre}
-L'analyse des besoins permet de cadrer clairement les fonctionnalités attendues et les contraintes à respecter.
-
-%============================================================
 \chapter{Conception du système}
 
 \section{Architecture globale du système}

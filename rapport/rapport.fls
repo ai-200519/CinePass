@@ -115,6 +115,14 @@ INPUT C:\Users\GROUP LAPTOPS\AppData\Local\Programs\MiKTeX\tex\latex\float\float
 INPUT C:\Users\GROUP LAPTOPS\AppData\Local\Programs\MiKTeX\tex\latex\float\float.sty
 INPUT C:\Users\GROUP LAPTOPS\AppData\Local\Programs\MiKTeX\tex\latex\tools\array.sty
 INPUT C:\Users\GROUP LAPTOPS\AppData\Local\Programs\MiKTeX\tex\latex\tools\array.sty
+INPUT C:\Users\GROUP LAPTOPS\AppData\Local\Programs\MiKTeX\tex\latex\xcolor\xcolor.sty
+INPUT C:\Users\GROUP LAPTOPS\AppData\Local\Programs\MiKTeX\tex\latex\xcolor\xcolor.sty
+INPUT C:\Users\GROUP LAPTOPS\AppData\Local\Programs\MiKTeX\tex\latex\graphics-cfg\color.cfg
+INPUT C:\Users\GROUP LAPTOPS\AppData\Local\Programs\MiKTeX\tex\latex\graphics-cfg\color.cfg
+INPUT C:\Users\GROUP LAPTOPS\AppData\Local\Programs\MiKTeX\tex\latex\graphics-cfg\color.cfg
+INPUT C:\Users\GROUP LAPTOPS\AppData\Local\Programs\MiKTeX\tex\latex\graphics\mathcolor.ltx
+INPUT C:\Users\GROUP LAPTOPS\AppData\Local\Programs\MiKTeX\tex\latex\graphics\mathcolor.ltx
+INPUT C:\Users\GROUP LAPTOPS\AppData\Local\Programs\MiKTeX\tex\latex\graphics\mathcolor.ltx
 INPUT C:\Users\GROUP LAPTOPS\AppData\Local\Programs\MiKTeX\tex\latex\booktabs\booktabs.sty
 INPUT C:\Users\GROUP LAPTOPS\AppData\Local\Programs\MiKTeX\tex\latex\booktabs\booktabs.sty
 INPUT C:\Users\GROUP LAPTOPS\AppData\Local\Programs\MiKTeX\tex\latex\caption\caption.sty
@@ -125,6 +133,8 @@ INPUT C:\Users\GROUP LAPTOPS\AppData\Local\Programs\MiKTeX\tex\latex\enumitem\en
 INPUT C:\Users\GROUP LAPTOPS\AppData\Local\Programs\MiKTeX\tex\latex\enumitem\enumitem.sty
 INPUT C:\Users\GROUP LAPTOPS\AppData\Local\Programs\MiKTeX\tex\latex\titlesec\titlesec.sty
 INPUT C:\Users\GROUP LAPTOPS\AppData\Local\Programs\MiKTeX\tex\latex\titlesec\titlesec.sty
+INPUT C:\Users\GROUP LAPTOPS\AppData\Local\Programs\MiKTeX\tex\latex\tools\tabularx.sty
+INPUT C:\Users\GROUP LAPTOPS\AppData\Local\Programs\MiKTeX\tex\latex\tools\tabularx.sty
 INPUT C:\Users\GROUP LAPTOPS\AppData\Local\Programs\MiKTeX\tex\latex\l3backend\l3backend-pdftex.def
 INPUT C:\Users\GROUP LAPTOPS\AppData\Local\Programs\MiKTeX\tex\latex\l3backend\l3backend-pdftex.def
 INPUT .\rapport.aux
@@ -175,9 +185,18 @@ OUTPUT rapport.lot
 INPUT C:\Users\GROUP LAPTOPS\AppData\Local\Programs\MiKTeX\fonts\tfm\jknappen\ec\ecbx1728.tfm
 INPUT C:\Users\GROUP LAPTOPS\AppData\Local\Programs\MiKTeX\fonts\tfm\jknappen\ec\ecrm1440.tfm
 INPUT C:\Users\GROUP LAPTOPS\AppData\Local\Programs\MiKTeX\fonts\tfm\jknappen\ec\ecbx1440.tfm
+INPUT C:\Users\GROUP LAPTOPS\AppData\Local\Programs\MiKTeX\fonts\tfm\jknappen\ec\ecrm0800.tfm
+INPUT C:\Users\GROUP LAPTOPS\AppData\Local\Programs\MiKTeX\fonts\tfm\jknappen\ec\ecbx0800.tfm
+INPUT C:\Users\GROUP LAPTOPS\AppData\Local\Programs\MiKTeX\fonts\tfm\jknappen\ec\eccc1200.tfm
 INPUT rapport.aux
 INPUT .\rapport.out
 INPUT .\rapport.out
+INPUT C:\Users\GROUP LAPTOPS\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\eccc1200.pk
+INPUT C:\Users\GROUP LAPTOPS\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\eccc1200.pk
+INPUT C:\Users\GROUP LAPTOPS\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\ecrm0800.pk
+INPUT C:\Users\GROUP LAPTOPS\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\ecrm0800.pk
+INPUT C:\Users\GROUP LAPTOPS\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\ecbx0800.pk
+INPUT C:\Users\GROUP LAPTOPS\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\ecbx0800.pk
 INPUT C:\Users\GROUP LAPTOPS\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\ecbx1440.pk
 INPUT C:\Users\GROUP LAPTOPS\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\ecbx1440.pk
 INPUT C:\Users\GROUP LAPTOPS\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\ecbx1728.pk

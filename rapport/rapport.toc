@@ -10,25 +10,26 @@
 \contentsline {chapter}{\numberline {2}Analyse et spécification des besoins}{6}{chapter.2}%
 \contentsline {section}{\numberline {2.1}Présentation du contexte et des objectifs du projet}{6}{section.2.1}%
 \contentsline {section}{\numberline {2.2}Identification des acteurs}{6}{section.2.2}%
-\contentsline {section}{\numberline {2.3}Besoins fonctionnels}{6}{section.2.3}%
-\contentsline {section}{\numberline {2.4}Besoins non fonctionnels}{6}{section.2.4}%
-\contentsline {section}{\numberline {2.5}Cas d'utilisation}{6}{section.2.5}%
-\contentsline {section}{\numberline {2.6}Conclusion du chapitre}{7}{section.2.6}%
-\contentsline {chapter}{\numberline {3}Conception du système}{8}{chapter.3}%
-\contentsline {section}{\numberline {3.1}Architecture globale du système}{8}{section.3.1}%
-\contentsline {section}{\numberline {3.2}Conception de la base de données}{8}{section.3.2}%
-\contentsline {section}{\numberline {3.3}Diagrammes UML}{8}{section.3.3}%
-\contentsline {subsection}{\numberline {3.3.1}Diagramme de cas d'utilisation}{8}{subsection.3.3.1}%
-\contentsline {subsection}{\numberline {3.3.2}Diagramme de classes}{8}{subsection.3.3.2}%
-\contentsline {subsection}{\numberline {3.3.3}Diagrammes de séquence}{8}{subsection.3.3.3}%
-\contentsline {section}{\numberline {3.4}Choix de conception}{8}{section.3.4}%
-\contentsline {section}{\numberline {3.5}Conclusion du chapitre}{9}{section.3.5}%
-\contentsline {chapter}{\numberline {4}Réalisation et implémentation}{10}{chapter.4}%
-\contentsline {section}{\numberline {4.1}Environnement de développement}{10}{section.4.1}%
-\contentsline {section}{\numberline {4.2}Implémentation du backend}{10}{section.4.2}%
-\contentsline {section}{\numberline {4.3}Implémentation du frontend}{10}{section.4.3}%
-\contentsline {section}{\numberline {4.4}Intégration des services et APIs}{10}{section.4.4}%
-\contentsline {section}{\numberline {4.5}Fonctionnalités réalisées}{10}{section.4.5}%
-\contentsline {section}{\numberline {4.6}Tests et validation}{10}{section.4.6}%
-\contentsline {section}{\numberline {4.7}Conclusion du chapitre}{11}{section.4.7}%
-\contentsline {chapter}{Conclusion générale}{12}{chapter*.5}%
+\contentsline {section}{\numberline {2.3}Équipe du projet}{6}{section.2.3}%
+\contentsline {section}{\numberline {2.4}Analyse concurrentielle}{7}{section.2.4}%
+\contentsline {section}{\numberline {2.5}Analyse SWOT}{7}{section.2.5}%
+\contentsline {section}{\numberline {2.6}Besoins fonctionnels}{7}{section.2.6}%
+\contentsline {section}{\numberline {2.7}Besoins non fonctionnels}{8}{section.2.7}%
+\contentsline {chapter}{\numberline {3}Conception du système}{9}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Architecture globale du système}{9}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Conception de la base de données}{9}{section.3.2}%
+\contentsline {section}{\numberline {3.3}Diagrammes UML}{9}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}Diagramme de cas d'utilisation}{9}{subsection.3.3.1}%
+\contentsline {subsection}{\numberline {3.3.2}Diagramme de classes}{9}{subsection.3.3.2}%
+\contentsline {subsection}{\numberline {3.3.3}Diagrammes de séquence}{9}{subsection.3.3.3}%
+\contentsline {section}{\numberline {3.4}Choix de conception}{9}{section.3.4}%
+\contentsline {section}{\numberline {3.5}Conclusion du chapitre}{10}{section.3.5}%
+\contentsline {chapter}{\numberline {4}Réalisation et implémentation}{11}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Environnement de développement}{11}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Implémentation du backend}{11}{section.4.2}%
+\contentsline {section}{\numberline {4.3}Implémentation du frontend}{11}{section.4.3}%
+\contentsline {section}{\numberline {4.4}Intégration des services et APIs}{11}{section.4.4}%
+\contentsline {section}{\numberline {4.5}Fonctionnalités réalisées}{11}{section.4.5}%
+\contentsline {section}{\numberline {4.6}Tests et validation}{11}{section.4.6}%
+\contentsline {section}{\numberline {4.7}Conclusion du chapitre}{12}{section.4.7}%
+\contentsline {chapter}{Conclusion générale}{13}{chapter*.6}%
