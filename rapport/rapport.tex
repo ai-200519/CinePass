@@ -14,6 +14,12 @@
 \usepackage{enumitem}
 \usepackage{titlesec}
 \usepackage{tabularx}
+\usepackage{float}          % for [H] figure placement
+\usepackage{xcolor}         % for \textcolor
+\usepackage{colortbl}       % for \rowcolor in tables
+\usepackage{graphicx}       % for \includegraphics
+\usepackage{array}          % for p{} column type
+\usepackage{booktabs}       % for professional tables
 
 \geometry{a4paper, left=2cm, right=2cm, top=2cm, bottom=2cm}
 \setstretch{1.2}
@@ -267,7 +273,541 @@ Les choix de conception ont été faits pour garantir une architecture claire, �
 \section{Conclusion du chapitre}
 La conception retenue assure une bonne séparation des responsabilités et prépare l'implémentation.
 
-\chapter{Gestion et Collaboration}
+
+% ============================================================
+% CHAPTER 4 — Gestion du projet et Collaboration
+\chapter{Gestion du projet et Collaboration}
+
+% ── Chapter intro quote box (optional — remove if not needed)
+\begin{center}
+\textit{``La réussite d'un projet logiciel repose autant sur 
+l'organisation de l'équipe que sur la qualité du code.''}
+\end{center}
+
+% ============================================================
+\section{Introduction}
+% ============================================================
+
+Ce chapitre présente l'organisation et la gestion du projet 
+\textbf{CinePass} tout au long de son cycle de développement. 
+Nous décrivons les outils utilisés pour la planification, 
+le suivi des tâches et la collaboration entre les membres de 
+l'équipe, notamment \textbf{Jira} pour la gestion Scrum et 
+\textbf{Git/GitHub} pour le versionnement et l'intégration 
+du code.
+
+% ============================================================
+\section{Outils de gestion du projet}
+% ============================================================
+
+\subsection{Jira}
+
+Jira est un outil de gestion de projet développé par 
+Atlassian, largement utilisé dans les équipes appliquant 
+les méthodologies agiles. Dans le cadre de CinePass, Jira 
+a été utilisé pour~:
+
+\begin{itemize}
+    \item Créer et organiser le \textbf{Product Backlog}
+    \item Rédiger et prioriser les \textbf{User Stories}
+    \item Planifier et suivre les \textbf{Sprints}
+    \item Assigner les tâches aux membres de l'équipe
+    \item Suivre l'avancement via le tableau \textbf{Kanban}
+    \item Générer les rapports de sprint (Burndown Chart)
+\end{itemize}
+
+\subsection{Git et GitHub}
+
+Git est le système de contrôle de version distribué utilisé 
+pour gérer le code source du projet. GitHub a été utilisé 
+comme plateforme d'hébergement centralisée permettant~:
+
+\begin{itemize}
+    \item Le versionnement continu du code
+    \item La gestion des branches par User Story
+    \item La revue de code via les \textbf{Pull Requests}
+    \item La traçabilité entre tickets Jira et commits Git
+    \item La protection de la branche principale \texttt{main}
+\end{itemize}
+
+% ============================================================
+\section{Product Backlog}
+% ============================================================
+
+Le Product Backlog regroupe l'ensemble des User Stories du 
+projet CinePass, priorisées selon la méthode \textbf{MoSCoW} 
+et estimées en \textbf{Story Points}. Le tableau suivant 
+présente un résumé du backlog organisé par sprint.
+
+% ── Backlog table ─────────────────────────────────────────────
+\begin{table}[H]
+\centering
+\caption{Product Backlog — CinePass}
+\label{tab:backlog}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{|c|p{5.5cm}|c|c|c|}
+\hline
+\rowcolor{gray!25}
+\textbf{ID} & \textbf{User Story} & \textbf{Sprint} 
+            & \textbf{Points} & \textbf{Priorité} \\
+\hline
+US-01 & S'inscrire et se connecter (OTP) & S1 & 8 & Must \\
+\hline
+US-02 & Réinitialiser le mot de passe & S1 & 5 & Must \\
+\hline
+US-03 & Gérer les films (Admin CRUD) & S1 & 5 & Must \\
+\hline
+US-04 & Gérer les séances et salles (Admin) & S1 & 5 & Must \\
+\hline
+US-05 & API tarification, réservations Admin et analytics & S1 & 8 & Must \\
+\hline
+US-06 & Gérer les utilisateurs (Admin) & S1 & 3 & Must \\
+\hline
+US-07 & Disponibilité des sièges & S2 & 8 & Must \\
+\hline
+US-08 & Création de réservation & S2 & 8 & Must \\
+\hline
+US-09 & API profil et historique des réservations & S2 & 5 & Must \\
+\hline
+US-10 & Paiement en ligne via Stripe & S3 & 8 & Must \\
+\hline
+US-11 & Génération QR Code et billet & S3 & 5 & Must \\
+\hline
+US-12 & Notifications par email & S3 & 3 & Should \\
+\hline
+US-13 & Validation d'entrée par le Staff & S4 & 5 & Should \\
+\hline
+US-14 & Tableau de bord analytique & S4 & 5 & Should \\
+\hline
+US-15 & Tests et documentation finale & S4 & 3 & Could \\
+\hline
+\end{tabular}
+\end{table}
+
+% ============================================================
+\section{Organisation en Sprints}
+% ============================================================
+
+Le projet CinePass a été organisé en \textbf{4 sprints} 
+d'une durée de deux semaines chacun, conformément à la 
+méthodologie Scrum. Chaque sprint a un objectif clair et 
+un ensemble de User Stories assignées aux membres de 
+l'équipe.
+
+% ── Sprint 1 ──────────────────────────────────────────────────
+\subsection{Sprint 1 — Infrastructure, Authentification et 
+            Back-office Admin}
+
+\textbf{Objectif~:} Mettre en place l'infrastructure technique 
+de base, implémenter l'authentification complète avec OTP, 
+et développer les premières fonctionnalités du back-office 
+administrateur.
+
+\begin{table}[H]
+\centering
+\caption{Répartition des tâches — Sprint 1}
+\label{tab:sprint1}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{|p{4cm}|p{5cm}|c|c|}
+\hline
+\rowcolor{gray!25}
+\textbf{User Story} & \textbf{Sous-tâches principales} 
+                    & \textbf{Dev} & \textbf{Statut} \\
+\hline
+US-01 — Authentification & 
+Register, Login, Verify-email, OTP, JWT & 
+Dev 1 & \textcolor{green!60!black}{Done} \\
+\hline
+US-02 — Reset password & 
+Forgot password, Reset OTP, Resend OTP & 
+Dev 1 & \textcolor{green!60!black}{Done} \\
+\hline
+US-03 — Gestion films & 
+CRUD films, filtres, Swagger & 
+Dev 2 & \textcolor{green!60!black}{Done} \\
+\hline
+US-04 — Gestion séances & 
+CRUD séances, salles, sièges & 
+Dev 2 & \textcolor{green!60!black}{Done} \\
+\hline
+US-05 — Tarification et stats & 
+Tarifs, réservations admin, analytics & 
+Dev 3 & \textcolor{green!60!black}{Done} \\
+\hline
+US-06 — Gestion utilisateurs & 
+CRUD utilisateurs, rôles, statuts & 
+Dev 3 & \textcolor{green!60!black}{Done} \\
+\hline
+\end{tabular}
+\end{table}
+
+% ── Sprint 2 ──────────────────────────────────────────────────
+\subsection{Sprint 2 — Disponibilité des Sièges, Réservation 
+            et Profil Client}
+
+\textbf{Objectif~:} Implémenter le parcours complet du client~: 
+consultation du plan de salle avec disponibilité en temps réel, 
+création de réservation avec transaction sécurisée, gestion du 
+profil et historique des réservations.
+
+\begin{table}[H]
+\centering
+\caption{Répartition des tâches — Sprint 2}
+\label{tab:sprint2}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{|p{4cm}|p{5cm}|c|c|}
+\hline
+\rowcolor{gray!25}
+\textbf{User Story} & \textbf{Sous-tâches principales} 
+                    & \textbf{Dev} & \textbf{Statut} \\
+\hline
+US-07 — Disponibilité sièges & 
+Plan de salle, disponibilité par séance, 
+scheduler expiration & 
+Dev 1 & \textcolor{green!60!black}{Done} \\
+\hline
+US-08 — Création réservation & 
+POST /reservation, transaction QueryRunner, 
+annulation & 
+Dev 2 & \textcolor{green!60!black}{Done} \\
+\hline
+US-09 — Profil et historique & 
+GET/PATCH profil, change password, 
+historique réservations & 
+Dev 3 & \textcolor{green!60!black}{Done} \\
+\hline
+\end{tabular}
+\end{table}
+
+% ── Sprint 3 ──────────────────────────────────────────────────
+\subsection{Sprint 3 — Paiement Stripe, QR Code et 
+            Notifications}
+
+\textbf{Objectif~:} Intégrer la passerelle de paiement Stripe 
+avec gestion des webhooks, générer les QR Codes après 
+confirmation du paiement, et envoyer les notifications par 
+email aux clients.
+
+\begin{table}[H]
+\centering
+\caption{Répartition des tâches — Sprint 3}
+\label{tab:sprint3}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{|p{4cm}|p{5cm}|c|c|}
+\hline
+\rowcolor{gray!25}
+\textbf{User Story} & \textbf{Sous-tâches principales} 
+                    & \textbf{Dev} & \textbf{Statut} \\
+\hline
+US-10 — Paiement Stripe & 
+Initier paiement, Stripe Gateway, 
+webhook, confirmation & 
+Dev 1 & \textcolor{orange}{In Progress} \\
+\hline
+US-11 — QR Code et billet & 
+Génération QR Code, sauvegarde, 
+retour au client & 
+Dev 2 & \textcolor{orange}{In Progress} \\
+\hline
+US-12 — Notifications email & 
+Templates email OTP, confirmation 
+paiement, Nodemailer & 
+Dev 3 & \textcolor{orange}{In Progress} \\
+\hline
+\end{tabular}
+\end{table}
+
+% ── Add Jira screenshot for Sprint 3 ──────────────────────────
+La figure~\ref{fig:jira_sprint3} présente le tableau Jira du 
+Sprint 3 en cours, illustrant la répartition des User Stories 
+entre les membres de l'équipe et leur état d'avancement.
+
+\begin{figure}[H]
+    \centering
+    % Replace with your actual Jira screenshot
+    \includegraphics[width=0.95\textwidth]{images/sprint 3 board.png}
+    \caption{Tableau Jira — Sprint 3 (en cours)}
+    \label{fig:jira_sprint3}
+\end{figure}
+
+% ── Sprint 4 ──────────────────────────────────────────────────
+\subsection{Sprint 4 — Validation Staff, Dashboard et 
+            Finalisation}
+
+\textbf{Objectif~:} Implémenter la validation d'entrée par le 
+Staff via QR Code, finaliser le tableau de bord analytique, 
+effectuer les tests complets et préparer la documentation 
+finale du projet.
+
+\begin{table}[H]
+\centering
+\caption{Répartition des tâches — Sprint 4 (planifié)}
+\label{tab:sprint4}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{|p{4cm}|p{5cm}|c|c|}
+\hline
+\rowcolor{gray!25}
+\textbf{User Story} & \textbf{Sous-tâches principales} 
+                    & \textbf{Dev} & \textbf{Statut} \\
+\hline
+US-13 — Validation Staff & 
+Scanner QR Code, valider référence, 
+mise à jour statut & 
+Dev 1 & \textcolor{gray}{To Do} \\
+\hline
+US-14 — Dashboard analytique & 
+KPIs, graphiques CA, taux remplissage, 
+comparaison cinémas & 
+Dev 2 & \textcolor{gray}{To Do} \\
+\hline
+US-15 — Tests et documentation & 
+Tests Jest, Swagger complet, 
+rapport final & 
+Dev 3 & \textcolor{gray}{To Do} \\
+\hline
+\end{tabular}
+\end{table}
+
+% ============================================================
+\section{Diagramme de Gantt}
+% ============================================================
+
+Le diagramme de Gantt présenté dans la 
+figure~\ref{fig:gantt} illustre la planification temporelle 
+du projet CinePass, organisée en 4 sprints de deux semaines 
+chacun. Il montre la répartition des User Stories dans le 
+temps et le travail parallèle entre les membres de l'équipe.
+
+\begin{figure}[H]
+    \centering
+    % Replace with your actual Gantt diagram
+    \includegraphics[width=0.95\textwidth]{images/api tarification user story.png}
+    \caption{Diagramme de Gantt — Projet CinePass}
+    \label{fig:gantt}
+\end{figure}
+
+% ── If you want to generate Gantt with LaTeX (no image needed)
+% Uncomment this block if you have pgfgantt package installed
+%
+% \begin{ganttchart}[
+%     hgrid,
+%     vgrid,
+%     x unit=0.7cm,
+%     y unit title=0.6cm,
+%     y unit chart=0.6cm,
+%     title height=1,
+%     bar height=0.6,
+%     bar label font=\footnotesize,
+%     title label font=\footnotesize,
+%     group label font=\small\bfseries
+% ]{1}{16}
+%     \gantttitle{Sprint 1}{4}
+%     \gantttitle{Sprint 2}{4}
+%     \gantttitle{Sprint 3}{4}
+%     \gantttitle{Sprint 4}{4} \\
+%     \ganttbar{US-01 Auth}{1}{2} \\
+%     \ganttbar{US-02 Reset pwd}{1}{2} \\
+%     \ganttbar{US-03 Films}{3}{4} \\
+%     \ganttbar{US-04 Séances}{3}{4} \\
+%     \ganttbar{US-05 Stats}{3}{4} \\
+%     \ganttbar{US-07 Sièges}{5}{6} \\
+%     \ganttbar{US-08 Réservation}{5}{8} \\
+%     \ganttbar{US-09 Profil}{7}{8} \\
+%     \ganttbar{US-10 Paiement}{9}{12} \\
+%     \ganttbar{US-11 QR Code}{9}{10} \\
+%     \ganttbar{US-12 Email}{11}{12} \\
+%     \ganttbar{US-13 Staff}{13}{14} \\
+%     \ganttbar{US-14 Dashboard}{13}{16} \\
+%     \ganttbar{US-15 Tests}{15}{16} \\
+% \end{ganttchart}
+
+% ============================================================
+\section{Workflow Git et GitHub}
+% ============================================================
+
+\subsection{Structure du dépôt}
+
+Le projet CinePass est hébergé sur GitHub dans un dépôt 
+organisé en deux répertoires principaux~:
+
+\begin{itemize}
+    \item \texttt{/backend} — API NestJS + PostgreSQL
+    \item \texttt{/frontend} — Application React
+\end{itemize}
+
+\subsection{Stratégie de branches}
+
+L'équipe a adopté une stratégie de branches structurée autour 
+des User Stories Jira. Chaque User Story assignée à un 
+développeur correspond à une branche Git dédiée, créée depuis 
+la branche \texttt{develop}.
+
+\begin{table}[H]
+\centering
+\caption{Convention de nommage des branches Git}
+\label{tab:branches}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{|l|l|}
+\hline
+\rowcolor{gray!25}
+\textbf{Type} & \textbf{Convention} \\
+\hline
+Fonctionnalité & \texttt{feature/US-XX-nom-user-story} \\
+\hline
+Correction bug & \texttt{fix/US-XX-description-bug} \\
+\hline
+Tests & \texttt{test/US-XX-nom-module} \\
+\hline
+Documentation & \texttt{docs/nom-section} \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Workflow de développement}
+
+Le workflow Git adopté par l'équipe suit les étapes 
+suivantes pour chaque User Story~:
+
+\begin{enumerate}
+    \item \textbf{Assignation} — la User Story est assignée 
+          à un développeur sur Jira
+    \item \textbf{Création de branche} — le développeur crée 
+          une branche depuis \texttt{develop}~:
+          \begin{center}
+          \texttt{git checkout -b feature/US-01-auth}
+          \end{center}
+    \item \textbf{Développement et commits} — le développeur 
+          implémente la fonctionnalité avec des commits 
+          réguliers~:
+          \begin{center}
+          \texttt{git commit -m "feat(auth): implement OTP 
+          verification [US-01]"}
+          \end{center}
+    \item \textbf{Push et Pull Request} — une Pull Request 
+          est ouverte sur GitHub vers la branche 
+          \texttt{develop}
+    \item \textbf{Code Review} — un autre membre de 
+          l'équipe révise le code et approuve ou demande 
+          des modifications
+    \item \textbf{Merge} — après validation, la branche est 
+          mergée dans \texttt{develop}
+    \item \textbf{Fin de sprint} — \texttt{develop} est 
+          mergé dans \texttt{main} à la fin de chaque sprint
+\end{enumerate}
+
+La figure~\ref{fig:git_workflow} illustre ce workflow de 
+manière schématique.
+
+\begin{figure}[H]
+    \centering
+    % Replace with your actual GitHub screenshot or workflow diagram
+    \includegraphics[width=0.90\textwidth]{images/sprint 3 in backlog onglet.png}
+    \caption{Workflow Git/GitHub — CinePass}
+    \label{fig:git_workflow}
+\end{figure}
+
+\subsection{Lien Jira et GitHub}
+
+Chaque commit Git référence le ticket Jira correspondant 
+dans son message, permettant une traçabilité complète entre 
+la planification et l'implémentation~:
+
+\begin{table}[H]
+\centering
+\caption{Traçabilité User Story → Branche → Commits}
+\label{tab:traceability}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{|c|l|l|}
+\hline
+\rowcolor{gray!25}
+\textbf{Jira} & \textbf{Branche Git} & 
+\textbf{Exemple de commit} \\
+\hline
+US-01 & \texttt{feature/US-01-auth} & 
+\texttt{feat(auth): add JWT login [US-01]} \\
+\hline
+US-02 & \texttt{feature/US-02-reset-pwd} & 
+\texttt{feat(auth): add OTP reset [US-02]} \\
+\hline
+US-07 & \texttt{feature/US-07-sieges} & 
+\texttt{feat(seance): add plan de salle [US-07]} \\
+\hline
+US-08 & \texttt{feature/US-08-reservation} & 
+\texttt{feat(reservation): add create with tx [US-08]} \\
+\hline
+US-10 & \texttt{feature/US-10-stripe} & 
+\texttt{feat(paiement): add stripe gateway [US-10]} \\
+\hline
+\end{tabular}
+\end{table}
+
+% ============================================================
+\section{Répartition globale des tâches}
+% ============================================================
+
+Le tableau suivant présente la répartition globale des 
+User Stories entre les membres de l'équipe sur les 
+4 sprints du projet~:
+
+\begin{table}[H]
+\centering
+\caption{Répartition globale des User Stories par développeur}
+\label{tab:global_repartition}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{|c|p{5cm}|c|c|}
+\hline
+\rowcolor{gray!25}
+\textbf{Développeur} & \textbf{User Stories assignées} 
+                     & \textbf{Sprints} & \textbf{Points} \\
+\hline
+\textbf{Dev 1} & 
+US-01 Authentification \newline
+US-02 Reset password \newline
+US-07 Disponibilité sièges \newline
+US-10 Paiement Stripe \newline
+US-13 Validation Staff & 
+S1, S2, S3, S4 & 29 \\
+\hline
+\textbf{Dev 2} & 
+US-03 Gestion films \newline
+US-04 Gestion séances \newline
+US-08 Création réservation \newline
+US-11 QR Code \newline
+US-14 Dashboard & 
+S1, S2, S3, S4 & 31 \\
+\hline
+\textbf{Dev 3} & 
+US-05 Tarification et stats \newline
+US-06 Gestion utilisateurs \newline
+US-09 Profil et historique \newline
+US-12 Notifications \newline
+US-15 Tests et docs & 
+S1, S2, S3, S4 & 22 \\
+\hline
+\end{tabular}
+\end{table}
+
+% ============================================================
+\section{Conclusion}
+% ============================================================
+
+Ce chapitre a présenté l'organisation et la gestion du 
+projet CinePass à travers les outils \textbf{Jira} et 
+\textbf{Git/GitHub}. L'adoption de la méthodologie 
+\textbf{Scrum} a permis une planification claire en 4 sprints 
+avec des objectifs bien définis, une répartition équitable 
+des tâches entre les membres de l'équipe, et un suivi 
+rigoureux de l'avancement via les tableaux Jira.
+
+Le workflow \textbf{Git} basé sur les branches par User Story 
+a facilité la collaboration en évitant les conflits de code 
+et en garantissant une traçabilité complète entre les tickets 
+Jira et le code source sur GitHub.
+
+Le chapitre suivant présentera la phase de réalisation et 
+d'implémentation, en détaillant les choix techniques et les 
+fonctionnalités développées au cours de chaque sprint.
+
 
 %============================================================
 \chapter{Réalisation et implémentation}
