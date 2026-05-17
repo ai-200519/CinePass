@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.9.12)  17 MAY 2026 19:31
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.9.12)  17 MAY 2026 19:49
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -422,7 +422,7 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.37 ...tionnalitÃ©s rÃ©alisÃ©es}{15}{section.5.5}
+l.37 ...ion des services et APIs}{15}{section.5.4}
                                                   % [1
 
 ])
@@ -449,29 +449,29 @@ Chapitre 1.
 
 ] [7] [8]
 Chapitre 2.
+[9
 
-Underfull \hbox (badness 10000) in paragraph at lines 208--208
+]
+Underfull \hbox (badness 10000) in paragraph at lines 211--211
 []|\T1/cmr/bx/n/8 Présence
  []
 
 
-Underfull \hbox (badness 1137) in paragraph at lines 208--208
+Underfull \hbox (badness 1137) in paragraph at lines 211--211
 []|\T1/cmr/m/n/8 Forte no-to-riété, large base d'uti-li-sa-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 208--208
+Underfull \hbox (badness 10000) in paragraph at lines 211--211
 []|\T1/cmr/m/n/8 MK2 / UGC
  []
 
 
-Underfull \hbox (badness 1472) in paragraph at lines 208--208
+Underfull \hbox (badness 1472) in paragraph at lines 211--211
 []|\T1/cmr/m/n/8 Inconnu au Ma-roc, pas de sup-port
  []
 
-[9
-
-] [10] [11]
+[10] [11]
 Chapitre 3.
 [12
 
@@ -491,20 +491,20 @@ LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-04>
  ***********
 Package rerunfilecheck Info: File `rapport.out' has not changed.
-(rerunfilecheck)             Checksum: F5A9632C73BA5A465F71CDF7736E62A7;7650.
+(rerunfilecheck)             Checksum: 5A6BD19FE33A031A3379EF5A63F002A7;7887.
  ) 
 Here is how much of TeX's memory you used:
- 13752 strings out of 474486
- 227548 string characters out of 5739943
- 1939542 words of memory out of 5000000
- 35799 multiletter control sequences out of 15000+600000
+ 13754 strings out of 474486
+ 227572 string characters out of 5739943
+ 1938542 words of memory out of 5000000
+ 35800 multiletter control sequences out of 15000+600000
  569878 words of font info for 57 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  75i,10n,79p,1116b,696s stack positions out of 10000i,1000n,20000p,200000b,200000s
  <C:\Users\GROUP LAPTOPS\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\eccc1200.pk> <C:\Users\GROUP LAPTOPS\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecrm0800.pk> <C:\Users\GROUP LAPTOPS\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx0800.pk> <C:\Users\GROUP LAPTOPS\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecti1200.pk> <C:\Users\GROUP LAPTOPS\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx1440.pk> <C:\Users\GROUP LAPTOPS\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx1728.pk> <C:\Users\GROUP LAPTOPS\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecrm1200.pk> <C:\Users\GROUP LAPTOPS\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx1200.pk> <C:\Users\GROUP LAPTOPS\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecrm1728.pk> <C:\Users\GROUP LAPTOPS\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx2488.pk>
-Output written on rapport.pdf (18 pages, 204513 bytes).
+Output written on rapport.pdf (18 pages, 205979 bytes).
 PDF statistics:
- 731 PDF objects out of 1000 (max. 8388607)
- 66 named destinations out of 1000 (max. 500000)
- 313 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 737 PDF objects out of 1000 (max. 8388607)
+ 67 named destinations out of 1000 (max. 500000)
+ 321 words of extra memory for PDF output out of 10000 (max. 10000000)
 
