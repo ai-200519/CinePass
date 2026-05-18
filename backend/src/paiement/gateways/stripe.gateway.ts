@@ -6,6 +6,7 @@ import Stripe                 from 'stripe';
 type StripeClient = InstanceType<typeof Stripe>;
 type StripeEvent = ReturnType<StripeClient['webhooks']['constructEvent']>;
 type StripeSession = Awaited<ReturnType<StripeClient['checkout']['sessions']['retrieve']>>;
+type StripePaymentIntent = Awaited<ReturnType<StripeClient['paymentIntents']['retrieve']>>;
 
 @Injectable()
 export class StripeGateway {
@@ -59,6 +60,36 @@ export class StripeGateway {
       sessionId: session.id,
       url:       session.url,
     };
+  }
+
+  async createPaymentIntent(
+    montant: number,
+    devise: string,
+    reference: string,
+    id_paiement: number,
+    filmTitle: string,
+  ): Promise<{ paymentIntentId: string; clientSecret: string }> {
+    const intent = await this.stripe.paymentIntents.create({
+      amount: Math.round(montant * 100),
+      currency: devise.toLowerCase(),
+      automatic_payment_methods: { enabled: true },
+      description: `CinePass - ${filmTitle} - Reservation ${reference}`,
+      metadata: {
+        id_paiement: id_paiement.toString(),
+        reference,
+      },
+    });
+
+    this.logger.log(`Stripe PaymentIntent created : ${intent.id}`);
+
+    return {
+      paymentIntentId: intent.id,
+      clientSecret: intent.client_secret,
+    };
+  }
+
+  async getPaymentIntent(paymentIntentId: string): Promise<StripePaymentIntent> {
+    return this.stripe.paymentIntents.retrieve(paymentIntentId);
   }
 
   // ── Verify webhook signature ────────────────────────────────────────────

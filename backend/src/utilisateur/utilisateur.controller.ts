@@ -67,6 +67,15 @@ export class UtilisateurController {
     return this.utilisateurService.findOne(user.id_utilisateur);
   }
 
+  @Get('me')
+  @ApiOperation({
+    summary: 'Utilisateur connecte',
+    description: 'Alias de /utilisateur/profil pour compatibilite frontend.',
+  })
+  getMe(@CurrentUser() user: any) {
+    return this.utilisateurService.findOne(user.id_utilisateur);
+  }
+
   // ── PATCH /utilisateur/profil — CLIENT ────────────────────────────────────
   @Patch('profil')
   @ApiOperation({
@@ -89,6 +98,15 @@ export class UtilisateurController {
     },
   })
   updateProfil(@CurrentUser() user: any, @Body() dto: UpdateProfilDto) {
+    return this.utilisateurService.updateProfil(user.id_utilisateur, dto);
+  }
+
+  @Patch('me')
+  @ApiOperation({
+    summary: 'Modifier mon profil',
+    description: 'Alias de /utilisateur/profil pour compatibilite frontend.',
+  })
+  updateMe(@CurrentUser() user: any, @Body() dto: UpdateProfilDto) {
     return this.utilisateurService.updateProfil(user.id_utilisateur, dto);
   }
 

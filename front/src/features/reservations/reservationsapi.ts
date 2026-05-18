@@ -55,6 +55,7 @@ export type ReservationDetail = {
   qrCode: string | null;
   montant: number;
   devise: string;
+  cinema?: string;
   film: {
     title: string;
     poster?: string;
@@ -125,6 +126,11 @@ export const reservationsApi = {
 
   async getById(id: number) {
     const res = await http.get<ReservationDetail>(`/reservation/${id}`);
+    return res.data;
+  },
+
+  async getByReference(reference: string) {
+    const res = await http.get<ReservationDetail>(`/reservation/by-reference/${encodeURIComponent(reference)}`);
     return res.data;
   },
 
