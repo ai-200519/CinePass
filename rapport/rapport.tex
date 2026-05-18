@@ -810,37 +810,464 @@ fonctionnalités développées au cours de chaque sprint.
 
 
 %============================================================
-\chapter{Réalisation et implémentation}
-
-\section{Environnement de développement}
-Le projet a été développé avec les outils et technologies adaptés au frontend, au backend et à la gestion de versions.
-
-\section{Implémentation du backend}
-Le backend gère les API de films, séances, réservations, utilisateurs et paiements.
-
-\section{Implémentation du frontend}
-Le frontend propose l'interface de navigation, de recherche, de réservation et de consultation des billets.
-
-\section{Intégration des services et APIs}
-L'intégration relie le frontend au backend et permet les échanges de données en temps réel.
-
-\section{Fonctionnalités réalisées}
-\begin{itemize}[leftmargin=1.2cm]
-  \item consultation des films ;
-  \item réservation de sièges ;
-  \item gestion des séances ;
-  \item paiement ;
-  \item historique des réservations.
-\end{itemize}
-
-\section{Tests et validation}
-Des tests fonctionnels et des vérifications d'intégration ont permis de valider les principales fonctionnalités.
-
-\section{Conclusion du chapitre}
-La réalisation confirme la faisabilité de la solution et la cohérence des choix techniques.
-
 %============================================================
-\chapter*{Conclusion générale}
+\chapter{Réalisation et implémentation}
+%============================================================
+
+\section{Introduction}
+
+Ce chapitre constitue le cœur technique du rapport de projet CinePass. Il présente de manière détaillée et structurée l'ensemble des travaux de réalisation et d'implémentation menés tout au long du cycle de développement. Après avoir défini les besoins fonctionnels et non fonctionnels dans les chapitres précédents et établi une architecture système cohérente, il convient à présent de décrire concrètement comment ces éléments ont été traduits en interfaces utilisateurs fonctionnelles, en services backend robustes et en fonctionnalités intégrées.
+
+La réalisation du projet CinePass mobilise un ensemble varié d'outils, de technologies et de bonnes pratiques de développement. Chaque décision technique a été motivée par des critères de performance, de maintenabilité, de sécurité et d'expérience utilisateur. Ce chapitre décrit successivement l'environnement de développement mis en place, les choix technologiques retenus pour le frontend et le backend, puis les fonctionnalités implémentées dans le cadre des différents sprints, illustrées par des captures d'écran des interfaces réalisées.
+
+%------------------------------------------------------------
+\section{Environnement de développement}
+%------------------------------------------------------------
+
+La mise en place d'un environnement de développement cohérent et bien configuré est une étape indispensable à la réussite d'un projet logiciel. Dans le cadre du projet CinePass, l'environnement technique a été soigneusement sélectionné afin de garantir une productivité maximale, une compatibilité entre les outils utilisés et une facilité de collaboration entre les membres de l'équipe.
+
+%------------------------------------------------------------
+\subsection{Outils de développement et de collaboration}
+%------------------------------------------------------------
+
+\subsubsection{Visual Studio Code}
+
+Visual Studio Code (VS Code) est l'éditeur de code principal utilisé dans le développement du projet CinePass. Il s'agit d'un éditeur open source développé par Microsoft, reconnu pour sa légèreté, sa rapidité et la richesse de son écosystème d'extensions. VS Code offre une prise en charge native de nombreux langages de programmation, notamment TypeScript, JavaScript et SQL, ainsi qu'un débogueur intégré, une gestion Git directement depuis l'interface et un terminal embarqué facilitant l'exécution des commandes. L'ensemble de ces fonctionnalités en fait un environnement de développement incontournable pour des projets web modernes.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.22\textwidth]{images/vscode}
+    \caption{Logo de Visual Studio Code — éditeur de code principal}
+    \label{fig:vscode}
+\end{figure}
+
+\subsubsection{Postman}
+
+Postman est l'outil utilisé pour tester et documenter les API REST développées dans le cadre du projet CinePass. Il offre une interface graphique intuitive permettant d'envoyer des requêtes HTTP (GET, POST, PUT, DELETE), de visualiser les réponses renvoyées par le serveur et de vérifier le bon fonctionnement des endpoints. Postman a été systématiquement utilisé tout au long du développement pour valider chaque route de l'API avant son intégration côté frontend, contribuant ainsi à la qualité et à la fiabilité de la solution.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.18\textwidth]{images/postman}
+    \caption{Logo de Postman — outil de test et de documentation des API REST}
+    \label{fig:postman}
+\end{figure}
+
+\subsubsection{Git et GitHub}
+
+Git est le système de contrôle de version distribué utilisé pour gérer le code source du projet CinePass. Il permet de suivre l'historique des modifications, de travailler sur des branches parallèles et de fusionner les contributions des différents membres de l'équipe de manière sécurisée. GitHub constitue la plateforme d'hébergement centralisée du dépôt Git, et a été utilisé pour faciliter la collaboration à travers les Pull Requests, les revues de code et la gestion des branches par User Story, conformément au workflow Scrum décrit dans le chapitre précédent.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.20\textwidth]{images/github}
+    \caption{Logo de GitHub — plateforme d'hébergement et de collaboration sur le code source}
+    \label{fig:github}
+\end{figure}
+
+\subsubsection{Docker}
+
+Docker est l'outil de conteneurisation utilisé dans le projet CinePass pour garantir la portabilité et la reproductibilité de l'environnement d'exécution. Il permet d'encapsuler chaque service de l'application — backend, base de données et outils annexes — dans des conteneurs isolés et légers, partageant le même système d'exploitation hôte. Grâce à Docker Compose, l'ensemble des services peut être démarré, arrêté et configuré via un fichier de configuration unique, facilitant considérablement la mise en place de l'environnement de développement pour chaque membre de l'équipe ainsi que le déploiement en production.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.28\textwidth]{images/Docker}
+    \caption{Logo de Docker — outil de conteneurisation des services applicatifs}
+    \label{fig:docker}
+\end{figure}
+
+\subsubsection{Jira}
+
+Jira est l'outil de gestion de projet agile utilisé par l'équipe CinePass pour planifier, suivre et coordonner l'ensemble des tâches de développement. Il a permis de créer et d'organiser le Product Backlog, de rédiger et prioriser les User Stories selon la méthode MoSCoW, de planifier les sprints et d'assigner les tâches aux membres de l'équipe. Le tableau Kanban de Jira a offert une visibilité en temps réel sur l'état d'avancement de chaque tâche, tandis que les rapports de sprint ont permis de mesurer la vélocité de l'équipe et d'ajuster la planification en conséquence.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.30\textwidth]{images/Jira_Logo}
+    \caption{Logo de Jira — outil de gestion de projet agile}
+    \label{fig:jira}
+\end{figure}
+
+%------------------------------------------------------------
+\subsection{Technologies et frameworks utilisés}
+%------------------------------------------------------------
+
+\subsubsection{Vite}
+
+Vite est l'outil de build utilisé pour le développement du frontend de CinePass. Contrairement aux bundlers traditionnels, Vite exploite les modules ES natifs du navigateur pour proposer un démarrage instantané du serveur de développement et des mises à jour ultra-rapides lors des modifications du code source. Cette approche améliore considérablement l'expérience de développement, en particulier sur des projets React de taille croissante. Vite est également responsable de la compilation et de l'optimisation des assets lors de la mise en production.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.18\textwidth]{images/vite}
+    \caption{Logo de Vite — outil de build et de développement frontend}
+    \label{fig:vite}
+\end{figure}
+
+\subsubsection{Node.js}
+
+Node.js constitue le socle d'exécution du backend de CinePass. Il s'agit d'un environnement d'exécution JavaScript côté serveur, basé sur le moteur V8 de Google Chrome. Node.js adopte un modèle d'entrées/sorties non bloquant et orienté événements, ce qui le rend particulièrement adapté aux applications web nécessitant un grand nombre de requêtes simultanées. Dans le cadre de ce projet, Node.js est utilisé en combinaison avec le framework NestJS pour implémenter l'API RESTful de la plateforme.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.38\textwidth]{images/nodejs}
+    \caption{Logo de Node.js — environnement d'exécution JavaScript côté serveur}
+    \label{fig:nodejs}
+\end{figure}
+
+\subsubsection{NestJS}
+
+NestJS est le framework backend principal utilisé dans le développement de l'API CinePass. Construit sur Node.js et TypeScript, NestJS adopte une architecture modulaire inspirée d'Angular, organisant le code en modules, contrôleurs et services. Cette structuration favorise la séparation des responsabilités, la réutilisabilité du code et facilite la maintenance ainsi que l'évolution du système. Chaque module correspond à un domaine métier précis : authentification, gestion des films, des séances, des salles, des réservations et des paiements.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.22\textwidth]{images/Nest}
+    \caption{Logo de NestJS — framework backend Node.js et TypeScript}
+    \label{fig:nest}
+\end{figure}
+
+\subsubsection{PostgreSQL}
+
+PostgreSQL est le système de gestion de base de données relationnelle (SGBDR) retenu pour stocker l'ensemble des données persistantes de CinePass. Il s'agit d'un SGBDR open source avancé, reconnu pour sa robustesse, ses performances, sa conformité aux standards SQL et ses fonctionnalités étendues telles que les transactions ACID, les index partiels et les types de données personnalisés. La base de données héberge l'ensemble des entités du système, notamment les utilisateurs, les films, les salles, les séances, les sièges, les réservations et les paiements. Les relations entre ces entités sont définies par des contraintes de clés étrangères garantissant l'intégrité référentielle des données.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.20\textwidth]{images/postgreSQL}
+    \caption{Logo de PostgreSQL — système de gestion de base de données relationnelle}
+    \label{fig:postgresql}
+\end{figure}
+
+\subsubsection{HTML et CSS}
+
+HTML (HyperText Markup Language) et CSS (Cascading Style Sheets) constituent les fondements de toute interface web. Dans le projet CinePass, HTML est utilisé via la syntaxe JSX de React pour structurer les composants de l'interface utilisateur, tandis que CSS est appliqué à travers des feuilles de style modulaires pour assurer la mise en forme, la réactivité et l'esthétique générale de la plateforme. Une attention particulière a été portée à la responsivité de l'interface afin d'assurer une expérience optimale aussi bien sur desktop que sur mobile, conformément à la charte graphique définie dans le cahier des charges.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.25\textwidth]{images/htmlcss}
+    \caption{Logos HTML5 et CSS3 — technologies de structuration et de mise en forme de l'interface}
+    \label{fig:htmlcss}
+\end{figure}
+
+\subsubsection{JavaScript et TypeScript}
+
+JavaScript est le langage de programmation central du projet CinePass, utilisé à la fois côté frontend via React et côté backend via Node.js et NestJS. TypeScript, sa surcouche statiquement typée, a été adopté sur l'ensemble du projet afin de renforcer la robustesse du code, de détecter les erreurs dès la phase de développement et d'améliorer la lisibilité et la maintenabilité du code source. Le typage statique facilite également la collaboration entre les membres de l'équipe en rendant les interfaces et les contrats de données explicites.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.18\textwidth]{images/js}
+    \caption{Logo JavaScript — langage de programmation principal du projet}
+    \label{fig:js}
+\end{figure}
+
+%------------------------------------------------------------
+\section{Implémentation du backend}
+%------------------------------------------------------------
+
+Le backend de CinePass est développé avec NestJS, structuré en modules indépendants correspondant chacun à un domaine métier du système. Cette architecture modulaire garantit une séparation claire des responsabilités et facilite l'évolution progressive de la plateforme au fil des sprints. La communication avec la base de données PostgreSQL est assurée par TypeORM, un ORM compatible avec TypeScript permettant de définir les entités sous forme de classes annotées et de gérer les relations entre elles de manière déclarative.
+
+L'API exposée par le backend suit les conventions REST, avec des endpoints organisés par ressource et documentés via Swagger. La sécurité des routes est assurée par une stratégie d'authentification basée sur les JSON Web Tokens (JWT), complétée par un mécanisme de vérification par code OTP envoyé par email lors de l'inscription. Les mots de passe sont systématiquement hachés avec bcrypt avant leur persistance en base de données, conformément aux exigences de sécurité définies dans le cahier des charges.
+
+%------------------------------------------------------------
+\section{Implémentation du frontend}
+%------------------------------------------------------------
+
+Le frontend de CinePass est développé avec React et TypeScript, en utilisant Vite comme outil de build. L'architecture frontend repose sur une organisation en composants réutilisables, avec une séparation claire entre les composants de présentation et la logique applicative. La charte graphique définie dans le cahier des charges — thème sombre dominant, accents rouges pour les actions clés et typographie sans-sérif lisible — a été scrupuleusement respectée dans l'ensemble des interfaces implémentées.
+
+La gestion des appels à l'API backend est réalisée de manière asynchrone grâce à la bibliothèque Axios, qui offre une interface simple et configurable pour effectuer des requêtes HTTP et gérer les intercepteurs d'authentification. Les tokens JWT sont stockés côté client et automatiquement injectés dans les en-têtes des requêtes sécurisées, garantissant ainsi une authentification transparente pour l'utilisateur.
+
+%------------------------------------------------------------
+\section{Fonctionnalités réalisées par sprint}
+%------------------------------------------------------------
+
+Le développement de CinePass a été organisé en quatre sprints successifs de deux semaines chacun, conformément à la méthodologie Scrum adoptée. Chaque sprint dispose d'un périmètre fonctionnel clairement défini et d'un ensemble de User Stories assignées aux membres de l'équipe. Les sections suivantes décrivent les fonctionnalités réalisées dans les sprints complétés, illustrées par des captures d'écran des interfaces développées.
+
+%------------------------------------------------------------
+\subsection{Sprint 1 — Authentification et Back-office Administrateur}
+%------------------------------------------------------------
+
+Le premier sprint avait pour objectif de mettre en place l'infrastructure technique de base, d'implémenter le système d'authentification complet et de développer les premières fonctionnalités du back-office administrateur. À l'issue de ce sprint, la plateforme disposait d'une base fonctionnelle solide permettant à un administrateur de se connecter, de gérer les entités principales du système et de consulter des indicateurs d'activité en temps réel.
+
+%....................................
+\subsubsection{a. \quad Authentification utilisateur}
+%....................................
+
+L'authentification constitue le point d'entrée de la plateforme CinePass. Elle repose sur un mécanisme sécurisé combinant des identifiants classiques (adresse email et mot de passe) avec un système de vérification par code OTP (One-Time Password) envoyé par email lors de l'inscription. Les JSON Web Tokens (JWT) sont utilisés pour maintenir la session utilisateur de manière stateless, chaque requête authentifiée devant inclure un token valide dans son en-tête HTTP. Les mots de passe sont hachés avec bcrypt avant leur stockage en base de données, garantissant leur confidentialité même en cas de compromission.
+
+\paragraph{Interface de connexion (Login)}
+
+L'interface de connexion permet à l'utilisateur de saisir son adresse email et son mot de passe afin d'accéder à son espace personnel ou, dans le cas d'un administrateur, au back-office de gestion. L'interface adopte le design sombre défini dans la charte graphique, avec un formulaire centré et un bouton d'action mis en évidence par la couleur rouge caractéristique de CinePass.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.78\textwidth]{images/admin/login}
+    \caption{Interface de connexion (Login) — CinePass}
+    \label{fig:login}
+\end{figure}
+
+La figure \ref{fig:login} présente l'interface de connexion de la plateforme CinePass. Elle propose un formulaire épuré composé d'un champ pour l'adresse email et d'un champ pour le mot de passe, accompagnés d'un lien de réinitialisation pour les utilisateurs ayant oublié leurs identifiants. Le design sombre et minimaliste contribue à une expérience visuelle cohérente avec l'univers cinématographique de la plateforme.
+
+\paragraph{Interface d'inscription (Register)}
+
+L'interface d'inscription permet à un nouvel utilisateur de créer son compte sur la plateforme CinePass. Le formulaire collecte les informations essentielles telles que le prénom, le nom, l'adresse email et le mot de passe. Une étape de validation par code OTP est déclenchée immédiatement après la soumission du formulaire, garantissant l'authenticité de l'adresse email fournie avant l'activation définitive du compte.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.78\textwidth]{images/admin/regieter}
+    \caption{Interface d'inscription (Register) — CinePass}
+    \label{fig:register}
+\end{figure}
+
+La figure \ref{fig:register} illustre le formulaire d'inscription de la plateforme. Il reprend la même charte graphique sombre que le reste de l'application, avec des champs de saisie clairement identifiés et un bouton de soumission en rouge. Une fois le formulaire validé, un email contenant un code OTP est automatiquement envoyé à l'adresse renseignée afin de finaliser la création du compte.
+
+%....................................
+\subsubsection{b. \quad Interface d'administration}
+%....................................
+
+Le back-office administrateur constitue le tableau de pilotage central de la plateforme CinePass. Il offre à l'administrateur une vision globale de l'activité de la plateforme et lui permet de gérer l'ensemble des entités du système : films, salles, séances, utilisateurs et tarifs. La navigation latérale fixe, conforme à la maquette validée dans le cahier des charges, structure l'accès aux différents modules de gestion.
+
+\paragraph{Tableau de bord (Dashboard)}
+
+Le tableau de bord est la page d'accueil de l'espace administrateur. Il regroupe les indicateurs clés d'activité de la plateforme sous forme de cartes KPI et de graphiques analytiques, permettant à l'administrateur de suivre en temps réel l'évolution des réservations, le chiffre d'affaires journalier et le taux de remplissage moyen des séances.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.92\textwidth]{images/admin/dashboard}
+    \caption{Tableau de bord administrateur (Dashboard) — CinePass}
+    \label{fig:dashboard}
+\end{figure}
+
+La figure \ref{fig:dashboard} présente le tableau de bord de l'espace administrateur. On y distingue plusieurs widgets affichant des métriques essentielles, notamment le nombre total de réservations du jour, le chiffre d'affaires généré et des graphiques d'évolution temporelle des ventes. Cette interface offre à l'administrateur une vision synthétique et immédiate de l'activité de la plateforme, facilitant la prise de décision opérationnelle.
+
+\paragraph{Gestion des films}
+
+L'interface de gestion des films permet à l'administrateur d'effectuer l'ensemble des opérations CRUD (Create, Read, Update, Delete) sur le catalogue de films disponibles sur la plateforme. Chaque film est associé à un titre, une affiche, une description, une durée, une catégorie, une classification et un statut de diffusion.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.92\textwidth]{images/admin/gestionFilm}
+    \caption{Interface de gestion des films — Back-office CinePass}
+    \label{fig:gestionFilm}
+\end{figure}
+
+La figure \ref{fig:gestionFilm} illustre l'interface de gestion des films. Elle présente la liste des films enregistrés sous forme de tableau avec des options d'action permettant de modifier ou de supprimer chaque entrée. Un bouton d'ajout permet d'insérer un nouveau film via un formulaire dédié intégrant le téléchargement de l'affiche et de la bande-annonce.
+
+\paragraph{Gestion des salles}
+
+L'interface de gestion des salles permet à l'administrateur de configurer les salles disponibles dans chaque cinéma. Chaque salle est caractérisée par un nom, une capacité totale, une technologie de projection et une disposition des sièges utilisée lors de la création des séances.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.92\textwidth]{images/admin/gestionSalles}
+    \caption{Interface de gestion des salles — Back-office CinePass}
+    \label{fig:gestionSalles}
+\end{figure}
+
+La figure \ref{fig:gestionSalles} présente le module de gestion des salles de cinéma. L'administrateur peut consulter la liste des salles existantes, ajouter de nouvelles salles, modifier leurs caractéristiques ou les supprimer si nécessaire. Ces informations sont directement exploitées lors de la planification des séances.
+
+\paragraph{Gestion des séances}
+
+Le module de gestion des séances permet à l'administrateur de planifier les projections en associant un film, une salle et un créneau horaire précis. Cette fonctionnalité est au cœur du fonctionnement de la plateforme, car elle conditionne directement la disponibilité des billets accessibles aux utilisateurs.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.92\textwidth]{images/admin/gestionSeances}
+    \caption{Interface de gestion des séances — Back-office CinePass}
+    \label{fig:gestionSeances}
+\end{figure}
+
+La figure \ref{fig:gestionSeances} illustre l'interface de planification des séances. L'administrateur peut créer, modifier ou supprimer des séances, en spécifiant pour chacune le film projeté, la salle utilisée, la date et l'heure de début. Le système gère automatiquement la disponibilité des sièges associés à chaque séance créée, en initialisant leur statut à « disponible » dès la validation de la planification.
+
+\paragraph{Gestion des cinémas}
+
+L'interface de gestion des cinémas offre à l'administrateur la possibilité de configurer les établissements cinématographiques partenaires intégrés dans la plateforme CinePass. Chaque cinéma est identifié par un nom, une adresse géographique et un ensemble de salles qui lui sont rattachées.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.92\textwidth]{images/admin/gestionCinema}
+    \caption{Interface de gestion des cinémas — Back-office CinePass}
+    \label{fig:gestionCinema}
+\end{figure}
+
+La figure \ref{fig:gestionCinema} présente le module de gestion des cinémas partenaires. Cette interface permet d'administrer les établissements référencés sur la plateforme et de leur associer les salles correspondantes, constituant ainsi la structure hiérarchique sur laquelle repose l'ensemble du système de réservation.
+
+\paragraph{Gestion des utilisateurs}
+
+L'interface de gestion des utilisateurs donne à l'administrateur un accès centralisé à l'ensemble des comptes inscrits sur la plateforme. Il lui est possible de consulter les informations des utilisateurs, de modifier leurs rôles (client, staff ou administrateur) et de gérer leurs statuts d'activation.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.92\textwidth]{images/admin/gestionUser}
+    \caption{Interface de gestion des utilisateurs — Back-office CinePass}
+    \label{fig:gestionUser}
+\end{figure}
+
+La figure \ref{fig:gestionUser} illustre le module de gestion des utilisateurs. L'administrateur dispose d'une vue tabulaire listant l'ensemble des comptes enregistrés, avec la possibilité de filtrer, de rechercher et d'effectuer des actions de gestion sur chaque profil, notamment la modification du rôle et la désactivation du compte.
+
+\paragraph{Gestion des tarifs}
+
+Le module de tarification permet à l'administrateur de configurer les différentes catégories de prix appliquées aux billets vendus sur la plateforme. Les tarifs peuvent être différenciés selon le type de siège, le type de séance ou des catégories tarifaires spéciales telles que les tarifs étudiant, enfant ou senior.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.92\textwidth]{images/admin/tarif}
+    \caption{Interface de gestion des tarifs — Back-office CinePass}
+    \label{fig:tarif}
+\end{figure}
+
+La figure \ref{fig:tarif} présente l'interface de configuration des tarifs. L'administrateur peut définir et modifier les grilles tarifaires applicables aux réservations, garantissant ainsi une flexibilité totale dans la politique de prix de la plateforme selon les différents profils d'utilisateurs et types de séances.
+
+\paragraph{Rapport administrateur}
+
+L'interface de rapport administrateur offre une vue analytique approfondie de l'activité de la plateforme. Elle consolide les données de réservation, de chiffre d'affaires et de fréquentation sous forme de tableaux et de graphiques permettant une analyse détaillée sur des périodes définies.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.92\textwidth]{images/admin/rapportAdmin}
+    \caption{Interface de rapport administrateur — Back-office CinePass}
+    \label{fig:rapportAdmin}
+\end{figure}
+
+La figure \ref{fig:rapportAdmin} illustre l'interface de rapports analytiques de l'espace administrateur. Elle permet de suivre les indicateurs de performance de la plateforme, d'identifier les films et séances les plus populaires et d'appuyer les décisions de gestion sur des données concrètes et actualisées.
+
+%------------------------------------------------------------
+\subsection{Sprint 2 — Disponibilité des sièges, réservation et profil client}
+%------------------------------------------------------------
+
+Le deuxième sprint avait pour objectif d'implémenter le parcours complet du client sur la plateforme CinePass. Cela inclut la gestion du profil utilisateur, la consultation du catalogue de films disponibles, la visualisation des détails d'un film, la sélection d'une séance avec affichage du plan de salle en temps réel, la création d'une réservation sécurisée, ainsi que la consultation de l'historique des réservations. L'ensemble de ces fonctionnalités constitue le cœur de l'expérience utilisateur de la plateforme.
+
+%....................................
+\subsubsection{a. \quad Profil utilisateur}
+%....................................
+
+L'interface de gestion du profil constitue l'espace personnel de l'utilisateur sur la plateforme CinePass. Elle lui permet de consulter et de modifier ses informations personnelles enregistrées, notamment son prénom, son nom, son adresse email ainsi que son mot de passe. Cet espace centralise également l'accès aux différentes fonctionnalités liées au compte, offrant ainsi une expérience utilisateur cohérente et unifiée.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.88\textwidth]{images/client/profilUser}
+    \caption{Interface de gestion du profil utilisateur — CinePass}
+    \label{fig:profilUser}
+\end{figure}
+
+La figure \ref{fig:profilUser} illustre la page de profil utilisateur de la plateforme CinePass. L'interface présente les informations du compte sous forme de formulaire éditable, permettant à l'utilisateur de maintenir ses données personnelles à jour. Un accès rapide à l'historique des réservations est également proposé depuis cette page, centralisant ainsi l'ensemble des fonctionnalités liées au compte utilisateur.
+
+%....................................
+\subsubsection{b. \quad Consultation du catalogue de films}
+%....................................
+
+La page de consultation constitue le point d'entrée principal vers le catalogue de films disponibles sur CinePass. Elle permet au spectateur de parcourir les films actuellement à l'affiche, filtrés selon sa ville et le cinéma le plus proche. L'interface présente les films sous forme de vignettes visuelles mettant en avant les affiches, les titres et les horaires disponibles, facilitant ainsi la navigation et la prise de décision de l'utilisateur.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.88\textwidth]{images/client/consulté2}
+    \caption{Page d'accueil — Sélection de la ville et du cinéma}
+    \label{fig:consulte}
+\end{figure}
+
+La figure \ref{fig:consulte} présente la page d'accueil de la plateforme CinePass côté client. L'utilisateur est invité à choisir sa ville afin d'afficher les cinémas disponibles à proximité et les séances correspondantes. Cette étape de géolocalisation manuelle garantit une expérience personnalisée et pertinente pour chaque spectateur.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.88\textwidth]{images/client/consulté1}
+    \caption{Catalogue des films à l'affiche — Interface de consultation}
+    \label{fig:consulte1}
+\end{figure}
+
+La figure \ref{fig:consulte1} illustre le catalogue des films disponibles après sélection du cinéma. Les films sont affichés sous forme de cartes visuelles comprenant l'affiche, le titre, la catégorie et les créneaux horaires disponibles. Cette interface claire et intuitive permet à l'utilisateur de repérer rapidement le film et la séance qui l'intéressent.
+
+%....................................
+\subsubsection{c. \quad Détail d'un film}
+%....................................
+
+La page de détail d'un film offre à l'utilisateur une présentation complète du film sélectionné. Elle regroupe toutes les informations nécessaires à la prise de décision : synopsis, affiche, bande-annonce intégrée, durée, classification et séances disponibles. Cette page constitue également le point d'entrée vers le processus de réservation.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.88\textwidth]{images/client/detailfilm}
+    \caption{Page de détail d'un film — Informations et séances disponibles}
+    \label{fig:detailfilm}
+\end{figure}
+
+La figure \ref{fig:detailfilm} présente la page de détail du film, affichant l'affiche officielle, le titre, la description et les créneaux de projection disponibles. L'utilisateur peut sélectionner directement la séance souhaitée depuis cette page pour accéder au processus de réservation.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.88\textwidth]{images/client/detailfilm1}
+    \caption{Page de détail d'un film — Vue de la bande-annonce}
+    \label{fig:detailfilm1}
+\end{figure}
+
+La figure \ref{fig:detailfilm1} illustre la section bande-annonce intégrée à la page de détail du film. Le lecteur vidéo est directement embarqué dans l'interface, permettant à l'utilisateur de visionner la bande-annonce officielle sans quitter la plateforme, enrichissant ainsi son expérience avant la réservation.
+
+%....................................
+\subsubsection{d. \quad Réservation d'une séance}
+%....................................
+
+Le module de réservation constitue la fonctionnalité centrale du sprint 2. Il permet à l'utilisateur de sélectionner ses sièges parmi ceux disponibles pour une séance donnée, puis de confirmer sa réservation. Le plan de salle est affiché dynamiquement avec une mise à jour en temps réel de la disponibilité des places, grâce à un mécanisme de verrouillage temporaire des sièges sélectionnés, évitant ainsi tout risque de double réservation.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.88\textwidth]{images/client/reservationfilm}
+    \caption{Interface de réservation — Sélection des sièges et confirmation}
+    \label{fig:reservationfilm}
+\end{figure}
+
+La figure \ref{fig:reservationfilm} présente l'interface de réservation de la plateforme CinePass. Le plan de salle est représenté graphiquement avec un code couleur distinguant les sièges disponibles, occupés et sélectionnés par l'utilisateur en cours de réservation, conformément aux spécifications de la charte graphique. Une fois les sièges choisis, l'utilisateur peut confirmer sa sélection et procéder au paiement.
+
+%....................................
+\subsubsection{e. \quad Billet numérique et QR Code de réservation}
+%....................................
+
+À l'issue d'une réservation confirmée, la plateforme génère automatiquement un billet numérique associé à un QR Code unique. Ce billet constitue le justificatif d'entrée que l'utilisateur présente à l'accueil du cinéma pour validation par le personnel de la plateforme. Le QR Code encode la référence unique de la réservation et permet une validation rapide et sans contact.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.72\textwidth]{images/client/padgreservation}
+    \caption{Billet numérique avec QR Code — Confirmation de réservation}
+    \label{fig:padgreservation}
+\end{figure}
+
+La figure \ref{fig:padgreservation} illustre le billet numérique généré après confirmation d'une réservation. Il affiche les informations essentielles de la séance — titre du film, date, horaire, salle et numéros de sièges — ainsi qu'un QR Code unique encodant la référence de réservation. Ce QR Code sera scanné par le personnel lors du contrôle d'entrée afin de valider l'accès à la salle.
+
+%....................................
+\subsubsection{f. \quad Historique des réservations}
+%....................................
+
+L'espace personnel de l'utilisateur lui permet de consulter l'ensemble de ses réservations passées et à venir. Cette fonctionnalité offre une traçabilité complète de l'activité de l'utilisateur sur la plateforme et lui permet de retrouver facilement ses billets numériques à tout moment, même après la date de la séance.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.88\textwidth]{images/client/mesreservation}
+    \caption{Page d'historique des réservations — Espace personnel utilisateur}
+    \label{fig:mesreservation}
+\end{figure}
+
+La figure \ref{fig:mesreservation} présente la page d'historique des réservations de l'espace personnel utilisateur. Chaque réservation est affichée avec ses informations détaillées : film, date, séance, sièges et statut de la réservation. L'utilisateur peut également accéder de nouveau à son billet numérique depuis cette interface, garantissant ainsi un accès permanent à ses justificatifs.
+
+%------------------------------------------------------------
+\subsection{Sprint 3 — Paiement Stripe, QR Code et notifications}
+%------------------------------------------------------------
+
+Le troisième sprint, qui concerne l'intégration de la passerelle de paiement Stripe, la génération automatique des QR Codes de validation d'entrée et l'envoi de notifications par email aux clients, est actuellement en cours de développement. Les captures d'écran et les descriptions détaillées de ces fonctionnalités seront intégrées dans la version définitive du rapport à l'issue de ce sprint.
+
+%------------------------------------------------------------
+\subsection{Sprint 4 — Validation Staff, Dashboard analytique et finalisation}
+%------------------------------------------------------------
+
+Le quatrième et dernier sprint, dédié à l'implémentation de la validation d'entrée par le staff via scan de QR Code, à la finalisation du tableau de bord analytique et à la rédaction de la documentation technique complète, est planifié et sera réalisé à l'issue du sprint 3. Son contenu sera documenté dans la version finale du rapport.
+
+%------------------------------------------------------------
+\section{Tests et validation}
+%------------------------------------------------------------
+
+La phase de tests constitue une étape essentielle du cycle de développement, permettant de s'assurer que les fonctionnalités implémentées répondent correctement aux spécifications définies en amont. Dans le cadre du projet CinePass, plusieurs niveaux de tests ont été mis en œuvre afin de garantir la qualité et la fiabilité de la solution.
+
+Les tests unitaires portent sur les composants individuels du backend, notamment les services NestJS responsables de la logique métier. Ces tests vérifient le comportement de chaque fonction de manière isolée, en simulant les dépendances externes telles que la base de données ou les services tiers, grâce au framework Jest intégré à l'écosystème NestJS.
+
+Les tests d'intégration permettent de valider les interactions entre les différents modules du système. Ils s'assurent notamment que les appels entre le frontend et le backend transitent correctement à travers les endpoints de l'API et que les données sont traitées et stockées de manière cohérente dans la base de données PostgreSQL.
+
+Les tests fonctionnels ont été réalisés à l'aide de Postman, en simulant les scénarios d'utilisation complets : inscription d'un utilisateur avec vérification OTP, connexion, consultation du catalogue, réservation d'une séance avec sélection des sièges et consultation de l'historique. Chaque scénario a été vérifié de bout en bout afin de valider le bon enchaînement des opérations et la conformité des réponses de l'API aux attentes spécifiées.
+
+%------------------------------------------------------------
+\section{Conclusion du chapitre}
+%------------------------------------------------------------
+
+Ce chapitre a présenté en détail la phase de réalisation et d'implémentation du projet CinePass. L'environnement de développement mis en place, composé d'outils modernes et éprouvés tels que VS Code, Docker, Vite, Node.js, NestJS, React et PostgreSQL, a permis de développer une solution web robuste, évolutive et conforme aux spécifications du cahier des charges. Les fonctionnalités du premier sprint — comprenant le système d'authentification sécurisé par JWT et OTP ainsi que l'ensemble du back-office administrateur — ont été pleinement implémentées et validées. Le deuxième sprint a permis de livrer le parcours client complet, de la consultation du catalogue jusqu'à la génération du billet numérique avec QR Code. Les sprints suivants, dédiés au paiement Stripe, aux notifications et à la validation des entrées par le staff, sont en cours de réalisation et viendront compléter la solution dans sa version finale.\chapter*{Conclusion générale}
 \addcontentsline{toc}{chapter}{Conclusion générale}
 CinePass répond aux besoins essentiels de réservation et de gestion d'un service de cinéma moderne. Ce projet a permis de développer une solution structurée, évolutive et orientée utilisateur.
 
