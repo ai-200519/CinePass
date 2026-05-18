@@ -1,22 +1,21 @@
 // src/paiement/paiement.service.ts
 import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-  ForbiddenException,
-  Logger,
+    BadRequestException,
+    ForbiddenException,
+    Injectable,
+    Logger,
+    NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ConfigService } from '@nestjs/config';
-import { Paiement } from './entities/paiement.entity';
-import { Reservation } from '../reservation/entities/reservation.entity';
-import { StripeGateway } from './gateways/stripe.gateway';
-import { ReservationService } from '../reservation/reservation.service';
-import { InitierPaiementDto } from './dto/initier-paiement.dto';
+import { MethodePaiement } from '../common/enums/methode-paiement.enum';
 import { StatutPaiement } from '../common/enums/statut-paiement.enum';
 import { StatutReservation } from '../common/enums/statut-reservation.enum';
-import { MethodePaiement } from '../common/enums/methode-paiement.enum';
+import { Reservation } from '../reservation/entities/reservation.entity';
+import { ReservationService } from '../reservation/reservation.service';
+import { InitierPaiementDto } from './dto/initier-paiement.dto';
+import { Paiement } from './entities/paiement.entity';
+import { StripeGateway } from './gateways/stripe.gateway';
 
 @Injectable()
 export class PaiementService {
@@ -68,20 +67,25 @@ export class PaiementService {
       );
     }
 
-    // 4. Check if paiement already exists — if so reuse session
+    // 4. Check if paiement already exists - if so reuse PaymentIntent
     if (reservation.paiement) {
       const existing = reservation.paiement;
       if (existing.statut === StatutPaiement.EN_ATTENTE) {
-        // Reuse existing session
-        return {
-          id_paiement: existing.id_paiement,
-          stripeSessionId: existing.referenceTransaction,
-          url: `https://checkout.stripe.com/pay/${existing.referenceTransaction}`,
-          montantTotal: existing.montantTotal,
-          devise: existing.devise,
-          statut: existing.statut,
-          message: 'Session de paiement existante',
-        };
+        const intent = await this.stripeGateway.getPaymentIntent(
+          existing.referenceTransaction,
+        );
+
+        if (intent.client_secret) {
+          return {
+            id_paiement: existing.id_paiement,
+            paymentIntentId: intent.id,
+            clientSecret: intent.client_secret,
+            montantTotal: Number(existing.montantTotal),
+            devise: existing.devise,
+            statut: existing.statut,
+            message: 'PaymentIntent existant',
+          };
+        }
       }
     }
 
@@ -102,7 +106,7 @@ export class PaiementService {
     });
     const savedPaiement = await this.paiementRepo.save(paiement);
 
-    // 7. Create Stripe checkout session
+    // 7. Create Stripe Checkout Session (hosted page)
     const filmTitle = reservation.seance?.film?.title || 'CinePass';
 
     const session = await this.stripeGateway.createCheckoutSession(
@@ -113,25 +117,25 @@ export class PaiementService {
       filmTitle,
     );
 
-    // 8. Save Stripe session ID as referenceTransaction
+    // 8. Save Stripe Checkout Session ID as referenceTransaction
     await this.paiementRepo.update(
       { id_paiement: savedPaiement.id_paiement },
       { referenceTransaction: session.sessionId },
     );
 
     this.logger.log(
-      `💳 Paiement initié — Réservation ${reservation.reference} — ` +
+      `💳 Checkout session created — Réservation ${reservation.reference} — ` +
         `Montant ${montantTotal} MAD`,
     );
 
     return {
       id_paiement: savedPaiement.id_paiement,
-      stripeSessionId: session.sessionId,
+      sessionId: session.sessionId,
       url: session.url,
       montantTotal,
       devise: 'MAD',
       statut: StatutPaiement.EN_ATTENTE,
-      message: "Redirigez le client vers l'URL Stripe pour le paiement",
+      message: 'Redirection vers la page de paiement Stripe',
     };
   }
 
@@ -194,6 +198,40 @@ export class PaiementService {
         );
 
         this.logger.log(`✅ Paiement confirmé — Référence ${reference}`);
+        break;
+      }
+
+      case 'payment_intent.succeeded': {
+        const intent = event.data.object;
+        const metadata = intent.metadata;
+
+        if (!metadata?.id_paiement) break;
+
+        const id_paiement = parseInt(metadata.id_paiement);
+        const reference = metadata.reference;
+
+        const paiement = await this.paiementRepo.findOne({
+          where: { id_paiement },
+          relations: ['reservation'],
+        });
+
+        if (!paiement) break;
+
+        await this.paiementRepo.update(
+          { id_paiement },
+          {
+            statut: StatutPaiement.ACCEPTE,
+            datePaiement: new Date(),
+            referenceTransaction: intent.id,
+          },
+        );
+
+        await this.reservationService.confirmerPaiement(
+          paiement.reservation.id_reservation,
+          intent.id,
+        );
+
+        this.logger.log(`Paiement confirme - Reference ${reference}`);
         break;
       }
 

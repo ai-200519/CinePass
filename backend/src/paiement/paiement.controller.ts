@@ -27,11 +27,11 @@ export class PaiementController {
   // ── POST /paiement/initier — CLIENT ───────────────────────────────────────
   @Post('initier')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.CLIENT)
+  @Roles(Role.CLIENT, Role.STAFF)
   @ApiBearerAuth('JWT-auth')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
-    summary:     '🔒 CLIENT — Initier un paiement Stripe',
+    summary:     '🔒 CLIENT/STAFF — Initier un paiement Stripe',
     description:
       'Crée une session de paiement Stripe. ' +
       'Retourne l\'URL de redirection vers la page de paiement Stripe. ' +
@@ -64,10 +64,10 @@ export class PaiementController {
   // ── GET /paiement/:id_reservation — CLIENT ────────────────────────────────
   @Get(':id_reservation')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.CLIENT)
+  @Roles(Role.CLIENT, Role.STAFF)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
-    summary:     '🔒 CLIENT — Statut du paiement',
+    summary:     '🔒 CLIENT/STAFF — Statut du paiement',
     description: 'Retourne le statut actuel du paiement pour une réservation.',
   })
   @ApiParam({ name: 'id_reservation', description: 'ID de la réservation' })

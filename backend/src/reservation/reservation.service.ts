@@ -1,22 +1,21 @@
 // src/reservation/reservation.service.ts
 import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-  ForbiddenException,
+    BadRequestException,
+    ForbiddenException,
+    Injectable,
+    NotFoundException,
 } from '@nestjs/common';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import * as QRCode from 'qrcode';
-import { InjectRepository } from '@nestjs/typeorm';
-import { InjectDataSource } from '@nestjs/typeorm';
-import { Repository, DataSource } from 'typeorm';
-import { Reservation } from './entities/reservation.entity';
-import { ReservationSiege } from './entities/reservation-siege.entity';
+import { DataSource, Repository } from 'typeorm';
+import { StatutReservation } from '../common/enums/statut-reservation.enum';
+import { StatutSeance } from '../common/enums/statut-seance.enum';
 import { Seance } from '../seance/entities/seance.entity';
 import { Siege } from '../siege/entities/siege.entity';
 import { Tarif } from '../tarif/entities/tarif.entity';
 import { CreateReservationDto } from './dto/create-reservation.dto';
-import { StatutReservation } from '../common/enums/statut-reservation.enum';
-import { StatutSeance } from '../common/enums/statut-seance.enum';
+import { ReservationSiege } from './entities/reservation-siege.entity';
+import { Reservation } from './entities/reservation.entity';
 
 @Injectable()
 export class ReservationService {
@@ -316,6 +315,61 @@ export class ReservationService {
     }
 
     // Client can only see their own reservations
+    if (reservation.utilisateur?.id_utilisateur !== id_utilisateur) {
+      throw new ForbiddenException('Accès refusé');
+    }
+
+    return {
+      id_reservation: reservation.id_reservation,
+      reference: reservation.reference,
+      statut: reservation.statut,
+      dateReservation: reservation.dateReservation,
+      qrCode: reservation.qrCode,
+      montant: reservation.paiement?.montantTotal || 0,
+      devise: reservation.paiement?.devise || 'MAD',
+      film: reservation.seance?.film
+        ? {
+            title: reservation.seance.film.title,
+            poster: reservation.seance.film.poster,
+            genre: reservation.seance.film.genre,
+            duration: reservation.seance.film.duration,
+          }
+        : null,
+      seance: {
+        dateHeure: reservation.seance?.dateHeure,
+        technologie: reservation.seance?.technologie,
+        salle: reservation.seance?.salle?.nom,
+      },
+      sieges:
+        reservation.reservationSieges?.map((rs) => ({
+          rangee: rs.siege?.rangee,
+          numero: rs.siege?.numero,
+          categorie: rs.categorie,
+          prix: rs.prixUnitaire,
+        })) || [],
+      nbSieges: reservation.reservationSieges?.length || 0,
+    };
+  }
+
+  // ── Find by reference (for redirect after Checkout)
+  async findByReference(reference: string, id_utilisateur: number): Promise<any> {
+    const reservation = await this.reservationRepo.findOne({
+      where: { reference },
+      relations: [
+        'utilisateur',
+        'seance',
+        'seance.film',
+        'seance.salle',
+        'paiement',
+        'reservationSieges',
+        'reservationSieges.siege',
+      ],
+    });
+
+    if (!reservation) {
+      throw new NotFoundException('Réservation introuvable');
+    }
+
     if (reservation.utilisateur?.id_utilisateur !== id_utilisateur) {
       throw new ForbiddenException('Accès refusé');
     }

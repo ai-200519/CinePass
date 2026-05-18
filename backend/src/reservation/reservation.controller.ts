@@ -1,20 +1,27 @@
 // src/reservation/reservation.controller.ts
 import {
-  Controller, Post, Delete, Get,
-  Body, Param, ParseIntPipe,
-  UseGuards, HttpCode, HttpStatus,
+    Body,
+    Controller,
+    Delete, Get,
+    HttpCode, HttpStatus,
+    Param, ParseIntPipe,
+    Post,
+    UseGuards,
 } from '@nestjs/common';
 import {
-  ApiTags, ApiOperation, ApiResponse,
-  ApiBearerAuth, ApiParam,
+    ApiBearerAuth,
+    ApiOperation,
+    ApiParam,
+    ApiResponse,
+    ApiTags,
 } from '@nestjs/swagger';
-import { ReservationService }    from './reservation.service';
-import { CreateReservationDto }  from './dto/create-reservation.dto';
-import { JwtAuthGuard }          from '../common/guards/jwt-auth.guard';
-import { RolesGuard }            from '../common/guards/roles.guard';
-import { Roles }                 from '../common/decorators/roles.decorator';
-import { Role }                  from '../common/enums/role.enum';
-import { CurrentUser }           from '../common/decorators/current-user.decorator';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { Roles } from '../common/decorators/roles.decorator';
+import { Role } from '../common/enums/role.enum';
+import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../common/guards/roles.guard';
+import { CreateReservationDto } from './dto/create-reservation.dto';
+import { ReservationService } from './reservation.service';
 
 @ApiTags('Reservation')
 @Controller('reservation')
@@ -28,9 +35,9 @@ export class ReservationController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @UseGuards(RolesGuard)
-  @Roles(Role.CLIENT)
+  @Roles(Role.CLIENT, Role.STAFF)
   @ApiOperation({
-    summary:     '🔒 CLIENT — Créer une réservation',
+    summary:     '🔒 CLIENT/STAFF — Créer une réservation',
     description:
       'Crée une réservation en statut EN_COURS. ' +
       'Vérifie la disponibilité des sièges en temps réel. ' +
@@ -69,7 +76,7 @@ export class ReservationController {
   })
   @ApiResponse({ status: 400, description: 'Siège indisponible ou séance invalide' })
   @ApiResponse({ status: 401, description: 'Non authentifié' })
-  @ApiResponse({ status: 403, description: 'Rôle CLIENT requis' })
+  @ApiResponse({ status: 403, description: 'Rôle CLIENT ou STAFF requis' })
   create(
     @Body() dto: CreateReservationDto,
     @CurrentUser() user: any,
@@ -80,10 +87,10 @@ export class ReservationController {
   // ── GET /reservation/mes-reservations — CLIENT ────────────────────────────
   @Get('mes-reservations')
   @UseGuards(RolesGuard)
-  @Roles(Role.CLIENT)
+  @Roles(Role.CLIENT, Role.STAFF)
   @ApiOperation({
-    summary:     '🔒 CLIENT — Historique des réservations',
-    description: 'Retourne toutes les réservations du client connecté.',
+    summary:     '🔒 CLIENT/STAFF — Historique des réservations',
+    description: 'Retourne toutes les réservations personnelles de l utilisateur connecté.',
   })
   @ApiResponse({
     status: 200,
@@ -115,8 +122,8 @@ export class ReservationController {
   // ── GET /reservation/:id — CLIENT ────────────────────────────────────────
   @Get(':id')
   @ApiOperation({
-    summary:     '🔒 CLIENT — Détail d\'une réservation',
-    description: 'Retourne le détail d\'une réservation appartenant au client connecté.',
+    summary:     '🔒 CLIENT/STAFF — Détail d\'une réservation',
+    description: 'Retourne le détail d\'une réservation appartenant a l utilisateur connecté.',
   })
   @ApiParam({ name: 'id', description: 'ID de la réservation' })
   @ApiResponse({ status: 403, description: 'Réservation d\'un autre client' })
@@ -128,12 +135,23 @@ export class ReservationController {
     return this.reservationService.findOne(id, user.id_utilisateur);
   }
 
+  // ── GET /reservation/by-reference/:reference — CLIENT
+  @Get('by-reference/:reference')
+  @ApiOperation({ summary: '🔒 CLIENT — Get reservation by reference' })
+  @ApiParam({ name: 'reference', description: 'Reservation reference' })
+  findByReference(
+    @Param('reference') reference: string,
+    @CurrentUser() user: any,
+  ) {
+    return this.reservationService.findByReference(reference, user.id_utilisateur);
+  }
+
   // ── DELETE /reservation/:id — CLIENT ─────────────────────────────────────
   @Delete(':id')
   @UseGuards(RolesGuard)
-  @Roles(Role.CLIENT)
+  @Roles(Role.CLIENT, Role.STAFF)
   @ApiOperation({
-    summary:     '🔒 CLIENT — Annuler une réservation',
+    summary:     '🔒 CLIENT/STAFF — Annuler une réservation',
     description:
       'Annule une réservation EN_COURS uniquement. ' +
       'Impossible après paiement (PAYEE).',

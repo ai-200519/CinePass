@@ -239,7 +239,7 @@ export default function SeatSelectionPage() {
         })),
       });
       setToast(`Reservation ${reservation.reference} creee.`);
-      window.setTimeout(() => navigate('/reservations'), 700);
+      window.setTimeout(() => navigate(`/paiement/${reservation.id_reservation}`), 700);
     } catch (e: any) {
       setToast(e?.response?.data?.message || e?.message || 'Reservation impossible.');
     } finally {
