@@ -48,7 +48,8 @@ export default function ReservationsPage() {
       return;
     }
 
-    const payload = selected.qrCode || JSON.stringify({ reference: selected.reference });
+    // Keep QR content minimal: only the reservation reference (e.g., CP-2026-R5BZEX)
+    const payload = selected.reference;
     void QRCode.toDataURL(payload, {
       margin: 2,
       width: 220,

@@ -6,6 +6,7 @@ export type Siege = {
   numero: number;
   categorie: 'STANDARD' | 'VIP' | string;
   statut: 'DISPONIBLE' | 'BLOQUE' | string;
+  reserved?: boolean;
   salle?: {
     id_salle: number;
     numero: number;
@@ -13,9 +14,9 @@ export type Siege = {
 };
 
 export const siegesApi = {
-  async getBySalle(idSalle: number) {
+  async getBySalle(idSalle: number, idSeance?: number) {
     const res = await http.get<Siege[]>('/siege', {
-      params: { id_salle: idSalle },
+      params: { id_salle: idSalle, id_seance: idSeance },
     });
     return res.data;
   },

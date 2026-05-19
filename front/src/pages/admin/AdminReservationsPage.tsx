@@ -14,20 +14,20 @@ import {
   selectReservations,
   selectReservationsFetchError,
   selectReservationsFetchStatus,
-  selectUpdateReservationState,
 } from '../../features/reservations/reservationsselectors';
 import {
   deleteReservation,
   fetchReservations,
-  updateReservationStatut,
 } from '../../features/reservations/reservationsslice';
 
 // ─── Constantes & Helpers ─────────────────────────────────────────────────────
-const STATUTS: StatutReservation[] = ['EN_COURS', 'PAYEE', 'ANNULEE', 'EXPIREE'];
+const STATUTS: StatutReservation[] = ['EN_COURS', 'PAYEE', 'VALIDEE', 'UTILISEE', 'ANNULEE', 'EXPIREE'];
 
 const STATUT_META: Record<StatutReservation, { label: string; classes: string; dot: string }> = {
   EN_COURS: { label: 'En cours', classes: 'bg-amber-400/15 text-amber-300', dot: 'bg-amber-400' },
   PAYEE:    { label: 'Payée',    classes: 'bg-emerald-400/15 text-emerald-400', dot: 'bg-emerald-400' },
+  VALIDEE:  { label: 'Validée',  classes: 'bg-emerald-400/15 text-emerald-300', dot: 'bg-emerald-400' },
+  UTILISEE: { label: 'Utilisée', classes: 'bg-zinc-700/60 text-zinc-300', dot: 'bg-zinc-400' },
   ANNULEE:  { label: 'Annulée',  classes: 'bg-red-500/15 text-red-400', dot: 'bg-red-400' },
   EXPIREE:  { label: 'Expirée',  classes: 'bg-zinc-700/60 text-zinc-400', dot: 'bg-zinc-500' },
 };
@@ -41,12 +41,21 @@ const formatDateTime = (iso: string) =>
     hour: '2-digit', minute: '2-digit',
   });
 
-const totalPrix = (reservation: Reservation) =>
-  reservation.reservationSieges?.reduce((sum, rs) => sum + Number(rs.prixUnitaire), 0) ?? 0;
+const totalPrix = (reservation: Reservation) => {
+  const seatsTotal = reservation.reservationSieges?.reduce(
+    (sum, rs) => sum + Number(rs.prixUnitaire),
+    0,
+  ) ?? 0;
+  return seatsTotal > 0 ? seatsTotal : Number(reservation.montant ?? 0);
+};
 
 // ─── Badge Statut ─────────────────────────────────────────────────────────────
 function StatutBadge({ statut }: { statut: StatutReservation }) {
-  const meta = STATUT_META[statut];
+  const meta = STATUT_META[statut] ?? {
+    label: statut || 'Inconnu',
+    classes: 'bg-zinc-700/60 text-zinc-300',
+    dot: 'bg-zinc-400',
+  };
   return (
     <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${meta.classes}`}>
       <span className={`h-1.5 w-1.5 rounded-full ${meta.dot}`} />
@@ -59,13 +68,9 @@ function StatutBadge({ statut }: { statut: StatutReservation }) {
 function DetailModal({
   reservation,
   onClose,
-  onChangeStatut,
-  isUpdating,
 }: {
   reservation: Reservation;
   onClose: () => void;
-  onChangeStatut: (statut: StatutReservation) => void;
-  isUpdating: boolean;
 }) {
   const sieges = reservation.reservationSieges ?? [];
   const total = totalPrix(reservation);
@@ -98,17 +103,6 @@ function DetailModal({
               <span className="text-sm text-zinc-400">Statut actuel :</span>
               <StatutBadge statut={reservation.statut} />
             </div>
-            <select
-              defaultValue=""
-              disabled={isUpdating}
-              onChange={(e) => e.target.value && onChangeStatut(e.target.value as StatutReservation)}
-              className="rounded-xl border border-white/10 bg-zinc-800 px-3 py-1.5 text-xs text-white outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50"
-            >
-              <option value="" disabled>Changer…</option>
-              {STATUTS.filter((s) => s !== reservation.statut).map((s) => (
-                <option key={s} value={s}>{STATUT_META[s].label}</option>
-              ))}
-            </select>
           </div>
 
           {/* Séance */}
@@ -237,7 +231,6 @@ export default function AdminReservationsPage() {
   const reservationsRaw = useAppSelector(selectReservations);
   const fetchStatus = useAppSelector(selectReservationsFetchStatus);
   const fetchError = useAppSelector(selectReservationsFetchError);
-  const updateState = useAppSelector(selectUpdateReservationState);
   const deleteState = useAppSelector(selectDeleteReservationState);
 
   // Protection renforcée contre les erreurs de type
@@ -303,15 +296,6 @@ export default function AdminReservationsPage() {
     );
   }, [reservations, search]);
 
-  const handleChangeStatut = async (id: number, statut: StatutReservation) => {
-    try {
-      await dispatch(updateReservationStatut({ id, dto: { statut } })).unwrap();
-      setDetailRes(prev => prev?.id_reservation === id ? { ...prev, statut } : prev);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
   const handleDelete = async () => {
     if (!deleteRes) return;
     try {
@@ -342,9 +326,9 @@ export default function AdminReservationsPage() {
       </div>
 
       {/* Erreurs */}
-      {(fetchError || updateState.error || deleteState.error) && (
+      {(fetchError || deleteState.error) && (
         <div className="rounded-xl border border-red-500/30 bg-red-600/10 px-4 py-3 text-sm text-red-400">
-          {fetchError || updateState.error || deleteState.error}
+          {fetchError || deleteState.error}
         </div>
       )}
 
@@ -500,8 +484,6 @@ export default function AdminReservationsPage() {
         <DetailModal
           reservation={detailRes}
           onClose={() => setDetailRes(null)}
-          onChangeStatut={(statut) => handleChangeStatut(detailRes.id_reservation, statut)}
-          isUpdating={updateState.status === 'loading'}
         />
       )}
 
