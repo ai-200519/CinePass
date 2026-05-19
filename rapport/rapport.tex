@@ -1358,13 +1358,155 @@ Le billet numérique regroupe l'ensemble des informations nécessaires à la val
 
 Le module de notifications par email a été développé avec Nodemailer, une bibliothèque Node.js permettant l'envoi d'emails transactionnels via un serveur SMTP. Plusieurs types de notifications ont été implémentés afin d'accompagner l'utilisateur à chaque étape clé de son parcours sur la plateforme. Un email de vérification OTP est envoyé lors de l'inscription pour confirmer l'adresse email de l'utilisateur. Un email de confirmation est transmis après chaque réservation validée, récapitulant les détails de la séance et incluant le billet numérique en pièce jointe. Enfin, un email de rappel est envoyé avant la séance afin de rappeler à l'utilisateur les informations de sa réservation et de lui permettre d'accéder facilement à son billet.
 
-%------
-\subsection{Sprint 4 — Validation Staff, Dashboard analytique et finalisation}
-%------------------------------------------------------------
+\subsubsection{Sprint 4 — Validation Staff, Dashboard analytique et finalisation}
 
-Le quatrième et dernier sprint, dédié à l'implémentation de la validation d'entrée par le staff via scan de QR Code, à la finalisation du tableau de bord analytique et à la rédaction de la documentation technique complète, est planifié et sera réalisé à l'issue du sprint 3. Son contenu sera documenté dans la version finale du rapport.
+Le quatrième et dernier sprint avait pour objectif d'implémenter la validation
+d'entrée par le Staff via scan de QR Code, de finaliser le tableau de bord
+analytique et de procéder aux tests complets ainsi qu'à la rédaction de la
+documentation finale du projet. Ce sprint clôture le cycle de développement
+de CinePass en livrant les fonctionnalités opérationnelles côté terrain,
+indispensables au bon déroulement des séances.
 
-%------------------------------------------------------------
+\paragraph{a. Application mobile de validation Staff}
+
+L'application de validation Staff constitue l'outil de terrain mis à disposition
+du personnel d'accueil des cinémas partenaires. Elle permet aux agents de
+valider les entrées des spectateurs en scannant les QR Codes présents sur
+leurs billets numériques, assurant ainsi un contrôle rapide, fiable et sans
+contact à l'entrée des salles.
+
+\medskip
+\noindent\textbf{Interface de connexion Staff} \quad
+L'accès à l'application est sécurisé par une authentification dédiée au
+personnel. L'agent saisit son adresse email et son mot de passe pour accéder
+à l'espace de validation.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.45\textwidth]{images/staff/IMG-20260519-WA0010}
+    \caption{Interface de connexion Staff — Application CinePass}
+    \label{fig:staff-login}
+\end{figure}
+
+La figure~\ref{fig:staff-login} présente l'interface de connexion de
+l'application Staff CinePass. Elle reprend la charte graphique de la
+plateforme avec le logo et le formulaire d'authentification centré, garantissant
+un accès réservé exclusivement au personnel autorisé.
+
+\medskip
+\noindent\textbf{Sélection de la séance} \quad
+Une fois connecté, le Staff accède à la liste des séances programmées pour
+la journée. Il sélectionne la séance en cours afin de commencer la validation
+des entrées correspondantes.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.45\textwidth]{images/staff/IMG-20260519-WA0014}
+    \caption{Sélection de la séance — Application Staff CinePass}
+    \label{fig:staff-seances}
+\end{figure}
+
+La figure~\ref{fig:staff-seances} illustre l'interface de sélection de
+séance de l'application Staff. Chaque séance est affichée avec le titre du
+film, l'horaire, le numéro de salle, le nombre d'entrées validées par rapport
+à la capacité totale ainsi qu'une barre de progression du taux de remplissage.
+Deux séances sont ici visibles : \textit{Wonka} en Salle 2 et
+\textit{Spider-Man: Across the Spider-Verse} en Salle 1, cette dernière étant
+sélectionnée pour la validation en cours.
+
+\medskip
+\noindent\textbf{Scan du QR Code} \quad
+Après sélection de la séance, l'agent active le scanner de QR Code intégré à
+l'application. La caméra du téléphone est utilisée pour lire le code présent
+sur le billet numérique du spectateur, qu'il soit affiché sur écran mobile ou
+imprimé sur papier.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.45\textwidth]{images/staff/IMG-20260519-WA0011}
+    \caption{Interface de scan du QR Code — Application Staff CinePass}
+    \label{fig:staff-scan}
+\end{figure}
+
+La figure~\ref{fig:staff-scan} présente l'interface de scan de l'application
+Staff. Le cadre de scan est clairement délimité par une bordure en pointillés
+rouges indiquant la zone de lecture. Un bouton \textit{« Simuler un scan »}
+est également disponible pour les tests en environnement de développement.
+Le compteur d'entrées validées en temps réel (ici 0/247) permet à l'agent
+de suivre le taux de remplissage de la salle au fur et à mesure des validations.
+
+\medskip
+\noindent\textbf{Confirmation de validation} \quad
+Après lecture du QR Code, le système vérifie en temps réel la validité du
+billet auprès du backend CinePass : correspondance de la séance, statut de
+la réservation (payée, non utilisée) et unicité de l'utilisation. En cas de
+billet valide, un écran de confirmation verte s'affiche immédiatement.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.45\textwidth]{images/staff/IMG-20260519-WA0012}
+    \caption{Confirmation d'entrée validée — Application Staff CinePass}
+    \label{fig:staff-validation}
+\end{figure}
+
+La figure~\ref{fig:staff-validation} illustre l'écran de confirmation affiché
+après validation réussie d'un billet. Le message \textbf{« ENTREE VALIDEE »}
+accompagné d'un cercle vert à coche blanche confirme visuellement et sans
+ambiguïté l'accès autorisé du spectateur. Les informations détaillées de la
+réservation sont affichées : titre du film et cinéma
+(\textit{Spider-Man: Across the Spider-Verse — Errachidia}), horaire et salle
+(20:30 — Salle 1), numéros de sièges réservés (B4, C3, C5) et référence unique
+de la réservation (CP-2026-CAUJZ9). Un bouton \textit{« Scanner le suivant »}
+permet à l'agent de passer immédiatement au spectateur suivant, garantissant
+un flux de validation fluide et rapide.
+
+\medskip
+\noindent\textbf{Billet électronique côté client} \quad
+Du côté utilisateur, le billet numérique généré après confirmation du paiement
+présente l'ensemble des informations de la réservation ainsi que le QR Code
+à présenter à l'entrée de la salle.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{images/staff/IMG-20260519-WA0013}
+    \caption{Billet électronique CinePass — Interface web client}
+    \label{fig:billet-web}
+\end{figure}
+
+La figure~\ref{fig:billet-web} présente le billet électronique affiché dans
+l'interface web client de CinePass. Il regroupe toutes les informations
+nécessaires à l'entrée en salle : le titre du film et le cinéma
+(\textit{Spider-Man: Across the Spider-Verse — Errachidia}), la date
+(Mardi 19 mai 2026), l'heure (20:30), le format (Salle 1 — 2D), les sièges
+réservés avec leur catégorie (B4 VIP, C3 Standard, C5 Standard), le total
+payé (180,00 MAD) et le statut de paiement (PAYÉE). Le QR Code unique
+encodant la référence CP-2026-CAUJZ9 est affiché en bonne place pour
+être scanné par le personnel à l'entrée.
+
+\paragraph{b. Tests et validation finale}
+
+La phase de tests finale a permis de valider l'ensemble du système de bout
+en bout, en couvrant les scénarios critiques du parcours utilisateur et du
+workflow Staff. Les tests fonctionnels ont vérifié le bon enchaînement des
+opérations depuis la réservation jusqu'à la validation physique à l'entrée
+de la salle. Des tests d'intégration ont confirmé la cohérence des échanges
+entre l'application Staff, le backend NestJS et la base de données PostgreSQL,
+notamment la mise à jour en temps réel du statut de la réservation et du
+compteur d'entrées validées. Les tests de charge ont permis de s'assurer de
+la robustesse du système lors de validations simultanées en début de séance.
+L'ensemble des User Stories du projet ont ainsi été validées et livrées
+conformément aux critères d'acceptation définis dans le Product Backlog.
+
+\paragraph{c. Documentation technique}
+
+La documentation technique finale du projet CinePass a été rédigée à l'issue
+du sprint 4. Elle comprend la documentation complète de l'API REST via
+Swagger, couvrant l'ensemble des endpoints exposés par le backend avec leurs
+paramètres, réponses et codes d'erreur. Le présent rapport de projet constitue
+quant à lui la documentation fonctionnelle et technique de référence,
+décrivant l'architecture du système, les choix technologiques, l'organisation
+du développement et les fonctionnalités implémentées à travers les quatre
+sprints.
 \section{Tests et validation}
 %------------------------------------------------------------
 
