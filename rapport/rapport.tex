@@ -1,52 +1,117 @@
-\documentclass[12pt]{report}
+\documentclass[12pt,a4paper]{report}
+
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[french]{babel}
 \usepackage{graphicx}
 \usepackage{geometry}
-\usepackage{setspace}
-\usepackage{hyperref}
-\usepackage{float}
+\usepackage[table]{xcolor}
 \usepackage{array}
-\usepackage{xcolor}
-\usepackage{booktabs}
-\usepackage{caption}
-\usepackage{enumitem}
-\usepackage{titlesec}
 \usepackage{tabularx}
-\usepackage{float}          % for [H] figure placement
-\usepackage{xcolor}         % for \textcolor
-\usepackage{colortbl}       % for \rowcolor in tables
-\usepackage{graphicx}       % for \includegraphics
-\usepackage{array}          % for p{} column type
-\usepackage{booktabs}       % for professional tables
+\usepackage{float}
+\usepackage{enumitem}
+\usepackage{colortbl}
+\usepackage{hyperref}
+\usepackage{setspace}
 
-\geometry{a4paper, left=2cm, right=2cm, top=2cm, bottom=2cm}
-\setstretch{1.2}
-\setcounter{secnumdepth}{3}
+\geometry{
+    top=2cm,
+    bottom=2cm,
+    left=2.5cm,
+    right=2.5cm
+}
 
-\titleformat{\chapter}[display]{\bfseries\Huge}{\chaptername\ \thechapter}{12pt}{\Huge}
-\titlespacing*{\chapter}{0pt}{-10pt}{20pt}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    urlcolor=blue,
+    citecolor=black
+}
 
 \begin{document}
 
 %============================================================
-% Page de garde
+% PAGE DE GARDE
 %============================================================
 \begin{titlepage}
-\centering
-\vspace*{2cm}
-{\Huge\bfseries Rapport de projet CinePass\par}
-\vspace{1cm}
-{\Large Plateforme de réservation de billets et gestion des salles de cinéma\par}
-\vfill
-{\Large Réalisé par : Yassine EL AOUNI\par}
-{\Large Année universitaire : 2024/2025\par}
+
+    \noindent\textcolor{gray}{\rule{\linewidth}{0.8pt}}
+    \vspace{0.3cm}
+
+    % ── Logos : FSTE à gauche, ILIA à droite ──────────────────
+    \noindent
+    \begin{tabularx}{\textwidth}{X r}
+        \includegraphics[height=2cm]{images/fste.png}
+        &
+        \includegraphics[height=1.6cm]{images/ILIA.png}
+    \end{tabularx}
+
+    \vspace{0.3cm}
+    \noindent\textcolor{gray}{\rule{\linewidth}{0.8pt}}
+
+    \vspace{1.2cm}
+
+    \begin{center}
+        \textit{Cycle d'ingénieur en}\\[0.3cm]
+        {\large \textbf{Ingénierie Logicielle et Intelligence Artificielle}}
+    \end{center}
+
+    \vspace{0.8cm}
+    \noindent\textcolor{gray}{\rule{\linewidth}{0.5pt}}
+    \vspace{0.8cm}
+
+    \begin{center}
+        {\LARGE \textbf{RAPPORT DE PROJET}}\\[0.5cm]
+        \textit{sous le thème}\\[0.8cm]
+        {\Large \textbf{Application Web — Système de Réservation}}\\[0.3cm]
+        {\Large \textbf{de Places dans un Cinéma}}
+    \end{center}
+
+    \vspace{0.8cm}
+    \noindent\textcolor{gray}{\rule{\linewidth}{0.5pt}}
+
+    \vfill
+
+    \noindent
+    \begin{tabularx}{\textwidth}{X X}
+        \textbf{Effectué par :} & \textbf{Encadré par :} \\[0.6cm]
+        Abdessami Aglagal       & Pr. Jihan Elkhraoui    \\[0.2cm]
+        Yassin Aouni            & Pr. Zakiria Ithroui    \\[0.2cm]
+        Ayoub Boukili           &                        \\[0.2cm]
+        Ayeman Alhyani          &                        \\
+    \end{tabularx}
+
+    \vfill
+
+    \begin{center}
+        \textbf{ANNÉE UNIVERSITAIRE 2025-2026}
+    \end{center}
+
+    \vspace{0.3cm}
+    \noindent\textcolor{gray}{\rule{\linewidth}{0.8pt}}
+
 \end{titlepage}
 
+%============================================================
+% TABLE DES MATIÈRES
+%============================================================
 \tableofcontents
+\newpage
+
+%============================================================
+% LISTE DES FIGURES
+%============================================================
 \listoffigures
+\newpage
+
+%============================================================
+% LISTE DES TABLEAUX
+%============================================================
 \listoftables
+\newpage
+
+%============================================================
+% INTRODUCTION GÉNÉRALE
 %============================================================
 \chapter*{Introduction générale}
 \addcontentsline{toc}{chapter}{Introduction générale}
@@ -1154,7 +1219,7 @@ La page de consultation constitue le point d'entrée principal vers le catalogue
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.88\textwidth]{images/client/consulté2}
+    \includegraphics[width=0.88\textwidth]{images/client/consulte2}
     \caption{Page d'accueil — Sélection de la ville et du cinéma}
     \label{fig:consulte}
 \end{figure}
@@ -1243,9 +1308,57 @@ La figure \ref{fig:mesreservation} présente la page d'historique des réservati
 \subsection{Sprint 3 — Paiement Stripe, QR Code et notifications}
 %------------------------------------------------------------
 
-Le troisième sprint, qui concerne l'intégration de la passerelle de paiement Stripe, la génération automatique des QR Codes de validation d'entrée et l'envoi de notifications par email aux clients, est actuellement en cours de développement. Les captures d'écran et les descriptions détaillées de ces fonctionnalités seront intégrées dans la version définitive du rapport à l'issue de ce sprint.
+Le troisième sprint avait pour objectif d'intégrer la passerelle de paiement Stripe, de générer automatiquement les QR Codes associés aux billets numériques après confirmation du paiement, et d'envoyer des notifications par email aux clients à chaque étape clé de leur réservation. Ces fonctionnalités complètent le parcours utilisateur initié dans le sprint précédent et constituent la dernière étape avant la validation physique des entrées en salle.
 
-%------------------------------------------------------------
+%....................................
+\subsubsection{a. \quad Intégration du paiement en ligne via Stripe}
+%....................................
+
+L'intégration de la passerelle de paiement Stripe constitue la fonctionnalité principale du sprint 3. Stripe est une solution de paiement en ligne reconnue à l'échelle internationale, offrant une API robuste, une sécurité de niveau bancaire conforme à la norme PCI-DSS et une prise en charge native de nombreuses méthodes de paiement. Dans le cadre de CinePass, Stripe a été intégré côté backend via le module NestJS dédié, qui orchestre la création des sessions de paiement, la gestion des webhooks et la confirmation des transactions.
+
+Le processus de paiement débute dès que l'utilisateur confirme sa sélection de sièges. Le backend CinePass initie une session de paiement Stripe en transmettant le montant calculé, la devise et les métadonnées de la réservation. L'utilisateur est ensuite redirigé vers la page de paiement hébergée par Stripe, qui prend en charge la saisie sécurisée des informations bancaires. À l'issue du paiement, Stripe notifie le backend via un webhook afin de confirmer la transaction et déclencher la génération du billet numérique.
+
+\paragraph{Page de paiement Stripe}
+
+La page de paiement est entièrement gérée par Stripe Checkout, garantissant ainsi la sécurité des données bancaires de l'utilisateur sans que ces informations ne transitent jamais par les serveurs de CinePass. Elle affiche le récapitulatif de la commande — film, cinéma, référence de réservation et montant total en dirhams marocains (MAD) — ainsi que les différents moyens de paiement acceptés.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.88\textwidth]{images/paiement/payment}
+    \caption{Page de paiement Stripe — Saisie des informations bancaires}
+    \label{fig:payment}
+\end{figure}
+
+La figure \ref{fig:payment} présente la page de paiement Stripe intégrée à la plateforme CinePass. On y distingue, dans la partie gauche, le récapitulatif de la commande indiquant le film sélectionné (Coco — Errachidia), le montant total (MAD 170.00) et la référence de réservation (CP-2026-R5BZEX). La partie droite propose plusieurs méthodes de paiement, notamment le paiement par carte bancaire Visa avec saisie sécurisée du numéro de carte, de la date d'expiration, du code CVV et du nom du titulaire. La sélection du pays permet d'adapter les options de paiement disponibles selon la région de l'utilisateur.
+
+\paragraph{Confirmation de paiement}
+
+À l'issue d'une transaction réussie, Stripe retourne un statut de confirmation au backend de CinePass via le mécanisme de webhook. Le système met alors à jour le statut de la réservation en base de données, génère le billet numérique avec son QR Code unique et redirige l'utilisateur vers une page de confirmation récapitulant les détails de sa réservation.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.88\textwidth]{images/paiement/Paiementres}
+    \caption{Page de confirmation — Paiement réussi et récapitulatif de réservation}
+    \label{fig:paiementreussi}
+\end{figure}
+
+La figure \ref{fig:paiementreussi} illustre la page de confirmation affichée après un paiement validé avec succès. Elle présente un message de confirmation clair accompagné des informations essentielles de la réservation : la référence unique (CP-2026-R5BZEX), le titre du film et le cinéma (Coco — Errachidia), la date et l'heure de la séance (23/05/2026 à 17h45) ainsi que les numéros de sièges réservés (C5, D5). Un bouton d'accès direct au billet numérique permet à l'utilisateur de consulter et de télécharger son QR Code immédiatement après la confirmation du paiement.
+
+%....................................
+\subsubsection{b. \quad Génération du QR Code et du billet numérique}
+%....................................
+
+Suite à la confirmation du paiement par Stripe, le backend CinePass génère automatiquement un QR Code unique encodant la référence alphanumérique de la réservation. Ce QR Code est intégré au billet numérique présenté à l'utilisateur et sera scanné par le personnel de la plateforme lors du contrôle d'entrée en salle. La génération est réalisée côté serveur afin de garantir l'unicité et l'intégrité de chaque code, tout en empêchant toute falsification côté client.
+
+Le billet numérique regroupe l'ensemble des informations nécessaires à la validation de l'entrée : titre du film, nom du cinéma, date et heure de la séance, numéros des sièges réservés, référence de réservation et QR Code. Il est accessible depuis l'espace personnel de l'utilisateur à tout moment et peut être téléchargé ou présenté directement depuis l'interface mobile.
+
+%....................................
+\subsubsection{c. \quad Notifications par email}
+%....................................
+
+Le module de notifications par email a été développé avec Nodemailer, une bibliothèque Node.js permettant l'envoi d'emails transactionnels via un serveur SMTP. Plusieurs types de notifications ont été implémentés afin d'accompagner l'utilisateur à chaque étape clé de son parcours sur la plateforme. Un email de vérification OTP est envoyé lors de l'inscription pour confirmer l'adresse email de l'utilisateur. Un email de confirmation est transmis après chaque réservation validée, récapitulant les détails de la séance et incluant le billet numérique en pièce jointe. Enfin, un email de rappel est envoyé avant la séance afin de rappeler à l'utilisateur les informations de sa réservation et de lui permettre d'accéder facilement à son billet.
+
+%------
 \subsection{Sprint 4 — Validation Staff, Dashboard analytique et finalisation}
 %------------------------------------------------------------
 
