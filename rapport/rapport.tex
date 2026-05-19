@@ -43,7 +43,7 @@
     \begin{tabularx}{\textwidth}{X r}
         \includegraphics[height=2cm]{images/fste.png}
         &
-        \includegraphics[height=1.6cm]{images/ILIA.png}
+        \includegraphics[height=1.6cm]{images/ILIA.png}\\
     \end{tabularx}
 
     \vspace{0.3cm}
@@ -80,7 +80,7 @@
         Ayoub Boukili           &                        \\[0.2cm]
         Ayeman Alhyani          &                        \\
     \end{tabularx}
-
+    
     \vfill
 
     \begin{center}
@@ -324,7 +324,16 @@ Le modèle de données regroupe les entités essentielles : utilisateur, film, s
 Cette partie présente les diagrammes qui formalisent le comportement et la structure du système.
 
 \subsection{Diagramme de cas d'utilisation}
-Le diagramme de cas d'utilisation montre les interactions principales entre les acteurs et la plateforme.
+Le diagramme de cas d'utilisation présente les interactions principales entre les acteurs et la plateforme CinePass.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.98\textwidth]{images/diagrammes/useCase.png}
+    \caption{Diagramme de cas d'utilisation de CinePass}
+    \label{fig:usecase-cinepass}
+\end{figure}
+
+Ce diagramme met en évidence trois acteurs : le \textbf{Client}, le \textbf{Staff} et l'\textbf{Admin}. Côté client, les fonctionnalités couvrent l'authentification (avec les extensions \textit{Mot de passe oublié} et \textit{S'inscrire}), la gestion du profil, la consultation du catalogue (liste des films et détail d'un film), la réservation des places (choix d'une séance, sélection des sièges, paiement en ligne et récapitulatif), ainsi que la consultation de l'historique et du billet (référence, QR code et téléchargement). Le staff intervient pour \textbf{valider une entrée} via le scan du QR code ou une vérification manuelle (incluant la saisie d'une référence). Enfin, l'administrateur accède au \textbf{dashboard} pour gérer l'exploitation : réservations, tarification, analytics, films, séances et paramètres.
 
 \subsection{Diagramme de classes}
 Le diagramme de classes décrit les relations entre les entités métier du système.

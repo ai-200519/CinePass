@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.9.12)  19 MAY 2026 23:45
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.9.12)  20 MAY 2026 00:31
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -802,20 +802,25 @@ Overfull \hbox (499.26552pt too wide) in alignment at lines 282--282
 
 [9] [10]
 Chapitre 3.
+<images/diagrammes/useCase.png, id=93, 409.53pt x 528.17325pt>
+File: images/diagrammes/useCase.png Graphic file (type png)
+<use images/diagrammes/useCase.png>
+Package pdftex.def Info: images/diagrammes/useCase.png  used on input line 331.
+(pdftex.def)             Requested size: 446.13727pt x 575.42342pt.
 [11
 
-] [12]
+] [12 <./images/diagrammes/useCase.png>] [13]
 Chapitre 4.
-LaTeX Font Info:    Trying to load font information for T1+cmtt on input line 395.
+LaTeX Font Info:    Trying to load font information for T1+cmtt on input line 404.
 (C:\Users\GROUP LAPTOPS\AppData\Local\Programs\MiKTeX\tex/latex/base\t1cmtt.fd
 File: t1cmtt.fd 2023/04/13 v2.5m Standard LaTeX font definitions
-) [13
+) [14
 
 ]
-c:/Users/GROUP LAPTOPS/Desktop/CinePass/rapport/rapport.tex:413: Undefined control sequence.
+c:/Users/GROUP LAPTOPS/Desktop/CinePass/rapport/rapport.tex:422: Undefined control sequence.
 <argument> ...rtpbox {\@nextchar }\insert@pcolumn 
                                                   \@endpbox \do@row@strut \o...
-l.413 \begin{tabular}{|c|p{5.5cm}|c|c|c|}
+l.422 \begin{tabular}{|c|p{5.5cm}|c|c|c|}
                                          
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -823,24 +828,24 @@ misspelled it (e.g., `\hobx'), type `I' and the correct
 spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
-c:/Users/GROUP LAPTOPS/Desktop/CinePass/rapport/rapport.tex:413: Missing # inserted in alignment preamble.
+c:/Users/GROUP LAPTOPS/Desktop/CinePass/rapport/rapport.tex:422: Missing # inserted in alignment preamble.
 <to be read again> 
                    &
-l.413 \begin{tabular}{|c|p{5.5cm}|c|c|c|}
+l.422 \begin{tabular}{|c|p{5.5cm}|c|c|c|}
                                          
 There should be exactly one # between &'s, when an
 \halign or \valign is being set up. In this case you had
 none, so I've put one in; maybe that will work.
 
 
-Overfull \hbox (168.42047pt too wide) in paragraph at lines 413--450
+Overfull \hbox (168.42047pt too wide) in paragraph at lines 422--459
  [][] 
  []
 
-c:/Users/GROUP LAPTOPS/Desktop/CinePass/rapport/rapport.tex:476: Undefined control sequence.
+c:/Users/GROUP LAPTOPS/Desktop/CinePass/rapport/rapport.tex:485: Undefined control sequence.
 <argument> ...rtpbox {\@nextchar }\insert@pcolumn 
                                                   \@endpbox \do@row@strut \o...
-l.476 \begin{tabular}{|p{4cm}|p{5cm}|c|c|}
+l.485 \begin{tabular}{|p{4cm}|p{5cm}|c|c|}
                                           
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -848,10 +853,10 @@ misspelled it (e.g., `\hobx'), type `I' and the correct
 spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
-c:/Users/GROUP LAPTOPS/Desktop/CinePass/rapport/rapport.tex:476: Undefined control sequence.
+c:/Users/GROUP LAPTOPS/Desktop/CinePass/rapport/rapport.tex:485: Undefined control sequence.
 <argument> ...rtpbox {\@nextchar }\insert@pcolumn 
                                                   \@endpbox \do@row@strut \o...
-l.476 \begin{tabular}{|p{4cm}|p{5cm}|c|c|}
+l.485 \begin{tabular}{|p{4cm}|p{5cm}|c|c|}
                                           
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -859,34 +864,34 @@ misspelled it (e.g., `\hobx'), type `I' and the correct
 spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
-c:/Users/GROUP LAPTOPS/Desktop/CinePass/rapport/rapport.tex:476: Missing # inserted in alignment preamble.
+c:/Users/GROUP LAPTOPS/Desktop/CinePass/rapport/rapport.tex:485: Missing # inserted in alignment preamble.
 <to be read again> 
                    &
-l.476 \begin{tabular}{|p{4cm}|p{5cm}|c|c|}
+l.485 \begin{tabular}{|p{4cm}|p{5cm}|c|c|}
                                           
 There should be exactly one # between &'s, when an
 \halign or \valign is being set up. In this case you had
 none, so I've put one in; maybe that will work.
 
-c:/Users/GROUP LAPTOPS/Desktop/CinePass/rapport/rapport.tex:476: Missing # inserted in alignment preamble.
+c:/Users/GROUP LAPTOPS/Desktop/CinePass/rapport/rapport.tex:485: Missing # inserted in alignment preamble.
 <to be read again> 
                    &
-l.476 \begin{tabular}{|p{4cm}|p{5cm}|c|c|}
+l.485 \begin{tabular}{|p{4cm}|p{5cm}|c|c|}
                                           
 There should be exactly one # between &'s, when an
 \halign or \valign is being set up. In this case you had
 none, so I've put one in; maybe that will work.
 
 
-Overfull \hbox (299.33208pt too wide) in paragraph at lines 476--507
+Overfull \hbox (299.33208pt too wide) in paragraph at lines 485--516
  [][] 
  []
 
-[14]
-c:/Users/GROUP LAPTOPS/Desktop/CinePass/rapport/rapport.tex:523: Undefined control sequence.
+[15]
+c:/Users/GROUP LAPTOPS/Desktop/CinePass/rapport/rapport.tex:532: Undefined control sequence.
 <argument> ...rtpbox {\@nextchar }\insert@pcolumn 
                                                   \@endpbox \do@row@strut \o...
-l.523 \begin{tabular}{|p{4cm}|p{5cm}|c|c|}
+l.532 \begin{tabular}{|p{4cm}|p{5cm}|c|c|}
                                           
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -894,10 +899,10 @@ misspelled it (e.g., `\hobx'), type `I' and the correct
 spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
-c:/Users/GROUP LAPTOPS/Desktop/CinePass/rapport/rapport.tex:523: Undefined control sequence.
+c:/Users/GROUP LAPTOPS/Desktop/CinePass/rapport/rapport.tex:532: Undefined control sequence.
 <argument> ...rtpbox {\@nextchar }\insert@pcolumn 
                                                   \@endpbox \do@row@strut \o...
-l.523 \begin{tabular}{|p{4cm}|p{5cm}|c|c|}
+l.532 \begin{tabular}{|p{4cm}|p{5cm}|c|c|}
                                           
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -905,33 +910,33 @@ misspelled it (e.g., `\hobx'), type `I' and the correct
 spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
-c:/Users/GROUP LAPTOPS/Desktop/CinePass/rapport/rapport.tex:523: Missing # inserted in alignment preamble.
+c:/Users/GROUP LAPTOPS/Desktop/CinePass/rapport/rapport.tex:532: Missing # inserted in alignment preamble.
 <to be read again> 
                    &
-l.523 \begin{tabular}{|p{4cm}|p{5cm}|c|c|}
+l.532 \begin{tabular}{|p{4cm}|p{5cm}|c|c|}
                                           
 There should be exactly one # between &'s, when an
 \halign or \valign is being set up. In this case you had
 none, so I've put one in; maybe that will work.
 
-c:/Users/GROUP LAPTOPS/Desktop/CinePass/rapport/rapport.tex:523: Missing # inserted in alignment preamble.
+c:/Users/GROUP LAPTOPS/Desktop/CinePass/rapport/rapport.tex:532: Missing # inserted in alignment preamble.
 <to be read again> 
                    &
-l.523 \begin{tabular}{|p{4cm}|p{5cm}|c|c|}
+l.532 \begin{tabular}{|p{4cm}|p{5cm}|c|c|}
                                           
 There should be exactly one # between &'s, when an
 \halign or \valign is being set up. In this case you had
 none, so I've put one in; maybe that will work.
 
 
-Overfull \hbox (398.77165pt too wide) in paragraph at lines 523--545
+Overfull \hbox (398.77165pt too wide) in paragraph at lines 532--554
  [][] 
  []
 
-c:/Users/GROUP LAPTOPS/Desktop/CinePass/rapport/rapport.tex:561: Undefined control sequence.
+c:/Users/GROUP LAPTOPS/Desktop/CinePass/rapport/rapport.tex:570: Undefined control sequence.
 <argument> ...rtpbox {\@nextchar }\insert@pcolumn 
                                                   \@endpbox \do@row@strut \o...
-l.561 \begin{tabular}{|p{4cm}|p{5cm}|c|c|}
+l.570 \begin{tabular}{|p{4cm}|p{5cm}|c|c|}
                                           
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -939,10 +944,10 @@ misspelled it (e.g., `\hobx'), type `I' and the correct
 spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
-c:/Users/GROUP LAPTOPS/Desktop/CinePass/rapport/rapport.tex:561: Undefined control sequence.
+c:/Users/GROUP LAPTOPS/Desktop/CinePass/rapport/rapport.tex:570: Undefined control sequence.
 <argument> ...rtpbox {\@nextchar }\insert@pcolumn 
                                                   \@endpbox \do@row@strut \o...
-l.561 \begin{tabular}{|p{4cm}|p{5cm}|c|c|}
+l.570 \begin{tabular}{|p{4cm}|p{5cm}|c|c|}
                                           
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -950,42 +955,42 @@ misspelled it (e.g., `\hobx'), type `I' and the correct
 spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
-c:/Users/GROUP LAPTOPS/Desktop/CinePass/rapport/rapport.tex:561: Missing # inserted in alignment preamble.
+c:/Users/GROUP LAPTOPS/Desktop/CinePass/rapport/rapport.tex:570: Missing # inserted in alignment preamble.
 <to be read again> 
                    &
-l.561 \begin{tabular}{|p{4cm}|p{5cm}|c|c|}
+l.570 \begin{tabular}{|p{4cm}|p{5cm}|c|c|}
                                           
 There should be exactly one # between &'s, when an
 \halign or \valign is being set up. In this case you had
 none, so I've put one in; maybe that will work.
 
-c:/Users/GROUP LAPTOPS/Desktop/CinePass/rapport/rapport.tex:561: Missing # inserted in alignment preamble.
+c:/Users/GROUP LAPTOPS/Desktop/CinePass/rapport/rapport.tex:570: Missing # inserted in alignment preamble.
 <to be read again> 
                    &
-l.561 \begin{tabular}{|p{4cm}|p{5cm}|c|c|}
+l.570 \begin{tabular}{|p{4cm}|p{5cm}|c|c|}
                                           
 There should be exactly one # between &'s, when an
 \halign or \valign is being set up. In this case you had
 none, so I've put one in; maybe that will work.
 
 
-Overfull \hbox (394.53658pt too wide) in paragraph at lines 561--583
+Overfull \hbox (394.53658pt too wide) in paragraph at lines 570--592
  [][] 
  []
 
 
-LaTeX Warning: Reference `fig:jira_sprint3' on page 15 undefined on input line 586.
+LaTeX Warning: Reference `fig:jira_sprint3' on page 16 undefined on input line 595.
 
-<images/sprint 3 board.png, id=129, 1443.14156pt x 746.79pt>
+<images/sprint 3 board.png, id=136, 1443.14156pt x 746.79pt>
 File: images/sprint 3 board.png Graphic file (type png)
 <use images/sprint 3 board.png>
-Package pdftex.def Info: images/sprint 3 board.png  used on input line 593.
+Package pdftex.def Info: images/sprint 3 board.png  used on input line 602.
 (pdftex.def)             Requested size: 432.48051pt x 223.79942pt.
-[15]
-c:/Users/GROUP LAPTOPS/Desktop/CinePass/rapport/rapport.tex:612: Undefined control sequence.
+[16]
+c:/Users/GROUP LAPTOPS/Desktop/CinePass/rapport/rapport.tex:621: Undefined control sequence.
 <argument> ...rtpbox {\@nextchar }\insert@pcolumn 
                                                   \@endpbox \do@row@strut \o...
-l.612 \begin{tabular}{|p{4cm}|p{5cm}|c|c|}
+l.621 \begin{tabular}{|p{4cm}|p{5cm}|c|c|}
                                           
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -993,10 +998,10 @@ misspelled it (e.g., `\hobx'), type `I' and the correct
 spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
-c:/Users/GROUP LAPTOPS/Desktop/CinePass/rapport/rapport.tex:612: Undefined control sequence.
+c:/Users/GROUP LAPTOPS/Desktop/CinePass/rapport/rapport.tex:621: Undefined control sequence.
 <argument> ...rtpbox {\@nextchar }\insert@pcolumn 
                                                   \@endpbox \do@row@strut \o...
-l.612 \begin{tabular}{|p{4cm}|p{5cm}|c|c|}
+l.621 \begin{tabular}{|p{4cm}|p{5cm}|c|c|}
                                           
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1004,55 +1009,55 @@ misspelled it (e.g., `\hobx'), type `I' and the correct
 spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
-c:/Users/GROUP LAPTOPS/Desktop/CinePass/rapport/rapport.tex:612: Missing # inserted in alignment preamble.
+c:/Users/GROUP LAPTOPS/Desktop/CinePass/rapport/rapport.tex:621: Missing # inserted in alignment preamble.
 <to be read again> 
                    &
-l.612 \begin{tabular}{|p{4cm}|p{5cm}|c|c|}
+l.621 \begin{tabular}{|p{4cm}|p{5cm}|c|c|}
                                           
 There should be exactly one # between &'s, when an
 \halign or \valign is being set up. In this case you had
 none, so I've put one in; maybe that will work.
 
-c:/Users/GROUP LAPTOPS/Desktop/CinePass/rapport/rapport.tex:612: Missing # inserted in alignment preamble.
+c:/Users/GROUP LAPTOPS/Desktop/CinePass/rapport/rapport.tex:621: Missing # inserted in alignment preamble.
 <to be read again> 
                    &
-l.612 \begin{tabular}{|p{4cm}|p{5cm}|c|c|}
+l.621 \begin{tabular}{|p{4cm}|p{5cm}|c|c|}
                                           
 There should be exactly one # between &'s, when an
 \halign or \valign is being set up. In this case you had
 none, so I've put one in; maybe that will work.
 
 
-Overfull \hbox (415.6244pt too wide) in paragraph at lines 612--634
+Overfull \hbox (415.6244pt too wide) in paragraph at lines 621--643
  [][] 
  []
 
 
-LaTeX Warning: Reference `fig:gantt' on page 16 undefined on input line 641.
+LaTeX Warning: Reference `fig:gantt' on page 17 undefined on input line 650.
 
-<images/api tarification user story.png, id=139, 1444.64719pt x 744.53156pt>
+<images/api tarification user story.png, id=146, 1444.64719pt x 744.53156pt>
 File: images/api tarification user story.png Graphic file (type png)
 <use images/api tarification user story.png>
-Package pdftex.def Info: images/api tarification user story.png  used on input line 649.
+Package pdftex.def Info: images/api tarification user story.png  used on input line 658.
 (pdftex.def)             Requested size: 432.48051pt x 222.88403pt.
-[16 <./images/sprint 3 board.png>] [17 <./images/api tarification user story.png>]
+[17 <./images/sprint 3 board.png>] [18 <./images/api tarification user story.png>]
 
-LaTeX Warning: Reference `fig:git_workflow' on page 18 undefined on input line 763.
+LaTeX Warning: Reference `fig:git_workflow' on page 19 undefined on input line 772.
 
-<images/sprint 3 in backlog onglet.png, id=162, 1443.89438pt x 746.03719pt>
+<images/sprint 3 in backlog onglet.png, id=170, 1443.89438pt x 746.03719pt>
 File: images/sprint 3 in backlog onglet.png Graphic file (type png)
 <use images/sprint 3 in backlog onglet.png>
-Package pdftex.def Info: images/sprint 3 in backlog onglet.png  used on input line 769.
+Package pdftex.def Info: images/sprint 3 in backlog onglet.png  used on input line 778.
 (pdftex.def)             Requested size: 409.71692pt x 211.68935pt.
 
-Overfull \hbox (45.49554pt too wide) in paragraph at lines 785--807
+Overfull \hbox (45.49554pt too wide) in paragraph at lines 794--816
  [][] 
  []
 
-c:/Users/GROUP LAPTOPS/Desktop/CinePass/rapport/rapport.tex:822: Undefined control sequence.
+c:/Users/GROUP LAPTOPS/Desktop/CinePass/rapport/rapport.tex:831: Undefined control sequence.
 <argument> ...rtpbox {\@nextchar }\insert@pcolumn 
                                                   \@endpbox \do@row@strut \o...
-l.822 \begin{tabular}{|c|p{5cm}|c|c|}
+l.831 \begin{tabular}{|c|p{5cm}|c|c|}
                                      
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1060,265 +1065,265 @@ misspelled it (e.g., `\hobx'), type `I' and the correct
 spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
-c:/Users/GROUP LAPTOPS/Desktop/CinePass/rapport/rapport.tex:822: Missing # inserted in alignment preamble.
+c:/Users/GROUP LAPTOPS/Desktop/CinePass/rapport/rapport.tex:831: Missing # inserted in alignment preamble.
 <to be read again> 
                    &
-l.822 \begin{tabular}{|c|p{5cm}|c|c|}
+l.831 \begin{tabular}{|c|p{5cm}|c|c|}
                                      
 There should be exactly one # between &'s, when an
 \halign or \valign is being set up. In this case you had
 none, so I've put one in; maybe that will work.
 
 
-Overfull \hbox (527.44424pt too wide) in paragraph at lines 822--853
+Overfull \hbox (527.44424pt too wide) in paragraph at lines 831--862
  [][] 
  []
 
-[18 <./images/sprint 3 in backlog onglet.png>] [19]
+[19 <./images/sprint 3 in backlog onglet.png>] [20]
 Chapitre 5.
-<images/vscode.png, id=185, 1027.84pt x 1027.84pt>
+<images/vscode.png, id=192, 1027.84pt x 1027.84pt>
 File: images/vscode.png Graphic file (type png)
 <use images/vscode.png>
-Package pdftex.def Info: images/vscode.png  used on input line 904.
+Package pdftex.def Info: images/vscode.png  used on input line 913.
 (pdftex.def)             Requested size: 100.15425pt x 100.1395pt.
-[20
+[21
 
 ]
-<images/postman.png, id=195, 225.84375pt x 225.84375pt>
+<images/postman.png, id=202, 225.84375pt x 225.84375pt>
 File: images/postman.png Graphic file (type png)
 <use images/postman.png>
-Package pdftex.def Info: images/postman.png  used on input line 915.
+Package pdftex.def Info: images/postman.png  used on input line 924.
 (pdftex.def)             Requested size: 81.9406pt x 81.94121pt.
-<images/github.png, id=196, 352.40228pt x 352.40228pt>
+<images/github.png, id=203, 352.40228pt x 352.40228pt>
 File: images/github.png Graphic file (type png)
 <use images/github.png>
-Package pdftex.def Info: images/github.png  used on input line 926.
+Package pdftex.def Info: images/github.png  used on input line 935.
 (pdftex.def)             Requested size: 91.04742pt x 91.04706pt.
- [21 <./images/vscode.png> <./images/postman.png> <./images/github.png>]
-<images/Docker.png, id=209, 225.84375pt x 225.84375pt>
+ [22 <./images/vscode.png> <./images/postman.png> <./images/github.png>]
+<images/Docker.png, id=216, 225.84375pt x 225.84375pt>
 File: images/Docker.png Graphic file (type png)
 <use images/Docker.png>
-Package pdftex.def Info: images/Docker.png  used on input line 937.
+Package pdftex.def Info: images/Docker.png  used on input line 946.
 (pdftex.def)             Requested size: 127.46779pt x 127.471pt.
-<images/Jira_Logo.png, id=210, 1284.8pt x 541.02126pt>
+<images/Jira_Logo.png, id=217, 1284.8pt x 541.02126pt>
 File: images/Jira_Logo.png Graphic file (type png)
 <use images/Jira_Logo.png>
-Package pdftex.def Info: images/Jira_Logo.png  used on input line 948.
+Package pdftex.def Info: images/Jira_Logo.png  used on input line 957.
 (pdftex.def)             Requested size: 136.57462pt x 57.50647pt.
-<images/vite.png, id=211, 250.9375pt x 263.98625pt>
+<images/vite.png, id=218, 250.9375pt x 263.98625pt>
 File: images/vite.png Graphic file (type png)
 <use images/vite.png>
-Package pdftex.def Info: images/vite.png  used on input line 963.
+Package pdftex.def Info: images/vite.png  used on input line 972.
 (pdftex.def)             Requested size: 81.9406pt x 86.20134pt.
- [22 <./images/Docker.png> <./images/Jira_Logo.png>]
-<images/nodejs.png, id=223, 1885.30435pt x 1156.32pt>
+ [23 <./images/Docker.png> <./images/Jira_Logo.png>]
+<images/nodejs.png, id=230, 1885.30435pt x 1156.32pt>
 File: images/nodejs.png Graphic file (type png)
 <use images/nodejs.png>
-Package pdftex.def Info: images/nodejs.png  used on input line 974.
+Package pdftex.def Info: images/nodejs.png  used on input line 983.
 (pdftex.def)             Requested size: 172.99498pt x 106.09337pt.
-<images/Nest.png, id=224, 228.855pt x 221.82875pt>
+<images/Nest.png, id=231, 228.855pt x 221.82875pt>
 File: images/Nest.png Graphic file (type png)
 <use images/Nest.png>
-Package pdftex.def Info: images/Nest.png  used on input line 985.
+Package pdftex.def Info: images/Nest.png  used on input line 994.
 (pdftex.def)             Requested size: 100.15425pt x 97.08029pt.
- [23 <./images/vite.png> <./images/nodejs.png> <./images/Nest.png>]
-<images/postgreSQL.png, id=238, 221.82875pt x 228.855pt>
+ [24 <./images/vite.png> <./images/nodejs.png> <./images/Nest.png>]
+<images/postgreSQL.png, id=246, 221.82875pt x 228.855pt>
 File: images/postgreSQL.png Graphic file (type png)
 <use images/postgreSQL.png>
-Package pdftex.def Info: images/postgreSQL.png  used on input line 996.
+Package pdftex.def Info: images/postgreSQL.png  used on input line 1005.
 (pdftex.def)             Requested size: 91.04742pt x 93.92892pt.
-<images/htmlcss.png, id=239, 376.40625pt x 376.40625pt>
+<images/htmlcss.png, id=247, 376.40625pt x 376.40625pt>
 File: images/htmlcss.png Graphic file (type png)
 <use images/htmlcss.png>
-Package pdftex.def Info: images/htmlcss.png  used on input line 1007.
+Package pdftex.def Info: images/htmlcss.png  used on input line 1016.
 (pdftex.def)             Requested size: 113.81102pt x 113.81297pt.
-<images/js.png, id=240, 185.69376pt x 185.69376pt>
+<images/js.png, id=248, 185.69376pt x 185.69376pt>
 File: images/js.png Graphic file (type png)
 <use images/js.png>
-Package pdftex.def Info: images/js.png  used on input line 1018.
+Package pdftex.def Info: images/js.png  used on input line 1027.
 (pdftex.def)             Requested size: 81.9406pt x 81.94067pt.
- [24 <./images/postgreSQL.png> <./images/htmlcss.png>] [25 <./images/js.png>]
-<images/admin/login.png, id=261, 378.66469pt x 517.935pt>
+ [25 <./images/postgreSQL.png> <./images/htmlcss.png>] [26 <./images/js.png>]
+<images/admin/login.png, id=268, 378.66469pt x 517.935pt>
 File: images/admin/login.png Graphic file (type png)
 <use images/admin/login.png>
-Package pdftex.def Info: images/admin/login.png  used on input line 1063.
+Package pdftex.def Info: images/admin/login.png  used on input line 1072.
 (pdftex.def)             Requested size: 355.08984pt x 485.6972pt.
- [26]
+ [27]
 
-LaTeX Warning: Reference `fig:login' on page 27 undefined on input line 1068.
+LaTeX Warning: Reference `fig:login' on page 28 undefined on input line 1077.
 
-<images/admin/regieter.png, id=269, 486.31688pt x 556.32843pt>
+<images/admin/regieter.png, id=276, 486.31688pt x 556.32843pt>
 File: images/admin/regieter.png Graphic file (type png)
 <use images/admin/regieter.png>
-Package pdftex.def Info: images/admin/regieter.png  used on input line 1076.
+Package pdftex.def Info: images/admin/regieter.png  used on input line 1085.
 (pdftex.def)             Requested size: 355.08984pt x 406.20976pt.
-[27 <./images/admin/login.png>]
+[28 <./images/admin/login.png>]
 
-LaTeX Warning: Reference `fig:register' on page 28 undefined on input line 1081.
+LaTeX Warning: Reference `fig:register' on page 29 undefined on input line 1090.
 
-<images/admin/dashboard.png, id=277, 1177.39874pt x 654.94687pt>
+<images/admin/dashboard.png, id=284, 1177.39874pt x 654.94687pt>
 File: images/admin/dashboard.png Graphic file (type png)
 <use images/admin/dashboard.png>
-Package pdftex.def Info: images/admin/dashboard.png  used on input line 1095.
+Package pdftex.def Info: images/admin/dashboard.png  used on input line 1104.
 (pdftex.def)             Requested size: 418.82375pt x 232.97247pt.
-[28 <./images/admin/regieter.png>]
+[29 <./images/admin/regieter.png>]
 
-LaTeX Warning: Reference `fig:dashboard' on page 29 undefined on input line 1100.
+LaTeX Warning: Reference `fig:dashboard' on page 30 undefined on input line 1109.
 
-<images/admin/gestionFilm.png, id=286, 1186.4325pt x 621.82312pt>
+<images/admin/gestionFilm.png, id=293, 1186.4325pt x 621.82312pt>
 File: images/admin/gestionFilm.png Graphic file (type png)
 <use images/admin/gestionFilm.png>
-Package pdftex.def Info: images/admin/gestionFilm.png  used on input line 1108.
+Package pdftex.def Info: images/admin/gestionFilm.png  used on input line 1117.
 (pdftex.def)             Requested size: 418.82375pt x 219.51053pt.
 
-LaTeX Warning: Reference `fig:gestionFilm' on page 29 undefined on input line 1113.
+LaTeX Warning: Reference `fig:gestionFilm' on page 30 undefined on input line 1122.
 
-[29 <./images/admin/dashboard.png> <./images/admin/gestionFilm.png>]
-<images/admin/gestionSalles.png, id=296, 1183.42125pt x 553.31718pt>
+[30 <./images/admin/dashboard.png> <./images/admin/gestionFilm.png>]
+<images/admin/gestionSalles.png, id=304, 1183.42125pt x 553.31718pt>
 File: images/admin/gestionSalles.png Graphic file (type png)
 <use images/admin/gestionSalles.png>
-Package pdftex.def Info: images/admin/gestionSalles.png  used on input line 1121.
+Package pdftex.def Info: images/admin/gestionSalles.png  used on input line 1130.
 (pdftex.def)             Requested size: 418.82375pt x 195.8253pt.
 
 
-LaTeX Warning: Reference `fig:gestionSalles' on page 30 undefined on input line 1126.
+LaTeX Warning: Reference `fig:gestionSalles' on page 31 undefined on input line 1135.
 
-<images/admin/gestionSeances.png, id=297, 1198.4775pt x 660.21657pt>
+<images/admin/gestionSeances.png, id=305, 1198.4775pt x 660.21657pt>
 File: images/admin/gestionSeances.png Graphic file (type png)
 <use images/admin/gestionSeances.png>
-Package pdftex.def Info: images/admin/gestionSeances.png  used on input line 1134.
+Package pdftex.def Info: images/admin/gestionSeances.png  used on input line 1143.
 (pdftex.def)             Requested size: 418.82375pt x 230.71658pt.
-[30 <./images/admin/gestionSalles.png>]
+[31 <./images/admin/gestionSalles.png>]
 
-LaTeX Warning: Reference `fig:gestionSeances' on page 31 undefined on input line 1139.
+LaTeX Warning: Reference `fig:gestionSeances' on page 32 undefined on input line 1148.
 
-<images/admin/gestionCinema.png, id=307, 1202.99437pt x 599.23875pt>
+<images/admin/gestionCinema.png, id=314, 1202.99437pt x 599.23875pt>
 File: images/admin/gestionCinema.png Graphic file (type png)
 <use images/admin/gestionCinema.png>
-Package pdftex.def Info: images/admin/gestionCinema.png  used on input line 1147.
+Package pdftex.def Info: images/admin/gestionCinema.png  used on input line 1156.
 (pdftex.def)             Requested size: 418.82375pt x 208.62117pt.
 
-LaTeX Warning: Reference `fig:gestionCinema' on page 31 undefined on input line 1152.
+LaTeX Warning: Reference `fig:gestionCinema' on page 32 undefined on input line 1161.
 
-[31 <./images/admin/gestionSeances.png> <./images/admin/gestionCinema.png>]
-<images/admin/gestionUser.png, id=317, 1163.0953pt x 615.0478pt>
+[32 <./images/admin/gestionSeances.png> <./images/admin/gestionCinema.png>]
+<images/admin/gestionUser.png, id=324, 1163.0953pt x 615.0478pt>
 File: images/admin/gestionUser.png Graphic file (type png)
 <use images/admin/gestionUser.png>
-Package pdftex.def Info: images/admin/gestionUser.png  used on input line 1160.
+Package pdftex.def Info: images/admin/gestionUser.png  used on input line 1169.
 (pdftex.def)             Requested size: 418.82375pt x 221.47334pt.
 
 
-LaTeX Warning: Reference `fig:gestionUser' on page 32 undefined on input line 1165.
+LaTeX Warning: Reference `fig:gestionUser' on page 33 undefined on input line 1174.
 
-<images/admin/tarif.png, id=318, 1192.455pt x 555.57562pt>
+<images/admin/tarif.png, id=325, 1192.455pt x 555.57562pt>
 File: images/admin/tarif.png Graphic file (type png)
 <use images/admin/tarif.png>
-Package pdftex.def Info: images/admin/tarif.png  used on input line 1173.
+Package pdftex.def Info: images/admin/tarif.png  used on input line 1182.
 (pdftex.def)             Requested size: 418.82375pt x 195.13257pt.
 
-LaTeX Warning: Reference `fig:tarif' on page 32 undefined on input line 1178.
+LaTeX Warning: Reference `fig:tarif' on page 33 undefined on input line 1187.
 
-[32 <./images/admin/gestionUser.png> <./images/admin/tarif.png>]
-<images/admin/rapportAdmin.png, id=329, 1267.73625pt x 661.72218pt>
+[33 <./images/admin/gestionUser.png> <./images/admin/tarif.png>]
+<images/admin/rapportAdmin.png, id=336, 1267.73625pt x 661.72218pt>
 File: images/admin/rapportAdmin.png Graphic file (type png)
 <use images/admin/rapportAdmin.png>
-Package pdftex.def Info: images/admin/rapportAdmin.png  used on input line 1186.
+Package pdftex.def Info: images/admin/rapportAdmin.png  used on input line 1195.
 (pdftex.def)             Requested size: 418.82375pt x 218.61131pt.
 
 
-LaTeX Warning: Reference `fig:rapportAdmin' on page 33 undefined on input line 1191.
+LaTeX Warning: Reference `fig:rapportAdmin' on page 34 undefined on input line 1200.
 
-<images/client/profilUser.png, id=330, 594.72188pt x 402.75468pt>
+<images/client/profilUser.png, id=337, 594.72188pt x 402.75468pt>
 File: images/client/profilUser.png Graphic file (type png)
 <use images/client/profilUser.png>
-Package pdftex.def Info: images/client/profilUser.png  used on input line 1207.
+Package pdftex.def Info: images/client/profilUser.png  used on input line 1216.
 (pdftex.def)             Requested size: 400.61703pt x 271.30072pt.
-[33 <./images/admin/rapportAdmin.png>]
+[34 <./images/admin/rapportAdmin.png>]
 
-LaTeX Warning: Reference `fig:profilUser' on page 34 undefined on input line 1212.
+LaTeX Warning: Reference `fig:profilUser' on page 35 undefined on input line 1221.
 
-<images/client/consulte2.png, id=340, 1384.42218pt x 606.01407pt>
+<images/client/consulte2.png, id=347, 1384.42218pt x 606.01407pt>
 File: images/client/consulte2.png Graphic file (type png)
 <use images/client/consulte2.png>
-Package pdftex.def Info: images/client/consulte2.png  used on input line 1222.
+Package pdftex.def Info: images/client/consulte2.png  used on input line 1231.
 (pdftex.def)             Requested size: 400.61703pt x 175.36044pt.
 
-LaTeX Warning: Reference `fig:consulte' on page 34 undefined on input line 1227.
+LaTeX Warning: Reference `fig:consulte' on page 35 undefined on input line 1236.
 
-[34 <./images/client/profilUser.png> <./images/client/consulte2.png>]
-<images/client/consulté1.png, id=350, 662.475pt x 502.87875pt>
+[35 <./images/client/profilUser.png> <./images/client/consulte2.png>]
+<images/client/consulté1.png, id=357, 662.475pt x 502.87875pt>
 File: images/client/consulté1.png Graphic file (type png)
 <use images/client/consulté1.png>
-Package pdftex.def Info: images/client/consulté1.png  used on input line 1231.
+Package pdftex.def Info: images/client/consulté1.png  used on input line 1240.
 (pdftex.def)             Requested size: 400.61703pt x 304.10062pt.
 
 
-LaTeX Warning: Reference `fig:consulte1' on page 35 undefined on input line 1236.
+LaTeX Warning: Reference `fig:consulte1' on page 36 undefined on input line 1245.
 
-<images/client/detailfilm.png, id=351, 712.91344pt x 425.33907pt>
+<images/client/detailfilm.png, id=358, 712.91344pt x 425.33907pt>
 File: images/client/detailfilm.png Graphic file (type png)
 <use images/client/detailfilm.png>
-Package pdftex.def Info: images/client/detailfilm.png  used on input line 1246.
+Package pdftex.def Info: images/client/detailfilm.png  used on input line 1255.
 (pdftex.def)             Requested size: 400.61703pt x 239.01248pt.
-[35 <./images/client/consulté1.png>]
+[36 <./images/client/consulté1.png>]
 
-LaTeX Warning: Reference `fig:detailfilm' on page 36 undefined on input line 1251.
+LaTeX Warning: Reference `fig:detailfilm' on page 37 undefined on input line 1260.
 
-<images/client/detailfilm1.png, id=359, 341.77687pt x 390.70969pt>
+<images/client/detailfilm1.png, id=367, 341.77687pt x 390.70969pt>
 File: images/client/detailfilm1.png Graphic file (type png)
 <use images/client/detailfilm1.png>
-Package pdftex.def Info: images/client/detailfilm1.png  used on input line 1255.
+Package pdftex.def Info: images/client/detailfilm1.png  used on input line 1264.
 (pdftex.def)             Requested size: 400.61703pt x 458.00487pt.
-[36 <./images/client/detailfilm.png>]
+[37 <./images/client/detailfilm.png>]
 
-LaTeX Warning: Reference `fig:detailfilm1' on page 37 undefined on input line 1260.
+LaTeX Warning: Reference `fig:detailfilm1' on page 38 undefined on input line 1269.
 
-<images/client/reservationfilm.png, id=367, 719.68875pt x 527.72156pt>
+<images/client/reservationfilm.png, id=374, 719.68875pt x 527.72156pt>
 File: images/client/reservationfilm.png Graphic file (type png)
 <use images/client/reservationfilm.png>
-Package pdftex.def Info: images/client/reservationfilm.png  used on input line 1270.
+Package pdftex.def Info: images/client/reservationfilm.png  used on input line 1279.
 (pdftex.def)             Requested size: 400.61703pt x 293.76665pt.
-[37 <./images/client/detailfilm1.png>]
+[38 <./images/client/detailfilm1.png>]
 
-LaTeX Warning: Reference `fig:reservationfilm' on page 38 undefined on input line 1275.
+LaTeX Warning: Reference `fig:reservationfilm' on page 39 undefined on input line 1284.
 
-<images/client/padgreservation.png, id=375, 379.4175pt x 194.22563pt>
+<images/client/padgreservation.png, id=382, 379.4175pt x 194.22563pt>
 File: images/client/padgreservation.png Graphic file (type png)
 <use images/client/padgreservation.png>
-Package pdftex.def Info: images/client/padgreservation.png  used on input line 1285.
+Package pdftex.def Info: images/client/padgreservation.png  used on input line 1294.
 (pdftex.def)             Requested size: 327.7763pt x 167.79242pt.
 
-LaTeX Warning: Reference `fig:padgreservation' on page 38 undefined on input line 1290.
+LaTeX Warning: Reference `fig:padgreservation' on page 39 undefined on input line 1299.
 
-[38 <./images/client/reservationfilm.png> <./images/client/padgreservation.png>]
-<images/client/mesreservation.png, id=385, 712.16063pt x 166.37157pt>
+[39 <./images/client/reservationfilm.png> <./images/client/padgreservation.png>]
+<images/client/mesreservation.png, id=392, 712.16063pt x 166.37157pt>
 File: images/client/mesreservation.png Graphic file (type png)
 <use images/client/mesreservation.png>
-Package pdftex.def Info: images/client/mesreservation.png  used on input line 1300.
+Package pdftex.def Info: images/client/mesreservation.png  used on input line 1309.
 (pdftex.def)             Requested size: 400.61703pt x 93.58884pt.
 
 
-LaTeX Warning: Reference `fig:mesreservation' on page 39 undefined on input line 1305.
+LaTeX Warning: Reference `fig:mesreservation' on page 40 undefined on input line 1314.
 
-[39 <./images/client/mesreservation.png>]
-<images/paiement/payment.png, id=395, 883.50075pt x 543.2295pt>
+[40 <./images/client/mesreservation.png>]
+<images/paiement/payment.png, id=402, 883.50075pt x 543.2295pt>
 File: images/paiement/payment.png Graphic file (type png)
 <use images/paiement/payment.png>
-Package pdftex.def Info: images/paiement/payment.png  used on input line 1327.
+Package pdftex.def Info: images/paiement/payment.png  used on input line 1336.
 (pdftex.def)             Requested size: 400.61703pt x 246.32433pt.
 
 
-LaTeX Warning: Reference `fig:payment' on page 40 undefined on input line 1332.
+LaTeX Warning: Reference `fig:payment' on page 41 undefined on input line 1341.
 
-<images/paiement/Paiementres.png, id=396, 936.49875pt x 310.761pt>
+<images/paiement/Paiementres.png, id=403, 936.49875pt x 310.761pt>
 File: images/paiement/Paiementres.png Graphic file (type png)
 <use images/paiement/Paiementres.png>
-Package pdftex.def Info: images/paiement/Paiementres.png  used on input line 1340.
+Package pdftex.def Info: images/paiement/Paiementres.png  used on input line 1349.
 (pdftex.def)             Requested size: 400.61703pt x 132.9418pt.
 
-LaTeX Warning: Reference `fig:paiementreussi' on page 40 undefined on input line 1345.
+LaTeX Warning: Reference `fig:paiementreussi' on page 41 undefined on input line 1354.
 
-[40 <./images/paiement/payment.png> <./images/paiement/Paiementres.png>] [41] [42] [43
+[41 <./images/paiement/payment.png> <./images/paiement/Paiementres.png>] [42] [43] [44
 
 ] (rapport.aux)
  ***********
@@ -1342,17 +1347,17 @@ Package rerunfilecheck Info: Checksums for `rapport.out':
 (rerunfilecheck)             After:  22ED44A4FD30D1F148BBA532F858D084;13721.
  ) 
 Here is how much of TeX's memory you used:
- 12752 strings out of 474486
- 212424 string characters out of 5739943
+ 12762 strings out of 474486
+ 212714 string characters out of 5739943
  1944542 words of memory out of 5000000
- 34677 multiletter control sequences out of 15000+600000
+ 34685 multiletter control sequences out of 15000+600000
  572078 words of font info for 61 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  75i,12n,79p,1116b,613s stack positions out of 10000i,1000n,20000p,200000b,200000s
  <C:\Users\GROUP LAPTOPS\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcrm1200.pk> <C:\Users\GROUP LAPTOPS\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ectt1200.pk> <C:\Users\GROUP LAPTOPS\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\eccc1200.pk> <C:\Users\GROUP LAPTOPS\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecrm0800.pk> <C:\Users\GROUP LAPTOPS\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx0800.pk> <C:\Users\GROUP LAPTOPS\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx2488.pk> <C:\Users\GROUP LAPTOPS\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecrm1200.pk> <C:\Users\GROUP LAPTOPS\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx1200.pk> <C:\Users\GROUP LAPTOPS\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx1728.pk> <C:\Users\GROUP LAPTOPS\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx2074.pk> <C:\Users\GROUP LAPTOPS\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx1440.pk> <C:\Users\GROUP LAPTOPS\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecti1200.pk>
-Output written on rapport.pdf (44 pages, 3759048 bytes).
+Output written on rapport.pdf (45 pages, 3845425 bytes).
 PDF statistics:
- 1004 PDF objects out of 1200 (max. 8388607)
- 200 named destinations out of 1000 (max. 500000)
- 181 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 1013 PDF objects out of 1200 (max. 8388607)
+ 202 named destinations out of 1000 (max. 500000)
+ 186 words of extra memory for PDF output out of 10000 (max. 10000000)
 
