@@ -1,8 +1,8 @@
-import { ArrowLeft, Calendar, Clock, DoorOpen, Download, MapPin, Printer } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, DoorOpen, MapPin, Printer } from 'lucide-react';
+import QRCode from 'qrcode';
 import { QRCodeSVG } from 'qrcode.react';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { toast } from 'sonner';
 import Navbar from '../components/Navbar';
 import {
   reservationsApi,
@@ -32,7 +32,7 @@ export default function TicketPage() {
   const [reservation, setReservation] = useState<ReservationDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [downloading, setDownloading] = useState(false);
+  const [qrDataUrl, setQrDataUrl] = useState<string>('');
 
   useEffect(() => {
     if (!id) return;
@@ -43,56 +43,27 @@ export default function TicketPage() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  // ── PDF download via html2canvas + jsPDF ─────────────────────────────────
-  const handleDownload = async () => {
-    if (!ticketRef.current || !reservation) return;
-    setDownloading(true);
-    try {
-      const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
-        import('html2canvas'),
-        import('jspdf'),
-      ]);
-
-      const sourceNode = ticketRef.current;
-      const scale = Math.min(1.5, window.devicePixelRatio || 1);
-
-      const canvas = await html2canvas(sourceNode, {
-        backgroundColor: '#09090b',
-        scale,
-        useCORS: true,
-        allowTaint: false,
-        logging: false,
-        ignoreElements: (element) =>
-          element.tagName === 'IMG' || element.classList?.contains('pdf-ignore'),
-        onclone: (documentClone) => {
-          documentClone
-            .querySelectorAll('img')
-            .forEach((img) => img.remove());
-        },
-      });
-
-      const imgData = canvas.toDataURL('image/jpeg', 0.92);
-      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      const maxWidth = pageWidth - 20;
-      const maxHeight = pageHeight - 20;
-      const imgScale = Math.min(maxWidth / canvas.width, maxHeight / canvas.height);
-      const imgWidth = canvas.width * imgScale;
-      const imgHeight = canvas.height * imgScale;
-      const x = (pageWidth - imgWidth) / 2;
-      const y = 10;
-
-      pdf.addImage(imgData, 'JPEG', x, y, imgWidth, imgHeight);
-      pdf.save(`billet-${reservation.reference}.pdf`);
-      toast.success('Billet téléchargé avec succès.');
-    } catch (error) {
-      console.error('PDF generation failed:', error);
-      toast.error('Erreur lors de la génération du PDF.');
-    } finally {
-      setDownloading(false);
+  useEffect(() => {
+    if (!reservation?.reference) {
+      setQrDataUrl('');
+      return;
     }
-  };
+    let cancelled = false;
+    QRCode.toDataURL(reservation.reference, {
+      errorCorrectionLevel: 'H',
+      margin: 0,
+      width: 296,
+    })
+      .then((url) => {
+        if (!cancelled) setQrDataUrl(url);
+      })
+      .catch(() => {
+        if (!cancelled) setQrDataUrl('');
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [reservation?.reference]);
 
   const handlePrint = () => window.print();
 
@@ -125,18 +96,18 @@ export default function TicketPage() {
     );
   }
 
-  const qrPayload = reservation.qrCode ?? JSON.stringify({ reference: reservation.reference });
-  const seats = reservation.sieges?.map((s) => `${s.rangee}${s.numero}`).join(', ') ?? '—';
+  // Keep QR content minimal: only the reservation reference (e.g., CP-2026-R5BZEX)
+  const qrPayload = reservation.reference;
   const total = reservation.sieges?.reduce((sum, s) => sum + Number(s.prix), 0) ?? 0;
   const devise = reservation.devise ?? 'MAD';
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-white print:bg-white print:text-zinc-950">
+    <div className="ticket-page-root min-h-screen bg-[#09090b] text-white print:min-h-0 print:bg-white print:text-zinc-950">
       <div className="print:hidden">
         <Navbar />
       </div>
 
-      <div className="mx-auto w-full max-w-3xl px-3 py-6 sm:px-4 sm:py-10">
+      <div className="ticket-print-wrap mx-auto w-full max-w-3xl px-3 py-6 print:max-w-none print:px-0 print:py-0 sm:px-4 sm:py-10">
         {/* Back + actions */}
         <div className="mb-4 flex flex-col gap-3 print:hidden sm:mb-6 sm:flex-row sm:items-center sm:justify-between">
           <button
@@ -149,18 +120,10 @@ export default function TicketPage() {
           <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
             <button
               onClick={handlePrint}
-              className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 px-4 py-2 text-sm font-bold text-zinc-300 transition hover:bg-white/8 sm:w-auto"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-2 text-sm font-bold text-white transition hover:bg-red-500 sm:w-auto"
             >
               <Printer className="h-4 w-4" />
               Imprimer
-            </button>
-            <button
-              onClick={handleDownload}
-              disabled={downloading}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-2 text-sm font-bold text-white transition hover:bg-red-500 disabled:opacity-60 sm:w-auto"
-            >
-              <Download className="h-4 w-4" />
-              {downloading ? 'Génération…' : 'Télécharger PDF'}
             </button>
           </div>
         </div>
@@ -168,10 +131,10 @@ export default function TicketPage() {
         {/* ── Ticket card ── */}
         <div
           ref={ticketRef}
-          className="overflow-hidden rounded-3xl border border-red-500/20 bg-zinc-950 shadow-2xl shadow-red-900/10 print:border-zinc-300 print:shadow-none"
+          className="ticket-print overflow-hidden rounded-3xl border border-red-500/20 bg-zinc-950 shadow-2xl shadow-red-900/10 print:border-zinc-300 print:shadow-none"
         >
           {/* Top band */}
-          <div className="bg-gradient-to-r from-red-700 to-red-500 px-4 py-4 sm:px-8 sm:py-5">
+          <div className="ticket-top bg-gradient-to-r from-red-700 to-red-500 px-4 py-4 sm:px-8 sm:py-5">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div>
                 <p className="text-xs font-black uppercase tracking-widest text-red-200">
@@ -250,7 +213,7 @@ export default function TicketPage() {
                 </div>
 
                 {/* Divider dashed */}
-                <div className="border-t border-dashed border-white/10 print:border-zinc-300" />
+                <div className="ticket-divider border-t border-dashed border-white/10 print:border-zinc-300" />
 
                 {/* Seats */}
                 <div>
@@ -275,7 +238,7 @@ export default function TicketPage() {
                 </div>
 
                 {/* Price */}
-                <div className="flex flex-col gap-3 rounded-2xl border border-white/8 bg-white/4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+                <div className="ticket-price flex flex-col gap-3 rounded-2xl border border-white/8 bg-white/4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
                   <div>
                     <p className="text-xs font-bold text-zinc-500">Total payé</p>
                     <p className="text-2xl font-black text-white sm:text-[2rem]">
@@ -292,12 +255,15 @@ export default function TicketPage() {
               {/* Right: QR code */}
               <div className="flex flex-col items-center justify-start gap-3 md:gap-4">
                 <div className="rounded-2xl bg-white p-3 shadow-lg sm:p-4">
-                  <QRCodeSVG
-                    value={qrPayload}
-                    size={148}
-                    level="H"
-                    includeMargin={false}
-                  />
+                  {qrDataUrl ? (
+                    <img
+                      src={qrDataUrl}
+                      alt="QR"
+                      className="h-[148px] w-[148px]"
+                    />
+                  ) : (
+                    <QRCodeSVG value={qrPayload} size={148} level="H" includeMargin={false} />
+                  )}
                 </div>
                 <p className="text-center text-xs font-bold leading-snug text-zinc-500">
                   Présentez ce QR à l'entrée
@@ -308,7 +274,7 @@ export default function TicketPage() {
           </div>
 
           {/* Bottom strip */}
-          <div className="flex flex-col gap-1 border-t border-white/8 bg-zinc-900/50 px-4 py-3 text-center print:border-zinc-200 print:bg-zinc-50 sm:flex-row sm:items-center sm:justify-between sm:px-8 sm:text-left">
+          <div className="ticket-bottom flex flex-col gap-1 border-t border-white/8 bg-zinc-900/50 px-4 py-3 text-center print:border-zinc-200 print:bg-zinc-50 sm:flex-row sm:items-center sm:justify-between sm:px-8 sm:text-left">
             <p className="text-xs text-zinc-600">
               Généré par CinePass · {new Date().toLocaleDateString('fr-FR')}
             </p>

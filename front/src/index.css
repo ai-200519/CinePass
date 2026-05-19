@@ -8,6 +8,87 @@ body,
   height: 100%;
 }
 
+@media print {
+  html,
+  body,
+  #root {
+    height: auto !important;
+  }
+
+  body {
+    margin: 0 !important;
+  }
+
+  .ticket-page-root {
+    min-height: auto !important;
+  }
+
+  .ticket-print-wrap {
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: none !important;
+    width: 100% !important;
+  }
+
+  .ticket-print {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    break-after: avoid-page !important;
+    page-break-after: avoid !important;
+    overflow: visible !important;
+  }
+
+  @page {
+    margin: 0;
+  }
+}
+
+/* Ticket export (PDF capture) styling: applied only to an off-screen cloned node */
+[data-ticket-export='true'] {
+  background: #ffffff !important;
+  color: #09090b !important;
+  border-color: #e4e4e7 !important;
+  box-shadow: none !important;
+}
+
+[data-ticket-export='true'] .ticket-top {
+  background: #ffffff !important;
+  border-bottom: 1px solid #e4e4e7 !important;
+}
+
+[data-ticket-export='true'] .ticket-top * {
+  color: #09090b !important;
+}
+
+[data-ticket-export='true'] .ticket-divider {
+  border-color: #e4e4e7 !important;
+}
+
+[data-ticket-export='true'] .ticket-price {
+  background: #fafafa !important;
+  border-color: #e4e4e7 !important;
+}
+
+[data-ticket-export='true'] .ticket-price .text-white {
+  color: #09090b !important;
+}
+
+[data-ticket-export='true'] .ticket-bottom {
+  background: #ffffff !important;
+  border-color: #e4e4e7 !important;
+}
+
+[data-ticket-export='true'] .bg-zinc-950,
+[data-ticket-export='true'] .bg-zinc-900\/50,
+[data-ticket-export='true'] .bg-white\/4 {
+  background: #ffffff !important;
+}
+
+[data-ticket-export='true'] .border-white\/8,
+[data-ticket-export='true'] .border-white\/10 {
+  border-color: #e4e4e7 !important;
+}
+
 body {
   margin: 0;
   @apply bg-cinema-bg text-white font-sans;

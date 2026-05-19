@@ -9,6 +9,21 @@ import { staffTheme } from '../theme';
 export default function ResultatInvalideScreen({ navigation, route }) {
   const insets = useSafeAreaInsets();
   const result = route?.params?.result;
+  const reservation = result?.reservation;
+  const filmTitle = reservation?.film?.title;
+  const seance = reservation?.seance;
+  const seanceDate = seance?.dateHeure ? new Date(seance.dateHeure) : null;
+  const seanceDateLabel = seanceDate
+    ? seanceDate.toLocaleDateString('fr-FR', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      })
+    : null;
+  const seanceTimeLabel = seanceDate
+    ? seanceDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+    : null;
 
   return (
     <View style={{ flex: 1, backgroundColor: staffTheme.colors.bg }}>
@@ -39,6 +54,45 @@ export default function ResultatInvalideScreen({ navigation, route }) {
         </View>
 
         <Text style={{ marginTop: 16, color: staffTheme.colors.text, fontWeight: '900', fontSize: 22 }}>
+
+          {reservation ? (
+            <>
+              <Text style={{ color: staffTheme.colors.textSecondary, fontWeight: '700', marginTop: 14 }}>
+                Billet pour
+              </Text>
+              <Text style={{ color: staffTheme.colors.text, fontWeight: '800', marginTop: 6 }}>
+                {filmTitle ?? 'Film'}
+              </Text>
+
+              {seanceDateLabel || seanceTimeLabel || seance?.salle ? (
+                <Text style={{ color: staffTheme.colors.textSecondary, fontWeight: '700', marginTop: 14 }}>
+                  Seance
+                </Text>
+              ) : null}
+
+              {seanceDateLabel ? (
+                <Text style={{ color: staffTheme.colors.text, fontWeight: '800', marginTop: 6 }}>
+                  {seanceDateLabel}
+                </Text>
+              ) : null}
+              {seanceTimeLabel || seance?.salle ? (
+                <Text style={{ color: staffTheme.colors.text, fontWeight: '800', marginTop: 6 }}>
+                  {[seanceTimeLabel, seance?.salle].filter(Boolean).join(' • ')}
+                </Text>
+              ) : null}
+
+              {reservation?.statut ? (
+                <>
+                  <Text style={{ color: staffTheme.colors.textSecondary, fontWeight: '700', marginTop: 14 }}>
+                    Statut
+                  </Text>
+                  <Text style={{ color: staffTheme.colors.text, fontWeight: '800', marginTop: 6 }}>
+                    {reservation.statut}
+                  </Text>
+                </>
+              ) : null}
+            </>
+          ) : null}
           BILLET INVALIDE
         </Text>
 

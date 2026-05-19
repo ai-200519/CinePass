@@ -1,10 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { SiegeController } from './siege.controller';
-import { SiegeService } from './siege.service';
-import { CreateSiegeDto } from './dto/create-siege.dto';
-import { UpdateSiegeDto } from './dto/update-siege.dto';
 import { CategorieSiege } from '../common/enums/categorie-siege.enum';
 import { StatutSiege } from '../common/enums/statut-siege.enum';
+import { CreateSiegeDto } from './dto/create-siege.dto';
+import { UpdateSiegeDto } from './dto/update-siege.dto';
+import { SiegeController } from './siege.controller';
+import { SiegeService } from './siege.service';
 
 describe('SiegeController', () => {
   let controller: SiegeController;
@@ -64,7 +64,7 @@ describe('SiegeController', () => {
       mockSiegeService.findAll.mockResolvedValue(result);
 
       expect(await controller.findAll()).toEqual(result);
-      expect(mockSiegeService.findAll).toHaveBeenCalledWith();
+      expect(mockSiegeService.findAll).toHaveBeenCalledWith(undefined, undefined);
     });
   });
 

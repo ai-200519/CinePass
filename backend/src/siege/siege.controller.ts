@@ -1,11 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards } from '@nestjs/common';
-import { SiegeService } from './siege.service';
-import { CreateSiegeDto } from './dto/create-siege.dto';
-import { UpdateSiegeDto } from './dto/update-siege.dto';
-import { ApiOperation, ApiTags, ApiResponse, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from 'src/common/enums/role.enum';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
-import { Roles } from 'src/common/decorators/roles.decorator';
+import { CreateSiegeDto } from './dto/create-siege.dto';
+import { UpdateSiegeDto } from './dto/update-siege.dto';
+import { SiegeService } from './siege.service';
 
 @ApiBearerAuth('JWT-auth')
 @ApiTags('Siege')
@@ -48,8 +48,11 @@ export class SiegeController {
   @Get()
   @UseGuards(JwtAuthGuard)
   @Roles(Role.ADMIN, Role.CLIENT, Role.STAFF)
-  findAll(@Query('id_salle') idSalle?: string) {
-    return this.siegeService.findAll(idSalle ? +idSalle : undefined);
+  findAll(@Query('id_salle') idSalle?: string, @Query('id_seance') idSeance?: string) {
+    return this.siegeService.findAll(
+      idSalle ? +idSalle : undefined,
+      idSeance ? +idSeance : undefined,
+    );
   }
 
   @ApiOperation({
