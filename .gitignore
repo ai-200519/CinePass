@@ -76,6 +76,7 @@ web-build/
 *.out
 *.run.xml
 *.synctex.gz
+*.synctex.gz(busy)
 *.toc
 *.lof
 *.lot

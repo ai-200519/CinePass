@@ -389,7 +389,7 @@ l'ensemble des entités du système depuis son dashboard dédié.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.92\textwidth]{images/diagrammes/useCase}
+    \includegraphics[width=0.92\textwidth]{images/diagrammes/useCase.png}
     \caption{Diagramme de cas d'utilisation — CinePass}
     \label{fig:usecase}
 \end{figure}
@@ -499,6 +499,55 @@ sont libérés et un message d'erreur est retourné au client.
     \caption{Diagramme de séquence — Processus de paiement (vue détaillée)}
     \label{fig:seq_blanc}
 \end{figure}
+
+%------------------------------------------------------------
+\subsection{Diagramme de classes métier}
+
+Le diagramme de classes métier (Figure~\ref{fig:class_metier}) présente
+les entités principales du domaine (Utilisateur, Film, Seance, Reservation,
+Paiement, Salle, Cinema, Siege) ainsi que leurs relations. Il sert de base
+conceptuelle pour comprendre la structure des données et les liens entre les
+objets métier de CinePass.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{images/diagrammes/Class Metier (analyse).png}
+    \caption{Diagramme de classes métier — CinePass}
+    \label{fig:class_metier}
+\end{figure}
+
+\subsection{Diagramme d'etats-transitions — Reservation}
+
+Le diagramme d'etats-transitions (Figure~\ref{fig:reservation_state})
+illustre le cycle de vie d'une reservation : creation, etat en cours,
+paiement valide, validation de l'entree et fin de seance. Il clarifie
+les evenements qui provoquent chaque changement d'etat et les actions
+associees (generation du QR code, liberation des sieges, notifications).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.92\textwidth]{images/diagrammes/reservation state diagramme.png}
+    \caption{Diagramme d'etats-transitions — Reservation}
+    \label{fig:reservation_state}
+\end{figure}
+
+%------------------------------------------------------------
+\subsection{Diagramme de classes de conception (CSR)}
+
+Le diagramme de classes de conception (Figure~\ref{fig:class_conception})
+décline la solution en trois couches conformément au pattern CSR de NestJS
+(Controller, Service, Repository). Cette séparation met en évidence le flux
+des requêtes, la logique métier et l'accès aux données, tout en favorisant la
+maintenabilité et l'isolation des responsabilités.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.2\textwidth]{images/diagrammes/Class technique (conception).png}
+    \caption{Diagramme de classes de conception — pattern CSR (NestJS)}
+    \label{fig:class_conception}
+\end{figure}
+
+%------------------------------------------------------------
 
 %------------------------------------------------------------
 \section{Choix de conception}
