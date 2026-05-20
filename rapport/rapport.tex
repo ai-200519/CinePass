@@ -312,42 +312,231 @@ Au-delà des fonctionnalités, CinePass doit respecter des contraintes de qualit
 
 Ce chapitre a permis de définir le périmètre fonctionnel et non fonctionnel de la plateforme \textbf{CinePass}, d'identifier les acteurs impliqués ainsi que les contraintes métiers et techniques prioritaires. Les éléments présentés servent de base à la conception détaillée : les choix d'architecture, le modèle de données et les diagrammes UML qui suivent visent à traduire ces besoins en une structure technique exploitable.
 
+%============================================================
 \chapter{Conception du système}
+%============================================================
 
+\section{Introduction}
+
+Ce chapitre présente la conception détaillée du système CinePass. Il décrit l'architecture
+globale adoptée, le modèle de données, ainsi que les différents diagrammes UML élaborés
+pour modéliser le comportement et la structure de la plateforme. Ces éléments constituent
+le socle technique sur lequel repose l'implémentation du système.
+
+%------------------------------------------------------------
 \section{Architecture globale du système}
-CinePass repose sur une architecture client-serveur avec séparation entre le frontend, le backend et la base de données.
+%------------------------------------------------------------
 
+CinePass repose sur une architecture client-serveur à trois niveaux
+(\textit{three-tier architecture}) assurant une séparation claire entre la
+présentation, la logique métier et la persistance des données~:
+
+\begin{itemize}
+    \item \textbf{Couche présentation (Frontend)} : application React/TypeScript
+          compilée avec Vite, accessible depuis un navigateur web ou un appareil mobile.
+    \item \textbf{Couche métier (Backend)} : API RESTful développée avec NestJS et
+          Node.js, exposant les endpoints consommés par les clients.
+    \item \textbf{Couche données (Base de données)} : système PostgreSQL hébergeant
+          l'ensemble des entités persistantes du système.
+\end{itemize}
+
+Les échanges entre le frontend et le backend s'effectuent via des requêtes HTTP
+sécurisées, avec authentification par JSON Web Token (JWT). Les services tiers
+(Stripe pour le paiement, Nodemailer pour les notifications par e-mail) sont intégrés
+côté backend via leurs SDK respectifs.
+
+%------------------------------------------------------------
 \section{Conception de la base de données}
-Le modèle de données regroupe les entités essentielles : utilisateur, film, salle, séance, siège, réservation et paiement.
+%------------------------------------------------------------
 
+Le modèle de données de CinePass regroupe les entités essentielles suivantes~:
+
+\begin{itemize}
+    \item \textbf{Utilisateur} : informations du compte, rôle (client, staff, admin),
+          statut d'activation et mot de passe haché.
+    \item \textbf{Film} : titre, affiche, description, durée, genre, classification
+          et statut de diffusion.
+    \item \textbf{Cinéma} : nom, adresse, ville et liste des salles associées.
+    \item \textbf{Salle} : numéro, capacité, technologie de projection et liste
+          des sièges.
+    \item \textbf{Séance} : film projeté, salle utilisée, date, heure de début
+          et statut.
+    \item \textbf{Siège} : numéro, rangée, type (standard, VIP) et statut de
+          disponibilité par séance.
+    \item \textbf{Réservation} : référence unique, utilisateur, séance, sièges
+          choisis, statut et date de création.
+    \item \textbf{Paiement} : montant, méthode, référence de transaction Stripe,
+          statut et horodatage.
+\end{itemize}
+
+Les relations entre ces entités sont définies par des contraintes de clés étrangères
+garantissant l'intégrité référentielle des données. Un mécanisme de verrouillage
+temporaire des sièges sélectionnés est mis en place afin d'éviter les doubles
+réservations.
+
+%------------------------------------------------------------
 \section{Diagrammes UML}
-Cette partie présente les diagrammes qui formalisent le comportement et la structure du système.
+%------------------------------------------------------------
 
 \subsection{Diagramme de cas d'utilisation}
-Le diagramme de cas d'utilisation présente les interactions principales entre les acteurs et la plateforme CinePass.
+
+Le diagramme de cas d'utilisation (Figure~\ref{fig:usecase}) illustre les interactions
+principales entre les trois acteurs du système — Client, Staff et Administrateur —
+et les fonctionnalités offertes par la plateforme CinePass. Le Client peut s'authentifier,
+consulter le catalogue, réserver des places et effectuer un paiement en ligne. Le Staff
+valide les entrées via scan de QR Code ou saisie manuelle. L'Administrateur gère
+l'ensemble des entités du système depuis son dashboard dédié.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.98\textwidth]{images/diagrammes/useCase.png}
-    \caption{Diagramme de cas d'utilisation de CinePass}
-    \label{fig:usecase-cinepass}
+    \includegraphics[width=0.92\textwidth]{images/diagrammes/useCase}
+    \caption{Diagramme de cas d'utilisation — CinePass}
+    \label{fig:usecase}
 \end{figure}
 
-Ce diagramme met en évidence trois acteurs : le \textbf{Client}, le \textbf{Staff} et l'\textbf{Admin}. Côté client, les fonctionnalités couvrent l'authentification (avec les extensions \textit{Mot de passe oublié} et \textit{S'inscrire}), la gestion du profil, la consultation du catalogue (liste des films et détail d'un film), la réservation des places (choix d'une séance, sélection des sièges, paiement en ligne et récapitulatif), ainsi que la consultation de l'historique et du billet (référence, QR code et téléchargement). Le staff intervient pour \textbf{valider une entrée} via le scan du QR code ou une vérification manuelle (incluant la saisie d'une référence). Enfin, l'administrateur accède au \textbf{dashboard} pour gérer l'exploitation : réservations, tarification, analytics, films, séances et paramètres.
+%------------------------------------------------------------
+\subsection{Diagrammes d'activité}
 
-\subsection{Diagramme de classes}
-Le diagramme de classes décrit les relations entre les entités métier du système.
+Les diagrammes d'activité modélisent le comportement dynamique du système pour
+chacun des acteurs principaux, en décrivant les enchaînements d'actions et les
+points de décision.
 
+%----  Activité Admin  ---------------------------------------
+\subsubsection{Diagramme d'activité — Administrateur}
+
+Le diagramme d'activité de l'administrateur (Figure~\ref{fig:activity_admin}) décrit
+le flux d'actions disponibles après authentification : gestion des films (ajout,
+modification, suppression), gestion des salles, planification des séances, consultation
+des réservations, configuration de la tarification, consultation des analytics et
+gestion des paramètres système. Chaque action administrative déclenche une validation
+des données côté système avant enregistrement, avec retour d'une erreur en cas de
+données invalides.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.82\textwidth]{images/daigramme/ActivityAdmin}
+    \caption{Diagramme d'activité — Administrateur}
+    \label{fig:activity_admin}
+\end{figure}
+
+%----  Activité Client  --------------------------------------
+\subsubsection{Diagramme d'activité — Client}
+
+Le diagramme d'activité du client (Figure~\ref{fig:activity_client}) représente
+le parcours complet d'un spectateur sur la plateforme : accès à l'application,
+authentification (optionnelle pour la consultation du catalogue), recherche et
+sélection d'un film, choix d'une séance, sélection des sièges disponibles,
+paiement en ligne et téléchargement du billet numérique. Les branches
+conditionnelles modélisent les cas où l'utilisateur n'est pas connecté, où
+aucun film n'est trouvé, ou encore où le paiement est refusé.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.82\textwidth]{images/daigramme/ActivityClient}
+    \caption{Diagramme d'activité — Client}
+    \label{fig:activity_client}
+\end{figure}
+
+%----  Activité Staff  ---------------------------------------
+\subsubsection{Diagramme d'activité — Staff}
+
+Le diagramme d'activité du staff (Figure~\ref{fig:activity_staff}) décrit le
+processus de validation d'entrée en salle. Après authentification sur l'application
+mobile CinePass Staff, l'agent choisit entre le scan du QR Code et la saisie
+manuelle de la référence. Le système vérifie la validité du billet en base de
+données (statut payé, non utilisé, séance correspondante) et retourne un retour
+visuel vert (entrée autorisée) ou rouge (entrée refusée avec motif). Le billet
+validé est immédiatement marqué comme utilisé afin d'empêcher toute réutilisation.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.82\textwidth]{images/daigramme/ActivityStaff}
+    \caption{Diagramme d'activité — Staff}
+    \label{fig:activity_staff}
+\end{figure}
+
+%------------------------------------------------------------
 \subsection{Diagrammes de séquence}
-Les diagrammes de séquence illustrent les scénarios clés comme la réservation d'une séance et le paiement.
 
+Les diagrammes de séquence modélisent les interactions temporelles entre les
+acteurs et les composants du système pour le scénario clé de paiement et de
+réservation.
+
+%----  Séquence paiement (noire / simplifiée)  ---------------
+\subsubsection{Diagramme de séquence — Processus de paiement (vue simplifiée)}
+
+Le diagramme de séquence (Figure~\ref{fig:seq_noir}) décrit le scénario de paiement
+du point de vue du client et de l'application. Le client accède à la page de paiement
+avec les identifiants de séance et de sièges, saisit ses informations personnelles
+et bancaires, puis soumet le paiement. L'application traite la transaction et retourne,
+selon le résultat, une confirmation avec le QR Code et la référence de réservation
+(\textit{paiement accepté}), ou un message d'erreur avec possibilité de réessayer
+(\textit{paiement refusé}).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.88\textwidth]{images/daigramme/sequenceNoirePaiement}
+    \caption{Diagramme de séquence — Processus de paiement (vue simplifiée)}
+    \label{fig:seq_noir}
+\end{figure}
+
+%----  Séquence paiement (blanche / détaillée)  --------------
+\subsubsection{Diagramme de séquence — Processus de paiement (vue détaillée)}
+
+Le diagramme de séquence détaillé (Figure~\ref{fig:seq_blanc}) présente l'ensemble
+des composants impliqués : le Client, le service de paiement frontend, le Payment
+Controller, et les entités \texttt{Paiement}, \texttt{Réservation} et \texttt{Siège}.
+Le flux distingue la phase de blocage temporaire des sièges, la validation du
+formulaire, la soumission via l'API \texttt{POST /api/payment}, l'initiation de
+la transaction auprès de la passerelle de paiement, puis les deux branches
+alternatives~: en cas d'acceptation, la réservation est créée, le QR Code est
+généré et les sièges sont marqués comme réservés~; en cas de refus, les sièges
+sont libérés et un message d'erreur est retourné au client.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{images/daigramme/SequencepaiementB}
+    \caption{Diagramme de séquence — Processus de paiement (vue détaillée)}
+    \label{fig:seq_blanc}
+\end{figure}
+
+%------------------------------------------------------------
 \section{Choix de conception}
-Les choix de conception ont été faits pour garantir une architecture claire, évolutive et facile à maintenir.
+%------------------------------------------------------------
 
+Plusieurs décisions architecturales importantes ont été prises afin de garantir
+la robustesse, la maintenabilité et la scalabilité de la solution~:
+
+\begin{itemize}
+    \item \textbf{Architecture modulaire NestJS} : chaque domaine métier est
+          encapsulé dans un module indépendant, favorisant la séparation des
+          responsabilités.
+    \item \textbf{Transactions PostgreSQL} : la création d'une réservation est
+          encapsulée dans une transaction atomique (\texttt{QueryRunner}) afin de
+          garantir la cohérence des données en cas d'erreur concurrente.
+    \item \textbf{Verrouillage temporaire des sièges} : un mécanisme de blocage
+          (\textit{soft lock}) avec expiration automatique prévient les doubles
+          réservations sans bloquer les places indéfiniment.
+    \item \textbf{Webhooks Stripe} : la confirmation de paiement repose sur les
+          webhooks Stripe, garantissant la fiabilité de la transaction même en cas
+          d'interruption côté client.
+    \item \textbf{Génération du QR Code côté serveur} : les QR Codes sont générés
+          et stockés côté backend afin d'en garantir l'unicité et l'intégrité.
+    \item \textbf{JWT stateless} : l'authentification par tokens JWT sans état côté
+          serveur permet une scalabilité horizontale sans session partagée.
+\end{itemize}
+
+%------------------------------------------------------------
 \section{Conclusion du chapitre}
-La conception retenue assure une bonne séparation des responsabilités et prépare l'implémentation.
+%------------------------------------------------------------
 
-
+Ce chapitre a présenté la conception complète du système CinePass à travers son
+architecture trois-niveaux, son modèle de données et l'ensemble des diagrammes UML
+élaborés pour modéliser les cas d'utilisation, les activités et les séquences
+d'interaction. Les choix de conception retenus assurent une séparation claire des
+responsabilités, une gestion robuste des données critiques et une expérience
+utilisateur fluide. Ces éléments constituent la base solide sur laquelle repose
+l'implémentation détaillée présentée dans le chapitre suivant.
 % ============================================================
 % CHAPTER 4 — Gestion du projet et Collaboration
 \chapter{Gestion du projet et Collaboration}
