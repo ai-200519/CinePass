@@ -29,25 +29,112 @@
 \titleformat{\chapter}[display]{\bfseries\Huge}{\chaptername\ \thechapter}{12pt}{\Huge}
 \titlespacing*{\chapter}{0pt}{-10pt}{20pt}
 
+
+
+\geometry{
+    top=2cm,
+    bottom=2cm,
+    left=2.5cm,
+    right=2.5cm
+}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    urlcolor=blue,
+    citecolor=black
+}
+
 \begin{document}
 
 %============================================================
-% Page de garde
+% PAGE DE GARDE
 %============================================================
 \begin{titlepage}
-\centering
-\vspace*{2cm}
-{\Huge\bfseries Rapport de projet CinePass\par}
-\vspace{1cm}
-{\Large Plateforme de réservation de billets et gestion des salles de cinéma\par}
-\vfill
-{\Large Réalisé par : Yassine EL AOUNI\par}
-{\Large Année universitaire : 2024/2025\par}
+
+    \noindent\textcolor{gray}{\rule{\linewidth}{0.8pt}}
+    \vspace{0.3cm}
+
+    % ── Logos : FSTE à gauche, ILIA à droite ──────────────────
+    \noindent
+    \begin{tabularx}{\textwidth}{X r}
+        \includegraphics[height=2cm]{images/fste.png}
+        &
+        \includegraphics[height=1.6cm]{images/ILIA.png}\\
+    \end{tabularx}
+
+    \vspace{0.3cm}
+    \noindent\textcolor{gray}{\rule{\linewidth}{0.8pt}}
+
+    \vspace{1.2cm}
+
+    \begin{center}
+        \textit{Cycle d'ingénieur en}\\[0.3cm]
+        {\large \textbf{Ingénierie Logicielle et Intelligence Artificielle}}
+    \end{center}
+
+    \vspace{0.8cm}
+    \noindent\textcolor{gray}{\rule{\linewidth}{0.5pt}}
+    \vspace{0.8cm}
+
+    \begin{center}
+        {\LARGE \textbf{RAPPORT DE PROJET}}\\[0.5cm]
+        \textit{sous le thème}\\[0.8cm]
+        {\Large \textbf{Application Web Système de Réservation}}\\[0.3cm]
+        {\Large \textbf{de Places dans un Cinéma}}
+    \end{center}
+
+    \vspace{0.8cm}
+    \noindent\textcolor{gray}{\rule{\linewidth}{0.5pt}}
+
+    \vfill
+
+    \noindent
+    \begin{tabularx}{\textwidth}{X X}
+        \textbf{Effectué par :} & \textbf{Encadré par :} \\[0.2cm]
+        Abdessami Aglagal       & Pr. Jihan Elkhraoui    \\[0.2cm]
+        Yassine El aouni        & Pr. Zakiria Ithroui    \\[0.2cm]
+        Ayoub Boukili           &                        \\[0.2cm]
+        Ayeman Alhyani          &                        \\
+    \end{tabularx}
+    
+    \vfill
+
+
+
+
+
+    \begin{center}
+        \textbf{ANNÉE UNIVERSITAIRE 2025-2026}
+    \end{center}
+
+    \vspace{0.3cm}
+    \noindent\textcolor{gray}{\rule{\linewidth}{0.8pt}}
+
 \end{titlepage}
 
+
+%============================================================
+% TABLE DES MATIÈRES
+%============================================================
 \tableofcontents
+\newpage
+
+%============================================================
+% LISTE DES FIGURES
+%============================================================
 \listoffigures
+\newpage
+
+%============================================================
+% LISTE DES TABLEAUX
+%============================================================
 \listoftables
+\newpage
+
+
+%============================================================
+% INTRODUCTION GÉNÉRALE
 %============================================================
 \chapter*{Introduction générale}
 \addcontentsline{toc}{chapter}{Introduction générale}
@@ -248,26 +335,155 @@ Au-delà des fonctionnalités, CinePass doit respecter des contraintes de qualit
 
 Ce chapitre a permis de définir le périmètre fonctionnel et non fonctionnel de la plateforme \textbf{CinePass}, d'identifier les acteurs impliqués ainsi que les contraintes métiers et techniques prioritaires. Les éléments présentés servent de base à la conception détaillée : les choix d'architecture, le modèle de données et les diagrammes UML qui suivent visent à traduire ces besoins en une structure technique exploitable.
 
+%============================================================
 \chapter{Conception du système}
+%============================================================
 
+\section{Introduction}
+
+Ce chapitre présente la conception détaillée du système CinePass. Il décrit l'architecture
+globale adoptée, le modèle de données, ainsi que les différents diagrammes UML élaborés
+pour modéliser le comportement et la structure de la plateforme. Ces éléments constituent
+le socle technique sur lequel repose l'implémentation du système.
+
+%------------------------------------------------------------
 \section{Architecture globale du système}
-CinePass repose sur une architecture client-serveur avec séparation entre le frontend, le backend et la base de données.
+%------------------------------------------------------------
 
+CinePass repose sur une architecture client-serveur à trois niveaux
+(\textit{three-tier architecture}) assurant une séparation claire entre la
+présentation, la logique métier et la persistance des données~:
+
+\begin{itemize}
+    \item \textbf{Couche présentation (Frontend)} : application React/TypeScript
+          compilée avec Vite, accessible depuis un navigateur web ou un appareil mobile.
+    \item \textbf{Couche métier (Backend)} : API RESTful développée avec NestJS et
+          Node.js, exposant les endpoints consommés par les clients.
+    \item \textbf{Couche données (Base de données)} : système PostgreSQL hébergeant
+          l'ensemble des entités persistantes du système.
+\end{itemize}
+
+Les échanges entre le frontend et le backend s'effectuent via des requêtes HTTP
+sécurisées, avec authentification par JSON Web Token (JWT). Les services tiers
+(Stripe pour le paiement, Nodemailer pour les notifications par e-mail) sont intégrés
+côté backend via leurs SDK respectifs.
+
+%------------------------------------------------------------
 \section{Conception de la base de données}
-Le modèle de données regroupe les entités essentielles : utilisateur, film, salle, séance, siège, réservation et paiement.
+%------------------------------------------------------------
 
+Le modèle de données de CinePass regroupe les entités essentielles suivantes~:
+
+\begin{itemize}
+    \item \textbf{Utilisateur} : informations du compte, rôle (client, staff, admin),
+          statut d'activation et mot de passe haché.
+    \item \textbf{Film} : titre, affiche, description, durée, genre, classification
+          et statut de diffusion.
+    \item \textbf{Cinéma} : nom, adresse, ville et liste des salles associées.
+    \item \textbf{Salle} : numéro, capacité, technologie de projection et liste
+          des sièges.
+    \item \textbf{Séance} : film projeté, salle utilisée, date, heure de début
+          et statut.
+    \item \textbf{Siège} : numéro, rangée, type (standard, VIP) et statut de
+          disponibilité par séance.
+    \item \textbf{Réservation} : référence unique, utilisateur, séance, sièges
+          choisis, statut et date de création.
+    \item \textbf{Paiement} : montant, méthode, référence de transaction Stripe,
+          statut et horodatage.
+\end{itemize}
+
+Les relations entre ces entités sont définies par des contraintes de clés étrangères
+garantissant l'intégrité référentielle des données. Un mécanisme de verrouillage
+temporaire des sièges sélectionnés est mis en place afin d'éviter les doubles
+réservations.
+
+%------------------------------------------------------------
 \section{Diagrammes UML}
-Cette partie présente les diagrammes qui formalisent le comportement et la structure du système.
+%------------------------------------------------------------
 
 \subsection{Diagramme de cas d'utilisation}
-Le diagramme de cas d'utilisation montre les interactions principales entre les acteurs et la plateforme.
 
-\subsection{Diagramme de classes}
-Le diagramme de classes décrit les relations entre les entités métier du système.
+Le diagramme de cas d'utilisation (Figure~\ref{fig:usecase}) illustre les interactions
+principales entre les trois acteurs du système — Client, Staff et Administrateur —
+et les fonctionnalités offertes par la plateforme CinePass. Le Client peut s'authentifier,
+consulter le catalogue, réserver des places et effectuer un paiement en ligne. Le Staff
+valide les entrées via scan de QR Code ou saisie manuelle. L'Administrateur gère
+l'ensemble des entités du système depuis son dashboard dédié.
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.92\textwidth]{images/diagrammes/useCase.png}
+    \caption{Diagramme de cas d'utilisation — CinePass}
+    \label{fig:usecase}
+\end{figure}
+
+%------------------------------------------------------------
+\subsection{Diagrammes d'activité}
+
+Les diagrammes d'activité modélisent le comportement dynamique du système pour
+chacun des acteurs principaux, en décrivant les enchaînements d'actions et les
+points de décision.
+
+%----  Activité Admin  ---------------------------------------
+\subsubsection{Diagramme d'activité — Administrateur}
+
+Le diagramme d'activité de l'administrateur (Figure~\ref{fig:activity_admin}) décrit
+le flux d'actions disponibles après authentification : gestion des films (ajout,
+modification, suppression), gestion des salles, planification des séances, consultation
+des réservations, configuration de la tarification, consultation des analytics et
+gestion des paramètres système. Chaque action administrative déclenche une validation
+des données côté système avant enregistrement, avec retour d'une erreur en cas de
+données invalides.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.82\textwidth]{images/daigramme/ActivityAdmin}
+    \caption{Diagramme d'activité — Administrateur}
+    \label{fig:activity_admin}
+\end{figure}
+
+%----  Activité Client  --------------------------------------
+\subsubsection{Diagramme d'activité — Client}
+
+Le diagramme d'activité du client (Figure~\ref{fig:activity_client}) représente
+le parcours complet d'un spectateur sur la plateforme : accès à l'application,
+authentification (optionnelle pour la consultation du catalogue), recherche et
+sélection d'un film, choix d'une séance, sélection des sièges disponibles,
+paiement en ligne et téléchargement du billet numérique. Les branches
+conditionnelles modélisent les cas où l'utilisateur n'est pas connecté, où
+aucun film n'est trouvé, ou encore où le paiement est refusé.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.82\textwidth]{images/daigramme/ActivityClient}
+    \caption{Diagramme d'activité — Client}
+    \label{fig:activity_client}
+\end{figure}
+
+%----  Activité Staff  ---------------------------------------
+\subsubsection{Diagramme d'activité — Staff}
+
+Le diagramme d'activité du staff (Figure~\ref{fig:activity_staff}) décrit le
+processus de validation d'entrée en salle. Après authentification sur l'application
+mobile CinePass Staff, l'agent choisit entre le scan du QR Code et la saisie
+manuelle de la référence. Le système vérifie la validité du billet en base de
+données (statut payé, non utilisé, séance correspondante) et retourne un retour
+visuel vert (entrée autorisée) ou rouge (entrée refusée avec motif). Le billet
+validé est immédiatement marqué comme utilisé afin d'empêcher toute réutilisation.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.82\textwidth]{images/daigramme/ActivityStaff}
+    \caption{Diagramme d'activité — Staff}
+    \label{fig:activity_staff}
+\end{figure}
+
+%------------------------------------------------------------
 \subsection{Diagrammes de séquence}
-Les diagrammes de séquence illustrent les scénarios clés comme la réservation d'une séance et le paiement.
 
+Les diagrammes de séquence modélisent les interactions temporelles entre les
+acteurs et les composants du système pour le scénario clé de paiement et de
+réservation.
 
 
 \subsubsection{Scénario : Réserver des places}
@@ -318,14 +534,14 @@ Les diagrammes de séquence illustrent les scénarios clés comme la réservatio
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\linewidth]{blanch.png}
+    \includegraphics[width=0.8\linewidth]{images/daigramme/blanch.png}
     \caption{Diagramme de séquence : Boite Noir - Réserver des places}
     \label{fig:placeholder}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\linewidth]{noir.png}
+    \includegraphics[width=1\linewidth]{images/daigramme/noir.png}
     \caption{Diagramme de séquence : Boite Blanche - Réserver des places}
     \label{fig:placeholder}
 \end{figure}
@@ -368,547 +584,720 @@ sont libérés et un message d'erreur est retourné au client.
     \label{fig:seq_blanc}
 \end{figure}
 
+%------------------------------------------------------------
+\subsection{Diagramme de classes métier}
+
+Le diagramme de classes métier (Figure~\ref{fig:class_metier}) présente
+les entités principales du domaine (Utilisateur, Film, Seance, Reservation,
+Paiement, Salle, Cinema, Siege) ainsi que leurs relations. Il sert de base
+conceptuelle pour comprendre la structure des données et les liens entre les
+objets métier de CinePass.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{images/diagrammes/Class Metier (analyse).png}
+    \caption{Diagramme de classes métier — CinePass}
+    \label{fig:class_metier}
+\end{figure}
+
+\subsection{Diagramme d'etats-transitions — Reservation}
+
+Le diagramme d'etats-transitions (Figure~\ref{fig:reservation_state})
+illustre le cycle de vie d'une reservation : creation, etat en cours,
+paiement valide, validation de l'entree et fin de seance. Il clarifie
+les evenements qui provoquent chaque changement d'etat et les actions
+associees (generation du QR code, liberation des sieges, notifications).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.92\textwidth]{images/diagrammes/reservation state diagramme.png}
+    \caption{Diagramme d'etats-transitions — Reservation}
+    \label{fig:reservation_state}
+\end{figure}
+
+%------------------------------------------------------------
+\subsection{Diagramme de classes de conception (CSR)}
+
+Le diagramme de classes de conception (Figure~\ref{fig:class_conception})
+décline la solution en trois couches conformément au pattern CSR de NestJS
+(Controller, Service, Repository). Cette séparation met en évidence le flux
+des requêtes, la logique métier et l'accès aux données, tout en favorisant la
+maintenabilité et l'isolation des responsabilités.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.2\textwidth]{images/diagrammes/Class technique (conception).png}
+    \caption{Diagramme de classes de conception — pattern CSR (NestJS)}
+    \label{fig:class_conception}
+\end{figure}
+
+%------------------------------------------------------------
+
+%------------------------------------------------------------
 \section{Choix de conception}
-Les choix de conception ont été faits pour garantir une architecture claire, évolutive et facile à maintenir.
+%------------------------------------------------------------
 
+Plusieurs décisions architecturales importantes ont été prises afin de garantir
+la robustesse, la maintenabilité et la scalabilité de la solution~:
+
+\begin{itemize}
+    \item \textbf{Architecture modulaire NestJS} : chaque domaine métier est
+          encapsulé dans un module indépendant, favorisant la séparation des
+          responsabilités.
+    \item \textbf{Transactions PostgreSQL} : la création d'une réservation est
+          encapsulée dans une transaction atomique (\texttt{QueryRunner}) afin de
+          garantir la cohérence des données en cas d'erreur concurrente.
+    \item \textbf{Verrouillage temporaire des sièges} : un mécanisme de blocage
+          (\textit{soft lock}) avec expiration automatique prévient les doubles
+          réservations sans bloquer les places indéfiniment.
+    \item \textbf{Webhooks Stripe} : la confirmation de paiement repose sur les
+          webhooks Stripe, garantissant la fiabilité de la transaction même en cas
+          d'interruption côté client.
+    \item \textbf{Génération du QR Code côté serveur} : les QR Codes sont générés
+          et stockés côté backend afin d'en garantir l'unicité et l'intégrité.
+    \item \textbf{JWT stateless} : l'authentification par tokens JWT sans état côté
+          serveur permet une scalabilité horizontale sans session partagée.
+\end{itemize}
+
+%------------------------------------------------------------
 \section{Conclusion du chapitre}
-La conception retenue assure une bonne séparation des responsabilités et prépare l'implémentation.
+%------------------------------------------------------------
 
-
+Ce chapitre a présenté la conception complète du système CinePass à travers son
+architecture trois-niveaux, son modèle de données et l'ensemble des diagrammes UML
+élaborés pour modéliser les cas d'utilisation, les activités et les séquences
+d'interaction. Les choix de conception retenus assurent une séparation claire des
+responsabilités, une gestion robuste des données critiques et une expérience
+utilisateur fluide. Ces éléments constituent la base solide sur laquelle repose
+l'implémentation détaillée présentée dans le chapitre suivant.
 % ============================================================
 % CHAPTER 4 — Gestion du projet et Collaboration
 \chapter{Gestion du projet et Collaboration}
-
-% ── Chapter intro quote box (optional — remove if not needed)
-\begin{center}
-\textit{``La réussite d'un projet logiciel repose autant sur 
-l'organisation de l'équipe que sur la qualité du code.''}
-\end{center}
-
+ 
 % ============================================================
 \section{Introduction}
 % ============================================================
-
-Ce chapitre présente l'organisation et la gestion du projet 
-\textbf{CinePass} tout au long de son cycle de développement. 
-Nous décrivons les outils utilisés pour la planification, 
-le suivi des tâches et la collaboration entre les membres de 
-l'équipe, notamment \textbf{Jira} pour la gestion Scrum et 
-\textbf{Git/GitHub} pour le versionnement et l'intégration 
-du code.
-
+ 
+Ce chapitre présente l'organisation et la gestion du projet
+\textbf{CinePass} tout au long de son cycle de développement.
+Nous décrivons les outils utilisés pour la planification,
+le suivi des tâches et la collaboration entre les membres de
+l'équipe, notamment \textbf{Jira} pour la gestion Scrum et
+\textbf{Git/GitHub} pour le versionnement et l'intégration
+du code source.
+ 
 % ============================================================
 \section{Outils de gestion du projet}
 % ============================================================
-
+ 
 \subsection{Jira}
+ 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.30\textwidth]{images/Jira_Logo}
+    \label{fig:jira}
+\end{figure}
 
-Jira est un outil de gestion de projet développé par 
-Atlassian, largement utilisé dans les équipes appliquant 
-les méthodologies agiles. Dans le cadre de CinePass, Jira 
+\textbf{Jira} est un outil de gestion de projet développé par
+Atlassian, largement adopté dans les équipes appliquant
+les méthodologies agiles. Dans le cadre de CinePass, Jira
 a été utilisé pour~:
-
+ 
 \begin{itemize}
     \item Créer et organiser le \textbf{Product Backlog}
-    \item Rédiger et prioriser les \textbf{User Stories}
+          en Epics et User Stories
+    \item Rédiger et prioriser les User Stories
+          avec estimation en Story Points
     \item Planifier et suivre les \textbf{Sprints}
     \item Assigner les tâches aux membres de l'équipe
-    \item Suivre l'avancement via le tableau \textbf{Kanban}
-    \item Générer les rapports de sprint (Burndown Chart)
+    \item Suivre l'avancement via le tableau Scrum Board
 \end{itemize}
-
+ 
 \subsection{Git et GitHub}
+ 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.45\textwidth]{images/git_github logo.png}
+    \label{fig:git}
+\end{figure}
 
-Git est le système de contrôle de version distribué utilisé 
-pour gérer le code source du projet. GitHub a été utilisé 
-comme plateforme d'hébergement centralisée permettant~:
-
+\textbf{Git} est le système de contrôle de version utilisé pour
+gérer le code source du projet. \textbf{GitHub} a servi de plateforme
+d'hébergement centralisée permettant~:
+ 
 \begin{itemize}
-    \item Le versionnement continu du code
+    \item Le versionnement continu du code source
     \item La gestion des branches par User Story
     \item La revue de code via les \textbf{Pull Requests}
     \item La traçabilité entre tickets Jira et commits Git
-    \item La protection de la branche principale \texttt{main}
 \end{itemize}
-
+ 
 % ============================================================
 \section{Product Backlog}
 % ============================================================
-
-Le Product Backlog regroupe l'ensemble des User Stories du 
-projet CinePass, priorisées selon la méthode \textbf{MoSCoW} 
-et estimées en \textbf{Story Points}. Le tableau suivant 
-présente un résumé du backlog organisé par sprint.
-
-% ── Backlog table ─────────────────────────────────────────────
+ 
+Le Product Backlog du projet CinePass regroupe l'ensemble
+des User Stories organisées en six Epics couvrant toutes
+les fonctionnalités du système. Chaque User Story est
+estimée en Story Points et assignée à un développeur selon
+sa spécialité (back-end ou front-end).
+ 
+% ── EP-01 ────────────────────────────────────────────────────
+\subsection*{EP-01 — Authentification \& Compte}
+ 
 \begin{table}[H]
 \centering
-\caption{Product Backlog — CinePass}
-\label{tab:backlog}
-\renewcommand{\arraystretch}{1.4}
-\begin{tabular}{|c|p{5.5cm}|c|c|c|}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{|c|p{3.8cm}|p{6.2cm}|c|c|}
 \hline
-\rowcolor{gray!25}
-\textbf{ID} & \textbf{User Story} & \textbf{Sprint} 
-            & \textbf{Points} & \textbf{Priorité} \\
+\rowcolor{gray!20}
+\textbf{ID} & \textbf{Titre} & \textbf{Description} 
+            & \textbf{Dev} & \textbf{Pts} \\
 \hline
-US-01 & S'inscrire et se connecter (OTP) & S1 & 8 & Must \\
+US-01 &
+API inscription et connexion &
+Implémenter POST /auth/register et POST /auth/login
+avec JWT, validation des données et gestion des erreurs
+(email déjà utilisé, mot de passe incorrect).
+&
+Aymane (Back) & 5 \\
 \hline
-US-02 & Réinitialiser le mot de passe & S1 & 5 & Must \\
+US-02 &
+Pages inscription, connexion et mot de passe oublié &
+Formulaires d'inscription, connexion et réinitialisation
+de mot de passe avec validation côté client, messages
+d'erreur et stockage du token JWT après connexion. &
+Yassine (Front) & 5 \\
 \hline
-US-03 & Gérer les films (Admin CRUD) & S1 & 5 & Must \\
-\hline
-US-04 & Gérer les séances et salles (Admin) & S1 & 5 & Must \\
-\hline
-US-05 & API tarification, réservations Admin et analytics & S1 & 8 & Must \\
-\hline
-US-06 & Gérer les utilisateurs (Admin) & S1 & 3 & Must \\
-\hline
-US-07 & Disponibilité des sièges & S2 & 8 & Must \\
-\hline
-US-08 & Création de réservation & S2 & 8 & Must \\
-\hline
-US-09 & API profil et historique des réservations & S2 & 5 & Must \\
-\hline
-US-10 & Paiement en ligne via Stripe & S3 & 8 & Must \\
-\hline
-US-11 & Génération QR Code et billet & S3 & 5 & Must \\
-\hline
-US-12 & Notifications par email & S3 & 3 & Should \\
-\hline
-US-13 & Validation d'entrée par le Staff & S4 & 5 & Should \\
-\hline
-US-14 & Tableau de bord analytique & S4 & 5 & Should \\
-\hline
-US-15 & Tests et documentation finale & S4 & 3 & Could \\
+US-03 &
+Réinitialisation du mot de passe (OTP) &
+POST /auth/forgot-password (envoi OTP),
+POST /auth/verify-otp (validation du code),
+POST /auth/reset-password (mise à jour du mot de passe).
+Gestion des expirations, tentatives et messages d'erreur. &
+Aymane (Back) & 5 \\
 \hline
 \end{tabular}
+\caption{EP-01 — Authentification \& Compte}
+\label{tab:ep01}
 \end{table}
-
+ 
+% ── EP-02 ────────────────────────────────────────────────────
+\subsection*{EP-02 — Catalogue \& Recherche de Films}
+ 
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{|c|p{3.8cm}|p{6.2cm}|c|c|}
+\hline
+\rowcolor{gray!20}
+\textbf{ID} & \textbf{Titre} & \textbf{Description}
+            & \textbf{Dev} & \textbf{Pts} \\
+\hline
+US-04 &
+API catalogue films &
+Exposer GET /films (liste paginée avec filtres),
+GET /films/:id (détail complet) et
+GET /films/search?q= (recherche par titre ou genre).
+Réponses incluant titre, synopsis, affiche, durée,
+séances et note moyenne. &
+Ayoub (Back) & 5 \\
+\hline
+US-05 &
+Interface catalogue, détail film et recherche &
+Cards films avec affiche et infos clés, page détail
+(synopsis, séances, bande-annonce), barre de recherche
+avec résultats dynamiques sans rechargement de page. &
+Abdessami (Front) & 8 \\
+\hline
+\end{tabular}
+\caption{EP-02 — Catalogue \& Recherche de Films}
+\label{tab:ep02}
+\end{table}
+ 
+% ── EP-03 ────────────────────────────────────────────────────
+\subsection*{EP-03 — Réservation \& Paiement}
+ 
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{|c|p{3.8cm}|p{6.2cm}|c|c|}
+\hline
+\rowcolor{gray!20}
+\textbf{ID} & \textbf{Titre} & \textbf{Description}
+            & \textbf{Dev} & \textbf{Pts} \\
+\hline
+US-06 &
+API réservation, sièges et paiement &
+GET /seances/:id (disponibilité sièges),
+POST /reservations (créer réservation avec sièges),
+POST /paiement (intégration Stripe),
+génération automatique billet PDF avec QR Code unique
+après paiement confirmé. Gestion des conflits
+de réservation simultanée par transaction. &
+Aymane (Back) & 8 \\
+\hline
+US-07 &
+Interface réservation — séance, sièges et paiement &
+Choix de séance, plan de salle interactif
+(sièges libres/occupés), sélection des places,
+formulaire de paiement bancaire sécurisé,
+récapitulatif de commande et confirmation après paiement. &
+Yassine (Front) & 8 \\
+\hline
+\end{tabular}
+\caption{EP-03 — Réservation \& Paiement}
+\label{tab:ep03}
+\end{table}
+ 
+% ── EP-04 ────────────────────────────────────────────────────
+\subsection*{EP-04 — Billet \& Espace Client}
+ 
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{|c|p{3.8cm}|p{6.2cm}|c|c|}
+\hline
+\rowcolor{gray!20}
+\textbf{ID} & \textbf{Titre} & \textbf{Description}
+            & \textbf{Dev} & \textbf{Pts} \\
+\hline
+US-08 &
+API profil, historique et billets &
+GET /profil, GET /reservations (historique avec statut),
+GET /billets/:id (billet avec QR code et référence unique),
+téléchargement PDF. Toutes les routes protégées par JWT. &
+Ayoub (Back) & 5 \\
+\hline
+US-09 &
+Interface espace client &
+Consultation du profil, historique des réservations
+avec statut, affichage des billets avec QR code visible
+et bouton de téléchargement PDF. &
+Abdessami (Front) & 5 \\
+\hline
+\end{tabular}
+\caption{EP-04 — Billet \& Espace Client}
+\label{tab:ep04}
+\end{table}
+ 
+% ── EP-05 ────────────────────────────────────────────────────
+\subsection*{EP-05 — Validation Entrée (Staff)}
+ 
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{|c|p{3.8cm}|p{6.2cm}|c|c|}
+\hline
+\rowcolor{gray!20}
+\textbf{ID} & \textbf{Titre} & \textbf{Description}
+            & \textbf{Dev} & \textbf{Pts} \\
+\hline
+US-10 &
+API validation billets par QR code et référence &
+POST /validate/qr (validation via QR code scanné)
+et POST /validate/ref (validation manuelle par référence).
+Vérification de validité, non-utilisation, séance correcte
+et marquage comme utilisé. Réservé aux comptes Staff. &
+Aymane (Back) & 5 \\
+\hline
+US-11 &
+Interface staff — scan QR et vérification manuelle &
+Scanner QR code via caméra ou saisie manuelle de référence.
+Affichage instantané du résultat (valide / invalide /
+déjà utilisé) avec retour visuel clair. &
+Yassine (Front) & 5 \\
+\hline
+\end{tabular}
+\caption{EP-05 — Validation Entrée (Staff)}
+\label{tab:ep05}
+\end{table}
+ 
+% ── EP-06 ────────────────────────────────────────────────────
+\subsection*{EP-06 — Dashboard Administrateur}
+ 
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{|c|p{3.8cm}|p{6.2cm}|c|c|}
+\hline
+\rowcolor{gray!20}
+\textbf{ID} & \textbf{Titre} & \textbf{Description}
+            & \textbf{Dev} & \textbf{Pts} \\
+\hline
+US-12 &
+API administration — films, séances, tarifs et analytics &
+CRUD complets films (POST/PUT/DELETE /films),
+séances (POST/PUT/DELETE /seances),
+tarification (GET/PUT /tarifs),
+réservations admin (GET /admin/reservations),
+statistiques (GET /stats — ventes, taux occupation,
+revenus). Toutes les routes requièrent le rôle Admin. &
+Ayoub (Back) & 8 \\
+\hline
+US-13 &
+Interface dashboard admin complet &
+Dashboard centralisé avec navigation latérale~:
+gestion films (CRUD + upload affiche), séances
+(calendrier + création), réservations (liste + filtres),
+tarification, analytics avec graphiques,
+et paramètres système. &
+Abdessami (Front) & 13 \\
+\hline
+\end{tabular}
+\caption{EP-06 — Dashboard Administrateur}
+\label{tab:ep06}
+\end{table}
+ 
+% ── Backlog summary ───────────────────────────────────────────
+\subsection*{Récapitulatif du Product Backlog}
+ 
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{|c|l|c|c|}
+\hline
+\rowcolor{gray!20}
+\textbf{Epic} & \textbf{Domaine} 
+              & \textbf{User Stories} & \textbf{Total Points} \\
+\hline
+EP-01 & Authentification \& Compte       & US-01, US-02, US-03 & 15 \\
+\hline
+EP-02 & Catalogue \& Recherche Films     & US-04, US-05 & 13 \\
+\hline
+EP-03 & Réservation \& Paiement          & US-06, US-07 & 16 \\
+\hline
+EP-04 & Billet \& Espace Client          & US-08, US-09 & 10 \\
+\hline
+EP-05 & Validation Entrée Staff          & US-10, US-11 & 10 \\
+\hline
+EP-06 & Dashboard Administrateur         & US-12, US-13 & 21 \\
+\hline
+\rowcolor{gray!10}
+\multicolumn{2}{|c|}{\textbf{Total}} & \textbf{13 US} & \textbf{85 pts} \\
+\hline
+\end{tabular}
+\caption{Récapitulatif global du Product Backlog}
+\label{tab:backlog_recap}
+\end{table}
+ 
 % ============================================================
 \section{Organisation en Sprints}
 % ============================================================
-
-Le projet CinePass a été organisé en \textbf{4 sprints} 
-d'une durée de deux semaines chacun, conformément à la 
-méthodologie Scrum. Chaque sprint a un objectif clair et 
-un ensemble de User Stories assignées aux membres de 
-l'équipe.
-
+ 
+Le projet CinePass a été organisé en \textbf{sprints}
+conformément à la méthodologie Scrum. Chaque sprint dispose
+d'un objectif clair et d'un ensemble de User Stories
+réparties entre les membres de l'équipe selon leur
+spécialité.
+ 
 % ── Sprint 1 ──────────────────────────────────────────────────
-\subsection{Sprint 1 — Infrastructure, Authentification et 
-            Back-office Admin}
-
-\textbf{Objectif~:} Mettre en place l'infrastructure technique 
-de base, implémenter l'authentification complète avec OTP, 
-et développer les premières fonctionnalités du back-office 
-administrateur.
-
+\subsection{Sprint 1 — Authentification, Back-office Admin et Dashboard}
+ 
+\textbf{Objectif~:} Mettre en place l'infrastructure technique,
+implémenter l'authentification complète avec OTP et JWT,
+et développer les fonctionnalités du back-office
+administrateur (CRUD films, séances, salles, sièges,
+tarification et analytics).
+ 
 \begin{table}[H]
 \centering
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{|c|p{4cm}|l|c|}
+\hline
+\rowcolor{gray!20}
+\textbf{US} & \textbf{Titre} & \textbf{Développeur} & \textbf{Statut} \\
+\hline
+US-01 & API inscription et connexion & Aymane (Back) &
+\textcolor{green!60!black}{\textbf{Done}} \\
+\hline
+US-02 & Pages inscription, connexion et mot de passe oublié & Yassine (Front) &
+\textcolor{green!60!black}{\textbf{Done}} \\
+\hline
+US-03 & Réinitialisation du mot de passe (OTP) & Aymane (Back) &
+\textcolor{green!60!black}{\textbf{Done}} \\
+\hline
+US-12 & API administration — films, séances, tarifs & Ayoub (Back) &
+\textcolor{green!60!black}{\textbf{Done}} \\
+\hline
+US-13 & Interface dashboard admin & Abdessami (Front) &
+\textcolor{green!60!black}{\textbf{Done}} \\
+\hline
+\end{tabular}
 \caption{Répartition des tâches — Sprint 1}
 \label{tab:sprint1}
-\renewcommand{\arraystretch}{1.4}
-\begin{tabular}{|p{4cm}|p{5cm}|c|c|}
-\hline
-\rowcolor{gray!25}
-\textbf{User Story} & \textbf{Sous-tâches principales} 
-                    & \textbf{Dev} & \textbf{Statut} \\
-\hline
-US-01 — Authentification & 
-Register, Login, Verify-email, OTP, JWT & 
-Dev 1 & \textcolor{green!60!black}{Done} \\
-\hline
-US-02 — Reset password & 
-Forgot password, Reset OTP, Resend OTP & 
-Dev 1 & \textcolor{green!60!black}{Done} \\
-\hline
-US-03 — Gestion films & 
-CRUD films, filtres, Swagger & 
-Dev 2 & \textcolor{green!60!black}{Done} \\
-\hline
-US-04 — Gestion séances & 
-CRUD séances, salles, sièges & 
-Dev 2 & \textcolor{green!60!black}{Done} \\
-\hline
-US-05 — Tarification et stats & 
-Tarifs, réservations admin, analytics & 
-Dev 3 & \textcolor{green!60!black}{Done} \\
-\hline
-US-06 — Gestion utilisateurs & 
-CRUD utilisateurs, rôles, statuts & 
-Dev 3 & \textcolor{green!60!black}{Done} \\
-\hline
-\end{tabular}
 \end{table}
-
+ 
 % ── Sprint 2 ──────────────────────────────────────────────────
-\subsection{Sprint 2 — Disponibilité des Sièges, Réservation 
-            et Profil Client}
-
-\textbf{Objectif~:} Implémenter le parcours complet du client~: 
-consultation du plan de salle avec disponibilité en temps réel, 
-création de réservation avec transaction sécurisée, gestion du 
-profil et historique des réservations.
-
+\subsection{Sprint 2 — Catalogue, Réservation et Espace Client}
+ 
+\textbf{Objectif~:} Implémenter le catalogue de films avec
+recherche, le parcours complet de réservation avec plan de
+salle interactif, et l'espace client (profil, historique,
+billets).
+ 
 \begin{table}[H]
 \centering
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{|c|p{4cm}|l|c|}
+\hline
+\rowcolor{gray!20}
+\textbf{US} & \textbf{Titre} & \textbf{Développeur} & \textbf{Statut} \\
+\hline
+US-04 & API catalogue films & Ayoub (Back) &
+\textcolor{green!60!black}{\textbf{Done}} \\
+\hline
+US-05 & Interface catalogue et détail film & Abdessami (Front) &
+\textcolor{green!60!black}{\textbf{Done}} \\
+\hline
+US-06 & API réservation, sièges et paiement & Aymane (Back) &
+\textcolor{green!60!black}{\textbf{Done}} \\
+\hline
+US-07 & Interface réservation et paiement & Yassine (Front) &
+\textcolor{green!60!black}{\textbf{Done}} \\
+\hline
+US-08 & API profil, historique et billets & Ayoub (Back) &
+\textcolor{green!60!black}{\textbf{Done}} \\
+\hline
+US-09 & Interface espace client & Abdessami (Front) &
+\textcolor{green!60!black}{\textbf{Done}} \\
+\hline
+\end{tabular}
 \caption{Répartition des tâches — Sprint 2}
 \label{tab:sprint2}
-\renewcommand{\arraystretch}{1.4}
-\begin{tabular}{|p{4cm}|p{5cm}|c|c|}
-\hline
-\rowcolor{gray!25}
-\textbf{User Story} & \textbf{Sous-tâches principales} 
-                    & \textbf{Dev} & \textbf{Statut} \\
-\hline
-US-07 — Disponibilité sièges & 
-Plan de salle, disponibilité par séance, 
-scheduler expiration & 
-Dev 1 & \textcolor{green!60!black}{Done} \\
-\hline
-US-08 — Création réservation & 
-POST /reservation, transaction QueryRunner, 
-annulation & 
-Dev 2 & \textcolor{green!60!black}{Done} \\
-\hline
-US-09 — Profil et historique & 
-GET/PATCH profil, change password, 
-historique réservations & 
-Dev 3 & \textcolor{green!60!black}{Done} \\
-\hline
-\end{tabular}
 \end{table}
-
+ 
 % ── Sprint 3 ──────────────────────────────────────────────────
-\subsection{Sprint 3 — Paiement Stripe, QR Code et 
-            Notifications}
-
-\textbf{Objectif~:} Intégrer la passerelle de paiement Stripe 
-avec gestion des webhooks, générer les QR Codes après 
-confirmation du paiement, et envoyer les notifications par 
-email aux clients.
-
+\subsection{Sprint 3 — Paiement Stripe et Validation Staff}
+ 
+\textbf{Objectif~:} Finaliser l'intégration complète du
+paiement Stripe avec gestion des webhooks, implémenter
+la génération des QR Codes et billets, et développer
+la validation d'entrée par le Staff.
+ 
 \begin{table}[H]
 \centering
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{|c|p{4cm}|l|c|}
+\hline
+\rowcolor{gray!20}
+\textbf{US} & \textbf{Titre} & \textbf{Développeur} & \textbf{Statut} \\
+\hline
+US-06 & Intégration Stripe + QR Code & Aymane (Back) &
+\textcolor{orange!80!black}{\textbf{In Progress}} \\
+\hline
+US-10 & API validation billets QR et référence & Aymane (Back) &
+\textcolor{orange!80!black}{\textbf{In Progress}} \\
+\hline
+US-11 & Interface staff — scan QR & Yassine (Front) &
+\textcolor{orange!80!black}{\textbf{In Progress}} \\
+\hline
+\end{tabular}
 \caption{Répartition des tâches — Sprint 3}
 \label{tab:sprint3}
-\renewcommand{\arraystretch}{1.4}
-\begin{tabular}{|p{4cm}|p{5cm}|c|c|}
-\hline
-\rowcolor{gray!25}
-\textbf{User Story} & \textbf{Sous-tâches principales} 
-                    & \textbf{Dev} & \textbf{Statut} \\
-\hline
-US-10 — Paiement Stripe & 
-Initier paiement, Stripe Gateway, 
-webhook, confirmation & 
-Dev 1 & \textcolor{orange}{In Progress} \\
-\hline
-US-11 — QR Code et billet & 
-Génération QR Code, sauvegarde, 
-retour au client & 
-Dev 2 & \textcolor{orange}{In Progress} \\
-\hline
-US-12 — Notifications email & 
-Templates email OTP, confirmation 
-paiement, Nodemailer & 
-Dev 3 & \textcolor{orange}{In Progress} \\
-\hline
-\end{tabular}
 \end{table}
-
-% ── Add Jira screenshot for Sprint 3 ──────────────────────────
-La figure~\ref{fig:jira_sprint3} présente le tableau Jira du 
-Sprint 3 en cours, illustrant la répartition des User Stories 
-entre les membres de l'équipe et leur état d'avancement.
-
+ 
+La figure~\ref{fig:jira_sprint3} présente le tableau Jira
+du Sprint 3 en cours, illustrant la répartition des User
+Stories et leur état d'avancement au sein de l'équipe.
+ 
 \begin{figure}[H]
     \centering
-    % Replace with your actual Jira screenshot
     \includegraphics[width=0.95\textwidth]{images/sprint 3 board.png}
-    \caption{Tableau Jira — Sprint 3 (en cours)}
+    \caption{Tableau Jira Scrum Board — Sprint 3 (en cours)}
     \label{fig:jira_sprint3}
 \end{figure}
-
-% ── Sprint 4 ──────────────────────────────────────────────────
-\subsection{Sprint 4 — Validation Staff, Dashboard et 
-            Finalisation}
-
-\textbf{Objectif~:} Implémenter la validation d'entrée par le 
-Staff via QR Code, finaliser le tableau de bord analytique, 
-effectuer les tests complets et préparer la documentation 
-finale du projet.
-
-\begin{table}[H]
-\centering
-\caption{Répartition des tâches — Sprint 4 (planifié)}
-\label{tab:sprint4}
-\renewcommand{\arraystretch}{1.4}
-\begin{tabular}{|p{4cm}|p{5cm}|c|c|}
-\hline
-\rowcolor{gray!25}
-\textbf{User Story} & \textbf{Sous-tâches principales} 
-                    & \textbf{Dev} & \textbf{Statut} \\
-\hline
-US-13 — Validation Staff & 
-Scanner QR Code, valider référence, 
-mise à jour statut & 
-Dev 1 & \textcolor{gray}{To Do} \\
-\hline
-US-14 — Dashboard analytique & 
-KPIs, graphiques CA, taux remplissage, 
-comparaison cinémas & 
-Dev 2 & \textcolor{gray}{To Do} \\
-\hline
-US-15 — Tests et documentation & 
-Tests Jest, Swagger complet, 
-rapport final & 
-Dev 3 & \textcolor{gray}{To Do} \\
-\hline
-\end{tabular}
-\end{table}
-
+ 
 % ============================================================
 \section{Diagramme de Gantt}
 % ============================================================
-
-Le diagramme de Gantt présenté dans la 
-figure~\ref{fig:gantt} illustre la planification temporelle 
-du projet CinePass, organisée en 4 sprints de deux semaines 
-chacun. Il montre la répartition des User Stories dans le 
-temps et le travail parallèle entre les membres de l'équipe.
-
+ 
+Le diagramme de Gantt illustré dans la
+figure~\ref{fig:gantt} présente la planification temporelle
+du projet CinePass. Il est organisé en trois groupes
+de tâches principaux~: \textbf{Authentification \& Compte},
+\textbf{Gestion Admin} (cinémas, salles, sièges, films,
+séances, tarification et analytics) et
+\textbf{Espace Client} (catalogue, réservation, profil et
+billet).
+ 
+Les tâches ont démarré le \textbf{1\textsuperscript{er}
+avril 2026} et s'étalent jusqu'au \textbf{22 mai 2026}.
+Le diagramme met en évidence le travail parallèle entre les
+membres de l'équipe, les dépendances entre les tâches et le
+chemin critique.
+ 
 \begin{figure}[H]
     \centering
-    % Replace with your actual Gantt diagram
-    \includegraphics[width=0.95\textwidth]{images/api tarification user story.png}
+    \includegraphics[width=0.98\textwidth]{images/gantt.png}
     \caption{Diagramme de Gantt — Projet CinePass}
     \label{fig:gantt}
 \end{figure}
-
-% ── If you want to generate Gantt with LaTeX (no image needed)
-% Uncomment this block if you have pgfgantt package installed
-%
-% \begin{ganttchart}[
-%     hgrid,
-%     vgrid,
-%     x unit=0.7cm,
-%     y unit title=0.6cm,
-%     y unit chart=0.6cm,
-%     title height=1,
-%     bar height=0.6,
-%     bar label font=\footnotesize,
-%     title label font=\footnotesize,
-%     group label font=\small\bfseries
-% ]{1}{16}
-%     \gantttitle{Sprint 1}{4}
-%     \gantttitle{Sprint 2}{4}
-%     \gantttitle{Sprint 3}{4}
-%     \gantttitle{Sprint 4}{4} \\
-%     \ganttbar{US-01 Auth}{1}{2} \\
-%     \ganttbar{US-02 Reset pwd}{1}{2} \\
-%     \ganttbar{US-03 Films}{3}{4} \\
-%     \ganttbar{US-04 Séances}{3}{4} \\
-%     \ganttbar{US-05 Stats}{3}{4} \\
-%     \ganttbar{US-07 Sièges}{5}{6} \\
-%     \ganttbar{US-08 Réservation}{5}{8} \\
-%     \ganttbar{US-09 Profil}{7}{8} \\
-%     \ganttbar{US-10 Paiement}{9}{12} \\
-%     \ganttbar{US-11 QR Code}{9}{10} \\
-%     \ganttbar{US-12 Email}{11}{12} \\
-%     \ganttbar{US-13 Staff}{13}{14} \\
-%     \ganttbar{US-14 Dashboard}{13}{16} \\
-%     \ganttbar{US-15 Tests}{15}{16} \\
-% \end{ganttchart}
-
+ 
+Les barres \textcolor{red!60!black}{\textbf{rouges}}
+désignent les \textbf{tâches critiques} (chemin critique),
+tandis que les barres \textcolor{blue!60!black}{\textbf{bleues}}
+correspondent aux tâches non critiques. Cette lecture met en
+évidence les activités dont le décalage impacterait
+directement la date de fin du projet.
+ 
 % ============================================================
 \section{Workflow Git et GitHub}
 % ============================================================
-
-\subsection{Structure du dépôt}
-
-Le projet CinePass est hébergé sur GitHub dans un dépôt 
-organisé en deux répertoires principaux~:
-
+ 
+\subsection{Structure du dépôt et stratégie de branches}
+ 
+Le projet CinePass est hébergé sur GitHub dans un dépôt
+organisé en trois répertoires principaux~:
+ 
 \begin{itemize}
-    \item \texttt{/backend} — API NestJS + PostgreSQL
-    \item \texttt{/frontend} — Application React
+    \item \texttt{/backend} — API REST NestJS + PostgreSQL (Neon)
+    \item \texttt{/front} — Application React
+    \item \texttt{/mobile} — Application mobile
 \end{itemize}
 
-\subsection{Stratégie de branches}
-
-L'équipe a adopté une stratégie de branches structurée autour 
-des User Stories Jira. Chaque User Story assignée à un 
-développeur correspond à une branche Git dédiée, créée depuis 
-la branche \texttt{develop}.
-
-\begin{table}[H]
-\centering
-\caption{Convention de nommage des branches Git}
-\label{tab:branches}
-\renewcommand{\arraystretch}{1.4}
-\begin{tabular}{|l|l|}
-\hline
-\rowcolor{gray!25}
-\textbf{Type} & \textbf{Convention} \\
-\hline
-Fonctionnalité & \texttt{feature/US-XX-nom-user-story} \\
-\hline
-Correction bug & \texttt{fix/US-XX-description-bug} \\
-\hline
-Tests & \texttt{test/US-XX-nom-module} \\
-\hline
-Documentation & \texttt{docs/nom-section} \\
-\hline
-\end{tabular}
-\end{table}
-
-\subsection{Workflow de développement}
-
-Le workflow Git adopté par l'équipe suit les étapes 
-suivantes pour chaque User Story~:
-
-\begin{enumerate}
-    \item \textbf{Assignation} — la User Story est assignée 
-          à un développeur sur Jira
-    \item \textbf{Création de branche} — le développeur crée 
-          une branche depuis \texttt{develop}~:
-          \begin{center}
-          \texttt{git checkout -b feature/US-01-auth}
-          \end{center}
-    \item \textbf{Développement et commits} — le développeur 
-          implémente la fonctionnalité avec des commits 
-          réguliers~:
-          \begin{center}
-          \texttt{git commit -m "feat(auth): implement OTP 
-          verification [US-01]"}
-          \end{center}
-    \item \textbf{Push et Pull Request} — une Pull Request 
-          est ouverte sur GitHub vers la branche 
-          \texttt{develop}
-    \item \textbf{Code Review} — un autre membre de 
-          l'équipe révise le code et approuve ou demande 
-          des modifications
-    \item \textbf{Merge} — après validation, la branche est 
-          mergée dans \texttt{develop}
-    \item \textbf{Fin de sprint} — \texttt{develop} est 
-          mergé dans \texttt{main} à la fin de chaque sprint
-\end{enumerate}
-
-La figure~\ref{fig:git_workflow} illustre ce workflow de 
-manière schématique.
+Le dépôt contient également les fichiers de configuration
+globaux (ex.~\texttt{docker-compose.yml} et \texttt{.gitignore}),
+assurant une cohérence d'exécution entre les environnements.
 
 \begin{figure}[H]
     \centering
-    % Replace with your actual GitHub screenshot or workflow diagram
-    \includegraphics[width=0.90\textwidth]{images/sprint 3 in backlog onglet.png}
-    \caption{Workflow Git/GitHub — CinePass}
-    \label{fig:git_workflow}
+    \includegraphics[width=0.95\textwidth]{images/actual branch master with back_front_mobile_dockercompose.png}
+    \caption{Structure du dépôt et branches Git principales}
+    \label{fig:repo-structure}
 \end{figure}
-
-\subsection{Lien Jira et GitHub}
-
-Chaque commit Git référence le ticket Jira correspondant 
-dans son message, permettant une traçabilité complète entre 
-la planification et l'implémentation~:
-
+ 
+ 
+L'équipe a adopté une stratégie de branches structurée
+autour des tickets Jira (format \texttt{SCRUM-XX}). Chaque
+User Story assignée à un développeur correspond à une
+branche Git dédiée, ce qui facilite la traçabilité entre
+les demandes métiers et le code livré.
+ 
 \begin{table}[H]
 \centering
-\caption{Traçabilité User Story → Branche → Commits}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{|l|l|}
+\hline
+\rowcolor{gray!20}
+\textbf{Type} & \textbf{Convention} \\
+\hline
+Fonctionnalité & \texttt{SCRUM-XX-nom-user-story} \\
+\hline
+Exemples & \texttt{SCRUM-94-api-gestion-des-sieges} / \texttt{SCRUM-96-page-reservations-salle} \\
+\hline
+\end{tabular}
+\caption{Convention de nommage des branches Git}
+\label{tab:git_branches}
+\end{table}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/justification of branch names are user stories .png}
+    \caption{Nommage des branches aligné sur les User Stories Jira}
+    \label{fig:branch-naming}
+\end{figure}
+ 
+\subsection{Workflow de développement}
+ 
+Le workflow Git adopté par l'équipe suit les étapes
+suivantes pour chaque User Story~:
+ 
+\begin{enumerate}
+    \item \textbf{Assignation} — la User Story est assignée
+          à un développeur sur Jira et passe en
+          \textit{In Progress}
+    \item \textbf{Création de branche} — le développeur
+          crée une branche :
+          \begin{center}
+          \texttt{git checkout -b SCRUM-19-sinscrire-et-se-connecter}
+          \end{center}
+    \item \textbf{Développement et commits} — commits
+          réguliers avec référence au ticket Jira~:
+          \begin{center}
+          \texttt{git commit -m
+          "feat(auth): implement OTP login [US-01]"}
+          \end{center}
+    \item \textbf{Push et Pull Request} — une Pull Request
+          est ouverte sur GitHub vers \texttt{main}
+    \item \textbf{Code Review} — un autre membre de
+          l'équipe révise et approuve le code
+    \item \textbf{Merge} — après validation, merge dans
+          \texttt{main} et ticket Jira passé à
+          \textit{Done}
+\end{enumerate}
+ 
+\subsection{Traçabilité Jira \texorpdfstring{$\leftrightarrow$}{<->} GitHub}
+
+Cette section met en évidence la correspondance entre les tickets Jira,
+les branches Git associées et les éléments de code livrés. Elle assure
+une visibilité claire sur l'avancement des User Stories et facilite les
+revues de code ainsi que le suivi des livraisons.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{images/git graph flow of commits and pull requests.png}
+    \caption{Graphe Git illustrant les commits et Pull Requests}
+    \label{fig:git-graph}
+\end{figure}
+ 
+\begin{table}[H]
+\centering
 \label{tab:traceability}
 \renewcommand{\arraystretch}{1.4}
-\begin{tabular}{|c|l|l|}
+\begin{tabular}{|c|l|l|l|}
 \hline
-\rowcolor{gray!25}
-\textbf{Jira} & \textbf{Branche Git} & 
-\textbf{Exemple de commit} \\
+\rowcolor{gray!20}
+\textbf{Jira} & \textbf{Développeur}
+              & \textbf{Branche Git} \\
 \hline
-US-01 & \texttt{feature/US-01-auth} & 
-\texttt{feat(auth): add JWT login [US-01]} \\
+SCRUM-91 & Aymane &
+\texttt{SCRUM-91-integration-de-l-endpoint-otp} \\
 \hline
-US-02 & \texttt{feature/US-02-reset-pwd} & 
-\texttt{feat(auth): add OTP reset [US-02]} \\
+SCRUM-92 & Ayoub &
+\texttt{SCRUM-92-api-gestion-des-salles} \\
 \hline
-US-07 & \texttt{feature/US-07-sieges} & 
-\texttt{feat(seance): add plan de salle [US-07]} \\
+SCRUM-93 & Ayoub &
+\texttt{SCRUM-93-api-gestion-des-cinemas} \\
 \hline
-US-08 & \texttt{feature/US-08-reservation} & 
-\texttt{feat(reservation): add create with tx [US-08]} \\
+SCRUM-94 & Ayoub &
+\texttt{SCRUM-94-api-gestion-des-sieges} \\
 \hline
-US-10 & \texttt{feature/US-10-stripe} & 
-\texttt{feat(paiement): add stripe gateway [US-10]} \\
+SCRUM-95 & Yassine &
+\texttt{SCRUM-95-implementation-champ-otp-reset} \\
 \hline
-\end{tabular}
-\end{table}
-
-% ============================================================
-\section{Répartition globale des tâches}
-% ============================================================
-
-Le tableau suivant présente la répartition globale des 
-User Stories entre les membres de l'équipe sur les 
-4 sprints du projet~:
-
-\begin{table}[H]
-\centering
-\caption{Répartition globale des User Stories par développeur}
-\label{tab:global_repartition}
-\renewcommand{\arraystretch}{1.4}
-\begin{tabular}{|c|p{5cm}|c|c|}
-\hline
-\rowcolor{gray!25}
-\textbf{Développeur} & \textbf{User Stories assignées} 
-                     & \textbf{Sprints} & \textbf{Points} \\
-\hline
-\textbf{Dev 1} & 
-US-01 Authentification \newline
-US-02 Reset password \newline
-US-07 Disponibilité sièges \newline
-US-10 Paiement Stripe \newline
-US-13 Validation Staff & 
-S1, S2, S3, S4 & 29 \\
-\hline
-\textbf{Dev 2} & 
-US-03 Gestion films \newline
-US-04 Gestion séances \newline
-US-08 Création réservation \newline
-US-11 QR Code \newline
-US-14 Dashboard & 
-S1, S2, S3, S4 & 31 \\
-\hline
-\textbf{Dev 3} & 
-US-05 Tarification et stats \newline
-US-06 Gestion utilisateurs \newline
-US-09 Profil et historique \newline
-US-12 Notifications \newline
-US-15 Tests et docs & 
-S1, S2, S3, S4 & 22 \\
+SCRUM-96 & Abdessami &
+\texttt{SCRUM-96-page-reservations-salle} \\
 \hline
 \end{tabular}
+\caption{Traçabilité User Story $\rightarrow$ Branche $\rightarrow$ Commits}
 \end{table}
-
+ 
+ 
 % ============================================================
 \section{Conclusion}
 % ============================================================
-
-Ce chapitre a présenté l'organisation et la gestion du 
-projet CinePass à travers les outils \textbf{Jira} et 
-\textbf{Git/GitHub}. L'adoption de la méthodologie 
-\textbf{Scrum} a permis une planification claire en 4 sprints 
-avec des objectifs bien définis, une répartition équitable 
-des tâches entre les membres de l'équipe, et un suivi 
-rigoureux de l'avancement via les tableaux Jira.
-
-Le workflow \textbf{Git} basé sur les branches par User Story 
-a facilité la collaboration en évitant les conflits de code 
-et en garantissant une traçabilité complète entre les tickets 
-Jira et le code source sur GitHub.
-
-Le chapitre suivant présentera la phase de réalisation et 
-d'implémentation, en détaillant les choix techniques et les 
-fonctionnalités développées au cours de chaque sprint.
-
+ 
+Ce chapitre a présenté l'organisation et la gestion du
+projet CinePass à travers les outils \textbf{Jira} et
+\textbf{Git/GitHub}. L'adoption de la méthodologie
+\textbf{Scrum} a permis une planification structurée en
+sprints avec des objectifs bien définis, une répartition
+claire des 13 User Stories entre les quatre membres de
+l'équipe (85 Story Points au total), et un suivi rigoureux
+de l'avancement via les tableaux Jira.
+ 
+Le workflow Git basé sur les branches par User Story a
+facilité la collaboration en garantissant une traçabilité
+complète entre les tickets Jira et le code source sur
+GitHub, tout en minimisant les conflits entre les
+développeurs travaillant en parallèle.
+ 
+Le chapitre suivant présentera la phase de réalisation
+et d'implémentation, en détaillant les choix techniques
+retenus et les fonctionnalités développées au cours de
+chaque sprint.
+ 
 
 %============================================================
 %============================================================
@@ -938,7 +1327,6 @@ Visual Studio Code (VS Code) est l'éditeur de code principal utilisé dans le d
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.22\textwidth]{images/vscode}
-    \caption{Logo de Visual Studio Code — éditeur de code principal}
     \label{fig:vscode}
 \end{figure}
 
@@ -949,7 +1337,6 @@ Postman est l'outil utilisé pour tester et documenter les API REST développée
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.18\textwidth]{images/postman}
-    \caption{Logo de Postman — outil de test et de documentation des API REST}
     \label{fig:postman}
 \end{figure}
 
@@ -960,7 +1347,6 @@ Git est le système de contrôle de version distribué utilisé pour gérer le c
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.20\textwidth]{images/github}
-    \caption{Logo de GitHub — plateforme d'hébergement et de collaboration sur le code source}
     \label{fig:github}
 \end{figure}
 
@@ -971,18 +1357,16 @@ Docker est l'outil de conteneurisation utilisé dans le projet CinePass pour gar
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.28\textwidth]{images/Docker}
-    \caption{Logo de Docker — outil de conteneurisation des services applicatifs}
     \label{fig:docker}
 \end{figure}
 
 \subsubsection{Jira}
 
-Jira est l'outil de gestion de projet agile utilisé par l'équipe CinePass pour planifier, suivre et coordonner l'ensemble des tâches de développement. Il a permis de créer et d'organiser le Product Backlog, de rédiger et prioriser les User Stories selon la méthode MoSCoW, de planifier les sprints et d'assigner les tâches aux membres de l'équipe. Le tableau Kanban de Jira a offert une visibilité en temps réel sur l'état d'avancement de chaque tâche, tandis que les rapports de sprint ont permis de mesurer la vélocité de l'équipe et d'ajuster la planification en conséquence.
+Jira est l'outil de gestion de projet agile utilisé par l'équipe CinePass pour planifier, suivre et coordonner l'ensemble des tâches de développement. Il a permis de créer et d'organiser le Product Backlog, de rédiger et prioriser les User Stories, de planifier les sprints et d'assigner les tâches aux membres de l'équipe. Le tableau Kanban de Jira a offert une visibilité en temps réel sur l'état d'avancement de chaque tâche, tandis que les rapports de sprint ont permis de mesurer la vélocité de l'équipe et d'ajuster la planification en conséquence.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.30\textwidth]{images/Jira_Logo}
-    \caption{Logo de Jira — outil de gestion de projet agile}
     \label{fig:jira}
 \end{figure}
 
@@ -997,7 +1381,6 @@ Vite est l'outil de build utilisé pour le développement du frontend de CinePas
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.18\textwidth]{images/vite}
-    \caption{Logo de Vite — outil de build et de développement frontend}
     \label{fig:vite}
 \end{figure}
 
@@ -1008,7 +1391,6 @@ Node.js constitue le socle d'exécution du backend de CinePass. Il s'agit d'un e
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.38\textwidth]{images/nodejs}
-    \caption{Logo de Node.js — environnement d'exécution JavaScript côté serveur}
     \label{fig:nodejs}
 \end{figure}
 
@@ -1019,7 +1401,6 @@ NestJS est le framework backend principal utilisé dans le développement de l'A
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.22\textwidth]{images/Nest}
-    \caption{Logo de NestJS — framework backend Node.js et TypeScript}
     \label{fig:nest}
 \end{figure}
 
@@ -1030,7 +1411,6 @@ PostgreSQL est le système de gestion de base de données relationnelle (SGBDR) 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.20\textwidth]{images/postgreSQL}
-    \caption{Logo de PostgreSQL — système de gestion de base de données relationnelle}
     \label{fig:postgresql}
 \end{figure}
 
@@ -1041,7 +1421,6 @@ HTML (HyperText Markup Language) et CSS (Cascading Style Sheets) constituent les
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.25\textwidth]{images/htmlcss}
-    \caption{Logos HTML5 et CSS3 — technologies de structuration et de mise en forme de l'interface}
     \label{fig:htmlcss}
 \end{figure}
 
@@ -1052,8 +1431,16 @@ JavaScript est le langage de programmation central du projet CinePass, utilisé 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.18\textwidth]{images/js}
-    \caption{Logo JavaScript — langage de programmation principal du projet}
     \label{fig:js}
+\end{figure}
+
+\subsubsection{React}
+React est la bibliothèque JavaScript utilisée pour construire l'interface utilisateur de CinePass. Elle permet de créer des composants réutilisables et de gérer efficacement l'état de l'application grâce à son système de props et de state. React facilite également la création d'interfaces dynamiques et réactives, offrant une expérience utilisateur fluide et moderne. L'utilisation de React a permis de respecter la charte graphique définie dans le cahier des charges tout en assurant une grande flexibilité dans la conception des différentes pages et fonctionnalités de la plateforme.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{images/react}
+    \label{fig:react}
 \end{figure}
 
 %------------------------------------------------------------
@@ -1255,7 +1642,7 @@ La page de consultation constitue le point d'entrée principal vers le catalogue
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.88\textwidth]{images/client/consulté2}
+    \includegraphics[width=0.88\textwidth]{images/client/consulte2}
     \caption{Page d'accueil — Sélection de la ville et du cinéma}
     \label{fig:consulte}
 \end{figure}
@@ -1344,15 +1731,205 @@ La figure \ref{fig:mesreservation} présente la page d'historique des réservati
 \subsection{Sprint 3 — Paiement Stripe, QR Code et notifications}
 %------------------------------------------------------------
 
-Le troisième sprint, qui concerne l'intégration de la passerelle de paiement Stripe, la génération automatique des QR Codes de validation d'entrée et l'envoi de notifications par email aux clients, est actuellement en cours de développement. Les captures d'écran et les descriptions détaillées de ces fonctionnalités seront intégrées dans la version définitive du rapport à l'issue de ce sprint.
+Le troisième sprint avait pour objectif d'intégrer la passerelle de paiement Stripe, de générer automatiquement les QR Codes associés aux billets numériques après confirmation du paiement, et d'envoyer des notifications par email aux clients à chaque étape clé de leur réservation. Ces fonctionnalités complètent le parcours utilisateur initié dans le sprint précédent et constituent la dernière étape avant la validation physique des entrées en salle.
 
-%------------------------------------------------------------
-\subsection{Sprint 4 — Validation Staff, Dashboard analytique et finalisation}
-%------------------------------------------------------------
+%....................................
+\subsubsection{a. \quad Intégration du paiement en ligne via Stripe}
+%....................................
 
-Le quatrième et dernier sprint, dédié à l'implémentation de la validation d'entrée par le staff via scan de QR Code, à la finalisation du tableau de bord analytique et à la rédaction de la documentation technique complète, est planifié et sera réalisé à l'issue du sprint 3. Son contenu sera documenté dans la version finale du rapport.
+L'intégration de la passerelle de paiement Stripe constitue la fonctionnalité principale du sprint 3. Stripe est une solution de paiement en ligne reconnue à l'échelle internationale, offrant une API robuste, une sécurité de niveau bancaire conforme à la norme PCI-DSS et une prise en charge native de nombreuses méthodes de paiement. Dans le cadre de CinePass, Stripe a été intégré côté backend via le module NestJS dédié, qui orchestre la création des sessions de paiement, la gestion des webhooks et la confirmation des transactions.
 
-%------------------------------------------------------------
+Le processus de paiement débute dès que l'utilisateur confirme sa sélection de sièges. Le backend CinePass initie une session de paiement Stripe en transmettant le montant calculé, la devise et les métadonnées de la réservation. L'utilisateur est ensuite redirigé vers la page de paiement hébergée par Stripe, qui prend en charge la saisie sécurisée des informations bancaires. À l'issue du paiement, Stripe notifie le backend via un webhook afin de confirmer la transaction et déclencher la génération du billet numérique.
+
+\paragraph{Page de paiement Stripe}
+
+La page de paiement est entièrement gérée par Stripe Checkout, garantissant ainsi la sécurité des données bancaires de l'utilisateur sans que ces informations ne transitent jamais par les serveurs de CinePass. Elle affiche le récapitulatif de la commande — film, cinéma, référence de réservation et montant total en dirhams marocains (MAD) — ainsi que les différents moyens de paiement acceptés.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.88\textwidth]{images/paiement/payment}
+    \caption{Page de paiement Stripe — Saisie des informations bancaires}
+    \label{fig:payment}
+\end{figure}
+
+La figure \ref{fig:payment} présente la page de paiement Stripe intégrée à la plateforme CinePass. On y distingue, dans la partie gauche, le récapitulatif de la commande indiquant le film sélectionné (Coco — Errachidia), le montant total (MAD 170.00) et la référence de réservation (CP-2026-R5BZEX). La partie droite propose plusieurs méthodes de paiement, notamment le paiement par carte bancaire Visa avec saisie sécurisée du numéro de carte, de la date d'expiration, du code CVV et du nom du titulaire. La sélection du pays permet d'adapter les options de paiement disponibles selon la région de l'utilisateur.
+
+\paragraph{Confirmation de paiement}
+
+À l'issue d'une transaction réussie, Stripe retourne un statut de confirmation au backend de CinePass via le mécanisme de webhook. Le système met alors à jour le statut de la réservation en base de données, génère le billet numérique avec son QR Code unique et redirige l'utilisateur vers une page de confirmation récapitulant les détails de sa réservation.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.88\textwidth]{images/paiement/Paiementres}
+    \caption{Page de confirmation — Paiement réussi et récapitulatif de réservation}
+    \label{fig:paiementreussi}
+\end{figure}
+
+La figure \ref{fig:paiementreussi} illustre la page de confirmation affichée après un paiement validé avec succès. Elle présente un message de confirmation clair accompagné des informations essentielles de la réservation : la référence unique (CP-2026-R5BZEX), le titre du film et le cinéma (Coco — Errachidia), la date et l'heure de la séance (23/05/2026 à 17h45) ainsi que les numéros de sièges réservés (C5, D5). Un bouton d'accès direct au billet numérique permet à l'utilisateur de consulter et de télécharger son QR Code immédiatement après la confirmation du paiement.
+
+%....................................
+\subsubsection{b. \quad Génération du QR Code et du billet numérique}
+%....................................
+
+Suite à la confirmation du paiement par Stripe, le backend CinePass génère automatiquement un QR Code unique encodant la référence alphanumérique de la réservation. Ce QR Code est intégré au billet numérique présenté à l'utilisateur et sera scanné par le personnel de la plateforme lors du contrôle d'entrée en salle. La génération est réalisée côté serveur afin de garantir l'unicité et l'intégrité de chaque code, tout en empêchant toute falsification côté client.
+
+Le billet numérique regroupe l'ensemble des informations nécessaires à la validation de l'entrée : titre du film, nom du cinéma, date et heure de la séance, numéros des sièges réservés, référence de réservation et QR Code. Il est accessible depuis l'espace personnel de l'utilisateur à tout moment et peut être téléchargé ou présenté directement depuis l'interface mobile.
+
+%....................................
+\subsubsection{c. \quad Notifications par email}
+%....................................
+
+Le module de notifications par email a été développé avec Nodemailer, une bibliothèque Node.js permettant l'envoi d'emails transactionnels via un serveur SMTP. Plusieurs types de notifications ont été implémentés afin d'accompagner l'utilisateur à chaque étape clé de son parcours sur la plateforme. Un email de vérification OTP est envoyé lors de l'inscription pour confirmer l'adresse email de l'utilisateur. Un email de confirmation est transmis après chaque réservation validée, récapitulant les détails de la séance et incluant le billet numérique en pièce jointe. Enfin, un email de rappel est envoyé avant la séance afin de rappeler à l'utilisateur les informations de sa réservation et de lui permettre d'accéder facilement à son billet.
+
+\subsubsection{Sprint 4 — Validation Staff, Dashboard analytique et finalisation}
+
+Le quatrième et dernier sprint avait pour objectif d'implémenter la validation
+d'entrée par le Staff via scan de QR Code, de finaliser le tableau de bord
+analytique et de procéder aux tests complets ainsi qu'à la rédaction de la
+documentation finale du projet. Ce sprint clôture le cycle de développement
+de CinePass en livrant les fonctionnalités opérationnelles côté terrain,
+indispensables au bon déroulement des séances.
+
+\paragraph{a. Application mobile de validation Staff}
+
+L'application de validation Staff constitue l'outil de terrain mis à disposition
+du personnel d'accueil des cinémas partenaires. Elle permet aux agents de
+valider les entrées des spectateurs en scannant les QR Codes présents sur
+leurs billets numériques, assurant ainsi un contrôle rapide, fiable et sans
+contact à l'entrée des salles.
+
+\medskip
+\noindent\textbf{Interface de connexion Staff} \quad
+L'accès à l'application est sécurisé par une authentification dédiée au
+personnel. L'agent saisit son adresse email et son mot de passe pour accéder
+à l'espace de validation.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.45\textwidth]{images/staff/IMG-20260519-WA0013}
+    \caption{Interface de connexion Staff — Application CinePass}
+    \label{fig:staff-login}
+\end{figure}
+
+La figure~\ref{fig:staff-login} présente l'interface de connexion de
+l'application Staff CinePass. Elle reprend la charte graphique de la
+plateforme avec le logo et le formulaire d'authentification centré, garantissant
+un accès réservé exclusivement au personnel autorisé.
+
+\medskip
+\noindent\textbf{Sélection de la séance} \quad
+Une fois connecté, le Staff accède à la liste des séances programmées pour
+la journée. Il sélectionne la séance en cours afin de commencer la validation
+des entrées correspondantes.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.45\textwidth]{images/staff/IMG-20260519-WA0014}
+    \caption{Sélection de la séance — Application Staff CinePass}
+    \label{fig:staff-seances}
+\end{figure}
+
+La figure~\ref{fig:staff-seances} illustre l'interface de sélection de
+séance de l'application Staff. Chaque séance est affichée avec le titre du
+film, l'horaire, le numéro de salle, le nombre d'entrées validées par rapport
+à la capacité totale ainsi qu'une barre de progression du taux de remplissage.
+Deux séances sont ici visibles : \textit{Wonka} en Salle 2 et
+\textit{Spider-Man: Across the Spider-Verse} en Salle 1, cette dernière étant
+sélectionnée pour la validation en cours.
+
+\medskip
+\noindent\textbf{Scan du QR Code} \quad
+Après sélection de la séance, l'agent active le scanner de QR Code intégré à
+l'application. La caméra du téléphone est utilisée pour lire le code présent
+sur le billet numérique du spectateur, qu'il soit affiché sur écran mobile ou
+imprimé sur papier.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.45\textwidth]{images/staff/IMG-20260519-WA0011}
+    \caption{Interface de scan du QR Code — Application Staff CinePass}
+    \label{fig:staff-scan}
+\end{figure}
+
+La figure~\ref{fig:staff-scan} présente l'interface de scan de l'application
+Staff. Le cadre de scan est clairement délimité par une bordure en pointillés
+rouges indiquant la zone de lecture. Un bouton \textit{« Simuler un scan »}
+est également disponible pour les tests en environnement de développement.
+Le compteur d'entrées validées en temps réel (ici 0/247) permet à l'agent
+de suivre le taux de remplissage de la salle au fur et à mesure des validations.
+
+\medskip
+\noindent\textbf{Confirmation de validation} \quad
+Après lecture du QR Code, le système vérifie en temps réel la validité du
+billet auprès du backend CinePass : correspondance de la séance, statut de
+la réservation (payée, non utilisée) et unicité de l'utilisation. En cas de
+billet valide, un écran de confirmation verte s'affiche immédiatement.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.45\textwidth]{images/staff/IMG-20260519-WA0012}
+    \caption{Confirmation d'entrée validée — Application Staff CinePass}
+    \label{fig:staff-validation}
+\end{figure}
+
+La figure~\ref{fig:staff-validation} illustre l'écran de confirmation affiché
+après validation réussie d'un billet. Le message \textbf{« ENTREE VALIDEE »}
+accompagné d'un cercle vert à coche blanche confirme visuellement et sans
+ambiguïté l'accès autorisé du spectateur. Les informations détaillées de la
+réservation sont affichées : titre du film et cinéma
+(\textit{Spider-Man: Across the Spider-Verse — Errachidia}), horaire et salle
+(20:30 — Salle 1), numéros de sièges réservés (B4, C3, C5) et référence unique
+de la réservation (CP-2026-CAUJZ9). Un bouton \textit{« Scanner le suivant »}
+permet à l'agent de passer immédiatement au spectateur suivant, garantissant
+un flux de validation fluide et rapide.
+
+\medskip
+\noindent\textbf{Billet électronique côté client} \quad
+Du côté utilisateur, le billet numérique généré après confirmation du paiement
+présente l'ensemble des informations de la réservation ainsi que le QR Code
+à présenter à l'entrée de la salle.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{images/staff/IMG-20260519-WA0010}
+    \caption{Billet électronique CinePass — Interface web client}
+    \label{fig:billet-web}
+\end{figure}
+
+La figure~\ref{fig:billet-web} présente le billet électronique affiché dans
+l'interface web client de CinePass. Il regroupe toutes les informations
+nécessaires à l'entrée en salle : le titre du film et le cinéma
+(\textit{Spider-Man: Across the Spider-Verse — Errachidia}), la date
+(Mardi 19 mai 2026), l'heure (20:30), le format (Salle 1 — 2D), les sièges
+réservés avec leur catégorie (B4 VIP, C3 Standard, C5 Standard), le total
+payé (180,00 MAD) et le statut de paiement (PAYÉE). Le QR Code unique
+encodant la référence CP-2026-CAUJZ9 est affiché en bonne place pour
+être scanné par le personnel à l'entrée.
+
+\paragraph{b. Tests et validation finale}
+
+La phase de tests finale a permis de valider l'ensemble du système de bout
+en bout, en couvrant les scénarios critiques du parcours utilisateur et du
+workflow Staff. Les tests fonctionnels ont vérifié le bon enchaînement des
+opérations depuis la réservation jusqu'à la validation physique à l'entrée
+de la salle. Des tests d'intégration ont confirmé la cohérence des échanges
+entre l'application Staff, le backend NestJS et la base de données PostgreSQL,
+notamment la mise à jour en temps réel du statut de la réservation et du
+compteur d'entrées validées. Les tests de charge ont permis de s'assurer de
+la robustesse du système lors de validations simultanées en début de séance.
+L'ensemble des User Stories du projet ont ainsi été validées et livrées
+conformément aux critères d'acceptation définis dans le Product Backlog.
+
+\paragraph{c. Documentation technique}
+
+La documentation technique finale du projet CinePass a été rédigée à l'issue
+du sprint 4. Elle comprend la documentation complète de l'API REST via
+Swagger, couvrant l'ensemble des endpoints exposés par le backend avec leurs
+paramètres, réponses et codes d'erreur. Le présent rapport de projet constitue
+quant à lui la documentation fonctionnelle et technique de référence,
+décrivant l'architecture du système, les choix technologiques, l'organisation
+du développement et les fonctionnalités implémentées à travers les quatre
+sprints.
 \section{Tests et validation}
 %------------------------------------------------------------
 
