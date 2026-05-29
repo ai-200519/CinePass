@@ -22,6 +22,10 @@
 \usepackage{booktabs}       % for professional tables
 \usepackage{float}
 
+\makeatletter
+\providecommand\insert@pcolumn{\insert@column}
+\makeatother
+
 \geometry{a4paper, left=2cm, right=2cm, top=2cm, bottom=2cm}
 \setstretch{1.2}
 \setcounter{secnumdepth}{3}
@@ -57,11 +61,14 @@
 
     % ── Logos : FSTE à gauche, ILIA à droite ──────────────────
     \noindent
-    \begin{tabularx}{\textwidth}{X r}
+    \begin{minipage}[t]{0.48\textwidth}
         \includegraphics[height=2cm]{images/fste.png}
-        &
-        \includegraphics[height=1.6cm]{images/ILIA.png}\\
-    \end{tabularx}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.48\textwidth}
+        \raggedleft
+        \includegraphics[height=1.6cm]{images/ILIA.png}
+    \end{minipage}
 
     \vspace{0.3cm}
     \noindent\textcolor{gray}{\rule{\linewidth}{0.8pt}}
@@ -403,12 +410,13 @@ réservations.
 
 \subsection{Diagramme de cas d'utilisation}
 
-Le diagramme de cas d'utilisation (Figure~\ref{fig:usecase}) illustre les interactions
-principales entre les trois acteurs du système — Client, Staff et Administrateur —
-et les fonctionnalités offertes par la plateforme CinePass. Le Client peut s'authentifier,
-consulter le catalogue, réserver des places et effectuer un paiement en ligne. Le Staff
-valide les entrées via scan de QR Code ou saisie manuelle. L'Administrateur gère
-l'ensemble des entités du système depuis son dashboard dédié.
+Le diagramme de cas d'utilisation (Figure~\ref{fig:usecase}) illustre les
+interactions principales entre les trois acteurs du système --- Client, Staff et
+Administrateur --- et les fonctionnalités offertes par la plateforme
+\textbf{CinePass}. Le Client peut s'authentifier, consulter le catalogue, réserver
+des places et effectuer un paiement en ligne. Le Staff valide les entrées via le
+scan d'un QR code ou une saisie manuelle. L'Administrateur gère l'ensemble des
+entités du système depuis son tableau de bord dédié.
 
 \begin{figure}[H]
     \centering
