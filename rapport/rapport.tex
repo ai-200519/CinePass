@@ -632,6 +632,76 @@ maintenabilité et l'isolation des responsabilités.
 \end{figure}
 
 %------------------------------------------------------------
+\section{Design patterns utilisés}
+%------------------------------------------------------------
+
+La conception de CinePass s'appuie sur plusieurs design patterns afin de
+structurer le code, réduire le couplage entre les composants et faciliter
+l'évolution de la plateforme.
+
+\subsection{Pattern Controller--Service--Repository}
+
+Le backend NestJS adopte principalement le pattern
+\textbf{Controller--Service--Repository}. Le \textbf{Controller} reçoit les
+requêtes HTTP, valide les paramètres d'entrée et retourne les réponses au
+client. Le \textbf{Service} contient la logique métier liée aux cas d'utilisation,
+comme la création d'une réservation, la vérification de disponibilité des sièges
+ou la validation d'un paiement. Le \textbf{Repository} assure l'accès aux données
+via TypeORM et isole les opérations de persistance.
+
+Ce découpage permet de séparer clairement les responsabilités : les contrôleurs
+ne contiennent pas de règles métier complexes, les services restent indépendants
+du protocole HTTP, et l'accès à la base de données peut évoluer sans modifier
+l'ensemble de l'application.
+
+\subsection{Pattern Repository}
+
+Le pattern \textbf{Repository} est utilisé pour centraliser les opérations liées
+aux entités persistantes telles que \texttt{Film}, \texttt{Seance},
+\texttt{Reservation}, \texttt{Paiement} et \texttt{Utilisateur}. Il fournit une
+interface cohérente pour rechercher, créer, modifier ou supprimer les données,
+tout en masquant les détails techniques de la base PostgreSQL.
+
+Dans CinePass, ce pattern facilite notamment la gestion des réservations et des
+sièges, car les règles de disponibilité peuvent être appliquées au niveau du
+service sans dépendre directement de requêtes SQL dispersées dans le code.
+
+\subsection{Pattern Dependency Injection}
+
+NestJS repose sur le pattern \textbf{Dependency Injection}, qui consiste à
+fournir automatiquement aux classes les dépendances dont elles ont besoin. Par
+exemple, un service de réservation peut recevoir le service de paiement, le
+repository des séances et le service de notification sans les instancier
+directement.
+
+Cette approche améliore la testabilité du système, car il devient possible de
+remplacer une dépendance réelle par une version simulée lors des tests unitaires.
+Elle réduit également le couplage entre les modules et rend l'architecture plus
+souple.
+
+\subsection{Pattern DTO}
+
+Le pattern \textbf{Data Transfer Object (DTO)} est utilisé pour structurer les
+données échangées entre le frontend et le backend. Les DTO définissent les champs
+attendus pour chaque opération, comme l'inscription d'un utilisateur, la création
+d'une séance ou la confirmation d'une réservation.
+
+Ce pattern permet de valider les données entrantes avant leur traitement, de
+limiter les erreurs de format et de sécuriser les échanges entre les différentes
+couches de l'application.
+
+\subsection{Pattern Component}
+
+Côté frontend, React applique le pattern \textbf{Component}. Les interfaces sont
+découpées en composants réutilisables : formulaires, cartes de films, plan de
+salle, tableau de bord, listes de réservations et éléments de navigation. Chaque
+composant possède une responsabilité précise et peut être composé avec d'autres
+éléments pour construire des pages complètes.
+
+Ce pattern favorise la réutilisation du code, l'homogénéité de l'interface et la
+maintenance progressive de l'application client.
+
+%------------------------------------------------------------
 
 %------------------------------------------------------------
 \section{Choix de conception}
