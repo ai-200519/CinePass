@@ -30,6 +30,9 @@
 \setstretch{1.2}
 \setcounter{secnumdepth}{3}
 
+
+
+
 \titleformat{\chapter}[display]{\bfseries\Huge}{\chaptername\ \thechapter}{12pt}{\Huge}
 \titlespacing*{\chapter}{0pt}{-10pt}{20pt}
 
@@ -490,8 +493,8 @@ validé est immédiatement marqué comme utilisé afin d'empêcher toute réutil
 \subsection{Diagrammes de séquence}
 
 Les diagrammes de séquence modélisent les interactions temporelles entre les
-acteurs et les composants du système pour le scénario clé de paiement et de
-réservation.
+acteurs et les composants du système pour les scénarios clés de réservation,
+de paiement et de validation des entrées par le staff.
 
 
 \subsubsection{Scénario : Réserver des places}
@@ -590,6 +593,40 @@ sont libérés et un message d'erreur est retourné au client.
     \includegraphics[width=0.95\textwidth]{images/daigramme/SequencepaiementB}
     \caption{Diagramme de séquence — Processus de paiement (vue détaillée)}
     \label{fig:seq_blanc}
+\end{figure}
+
+%----  Séquence validation staff (blanche / détaillée)  ------
+\subsubsection{Diagramme de séquence — Validation QR code par le staff (vue détaillée)}
+
+Le diagramme de séquence détaillé (Figure~\ref{fig:seq_staff_blanc}) décrit le
+processus de validation d'entrée réalisé par le staff. Après sélection de la
+séance, l'agent peut lancer le scan du QR code ou saisir manuellement une
+référence. L'application transmet la demande au contrôleur de réservation, qui
+recherche la réservation correspondante, vérifie son état puis met à jour le
+statut de la séance lorsque l'entrée est autorisée. En cas de QR code non valide,
+le système retourne un message d'échec et l'entrée est refusée.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.98\textwidth]{images/daigramme/staff boite blanch.png}
+    \caption{Diagramme de séquence — Validation QR code par le staff (vue détaillée)}
+    \label{fig:seq_staff_blanc}
+\end{figure}
+
+%----  Séquence validation staff (noire / simplifiée)  -------
+\subsubsection{Diagramme de séquence — Validation QR code par le staff (vue simplifiée)}
+
+Le diagramme de séquence simplifié (Figure~\ref{fig:seq_staff_noir}) présente
+la validation d'entrée du point de vue externe. Le staff sélectionne une séance
+dans l'application, puis choisit soit le scan du QR code, soit la saisie de la
+référence. L'application vérifie la validité de la réservation et retourne un
+résultat d'autorisation ou de refus.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.92\textwidth]{images/daigramme/staff boite noire.png}
+    \caption{Diagramme de séquence — Validation QR code par le staff (vue simplifiée)}
+    \label{fig:seq_staff_noir}
 \end{figure}
 
 %------------------------------------------------------------
