@@ -32,7 +32,6 @@
 
 
 
-
 \titleformat{\chapter}[display]{\bfseries\Huge}{\chaptername\ \thechapter}{12pt}{\Huge}
 \titlespacing*{\chapter}{0pt}{-10pt}{20pt}
 
@@ -123,6 +122,103 @@
 
 \end{titlepage}
 
+%============================================================
+% REMERCIEMENTS
+%============================================================
+\chapter*{Remerciements}
+\addcontentsline{toc}{chapter}{Remerciements}
+
+Nous tenons à exprimer notre profonde gratitude à l'ensemble de nos professeurs,
+qui nous ont transmis des connaissances précieuses tout au long de notre parcours
+universitaire et qui ont contribué de manière déterminante à notre formation en
+ingénierie logicielle et intelligence artificielle.
+
+Nous remercions tout particulièrement nos encadrants académiques, Pr. Jihan
+Elkhraoui et Pr. Zakiria Ithroui, pour leur suivi pédagogique, leurs conseils
+avisés, leur disponibilité et leur contribution à l'orientation de ce projet.
+Leur accompagnement nous a permis de mieux structurer notre travail, de clarifier
+nos choix méthodologiques et de mener à bien les différentes étapes de conception
+et de réalisation.
+
+Nous adressons également nos sincères remerciements à l'ensemble des enseignants
+de la Faculté des Sciences et Techniques d'Errachidia pour la qualité de leur
+encadrement, leur engagement et les efforts fournis afin de nous offrir une
+formation solide, à la fois théorique et pratique.
+
+Nous tenons aussi à remercier chaleureusement la Faculté des Sciences et
+Techniques d'Errachidia pour le cadre d'apprentissage qu'elle nous a offert,
+ainsi que pour les moyens mis à notre disposition tout au long de ce parcours
+académique.
+
+Enfin, nous exprimons toute notre reconnaissance à nos familles et à nos amis
+pour leur soutien, leurs encouragements et leur présence constante. Leur confiance
+et leur appui ont constitué une source de motivation essentielle pour mener ce
+travail à son terme.
+
+\newpage
+
+%============================================================
+% RÉSUMÉ
+%============================================================
+\chapter*{Résumé}
+\addcontentsline{toc}{chapter}{Résumé}
+
+Ce document présente le travail réalisé dans le cadre du projet \textbf{CinePass},
+une application web dédiée à la réservation et à la gestion de places de cinéma.
+Le projet vise à proposer une solution numérique moderne permettant aux
+utilisateurs de consulter les films disponibles, choisir une séance, sélectionner
+leurs sièges, effectuer une réservation et accéder à un billet électronique
+associé à un QR Code.
+
+Sur le plan technique, la solution repose sur une architecture structurée
+combinant une interface web, un backend développé avec NestJS et une base de
+données PostgreSQL. Le développement a été organisé selon une démarche
+méthodologique combinant 2TUP pour l'analyse et la conception, ainsi que Scrum
+pour la planification et la réalisation progressive des fonctionnalités.
+
+Les fonctionnalités implémentées couvrent la gestion des utilisateurs, des films,
+des cinémas, des salles, des séances, des réservations et des paiements. La
+plateforme propose également un espace d'administration permettant de gérer les
+ressources du système, ainsi qu'une application mobile destinée au staff pour la
+validation des entrées à l'aide du scan de QR Code ou de la saisie manuelle d'une
+référence.
+
+Ce rapport détaille les besoins fonctionnels et non fonctionnels, les choix de
+conception, les diagrammes UML, l'architecture technique, les outils utilisés, les
+fonctionnalités réalisées et les tests effectués afin de valider la fiabilité et
+la cohérence de la solution proposée.
+
+\newpage
+
+%============================================================
+% ABSTRACT
+%============================================================
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+
+This document presents the work carried out as part of the \textbf{CinePass}
+project, a web application dedicated to cinema seat reservation and management.
+The project aims to provide a modern digital solution that allows users to browse
+available movies, choose a screening, select seats, complete a reservation and
+access an electronic ticket associated with a QR Code.
+
+From a technical perspective, the solution is based on a structured architecture
+combining a web interface, a backend developed with NestJS and a PostgreSQL
+database. The development process followed a methodological approach combining
+2TUP for analysis and design, and Scrum for planning and incremental feature
+delivery.
+
+The implemented features include user, movie, cinema, room, screening,
+reservation and payment management. The platform also provides an administration
+space for managing system resources, as well as a mobile application for staff
+members to validate entries using QR Code scanning or manual reference input.
+
+This report describes the functional and non-functional requirements, design
+choices, UML diagrams, technical architecture, tools used, implemented features
+and tests performed to validate the reliability and consistency of the proposed
+solution.
+
+\newpage
 
 %============================================================
 % TABLE DES MATIÈRES
@@ -2060,8 +2156,18 @@ Les tests fonctionnels ont été réalisés à l'aide de Postman, en simulant le
 \section{Conclusion du chapitre}
 %------------------------------------------------------------
 
-Ce chapitre a présenté en détail la phase de réalisation et d'implémentation du projet CinePass. L'environnement de développement mis en place, composé d'outils modernes et éprouvés tels que VS Code, Docker, Vite, Node.js, NestJS, React et PostgreSQL, a permis de développer une solution web robuste, évolutive et conforme aux spécifications du cahier des charges. Les fonctionnalités du premier sprint — comprenant le système d'authentification sécurisé par JWT et OTP ainsi que l'ensemble du back-office administrateur — ont été pleinement implémentées et validées. Le deuxième sprint a permis de livrer le parcours client complet, de la consultation du catalogue jusqu'à la génération du billet numérique avec QR Code. Les sprints suivants, dédiés au paiement Stripe, aux notifications et à la validation des entrées par le staff, sont en cours de réalisation et viendront compléter la solution dans sa version finale.\chapter*{Conclusion générale}
+Ce chapitre a présenté en détail la phase de réalisation et d'implémentation du projet CinePass. L'environnement de développement mis en place, composé d'outils modernes et éprouvés tels que VS Code, Docker, Vite, Node.js, NestJS, React et PostgreSQL, a permis de développer une solution web robuste, évolutive et conforme aux spécifications du cahier des charges. Les fonctionnalités du premier sprint — comprenant le système d'authentification sécurisé par JWT et OTP ainsi que l'ensemble du back-office administrateur — ont été pleinement implémentées et validées. Le deuxième sprint a permis de livrer le parcours client complet, de la consultation du catalogue jusqu'à la génération du billet numérique avec QR Code. Les sprints suivants, dédiés au paiement Stripe, aux notifications et à la validation des entrées par le staff, sont en cours de réalisation et viendront compléter la solution dans sa version finale.
+
+\chapter*{Conclusion générale}
 \addcontentsline{toc}{chapter}{Conclusion générale}
-CinePass répond aux besoins essentiels de réservation et de gestion d'un service de cinéma moderne. Ce projet a permis de développer une solution structurée, évolutive et orientée utilisateur.
+CinePass répond aux besoins essentiels de réservation et de gestion d'un service de cinéma moderne. À travers ce projet, nous avons conçu et réalisé une solution structurée, évolutive et orientée utilisateur, capable de couvrir les principales étapes du parcours cinématographique : consultation des films, choix des séances, réservation des places, paiement en ligne, génération du billet numérique et validation de l'entrée par QR Code.
+
+Le projet a permis de mettre en pratique une démarche complète d'ingénierie logicielle, depuis l'analyse des besoins jusqu'à la conception, l'implémentation et la validation des fonctionnalités. L'utilisation d'une architecture organisée autour d'un frontend web, d'une application mobile Staff, d'un backend NestJS et d'une base de données PostgreSQL a contribué à construire une solution cohérente, maintenable et adaptée aux contraintes d'un système réel. Les diagrammes UML, les user stories, la planification par sprints et les tests réalisés ont également joué un rôle important dans la maîtrise du développement.
+
+Sur le plan fonctionnel, CinePass améliore l'expérience des clients en simplifiant la réservation et en réduisant les étapes manuelles habituellement associées à l'achat d'un billet. Du côté de l'administration, la plateforme facilite la gestion des films, des séances, des salles, des utilisateurs et des réservations. Pour le staff, l'application de validation constitue un outil pratique permettant de contrôler rapidement les billets et de sécuriser l'accès aux salles.
+
+Ce travail nous a également permis de renforcer nos compétences techniques et méthodologiques, notamment dans le développement full stack, l'intégration d'API, la gestion des données, la conception d'interfaces utilisateur et l'organisation d'un projet selon une approche agile. Il a montré l'importance de la coordination entre les différentes couches de l'application afin de garantir une expérience fluide, fiable et sécurisée.
+
+Enfin, CinePass peut encore être enrichi par plusieurs perspectives d'évolution, telles que l'ajout de recommandations personnalisées, l'amélioration du tableau de bord analytique, l'intégration de notifications avancées, la gestion de programmes de fidélité ou encore l'optimisation des performances pour un déploiement à plus grande échelle. Ainsi, le projet constitue une base solide pour une solution numérique complète dédiée à la gestion moderne des services de cinéma.
 
 \end{document}
