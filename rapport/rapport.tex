@@ -104,7 +104,7 @@
         Abdessami Aglagal       & Pr. Jihan Elkhraoui    \\[0.2cm]
         Yassine El aouni        & Pr. Zakiria Ithroui    \\[0.2cm]
         Ayoub Boukili           &                        \\[0.2cm]
-        Ayeman Alhyani          &                        \\
+        Aymane Alahyane          &                        \\
     \end{tabularx}
     
     \vfill
@@ -145,10 +145,6 @@ de la Faculté des Sciences et Techniques d'Errachidia pour la qualité de leur
 encadrement, leur engagement et les efforts fournis afin de nous offrir une
 formation solide, à la fois théorique et pratique.
 
-Nous tenons aussi à remercier chaleureusement la Faculté des Sciences et
-Techniques d'Errachidia pour le cadre d'apprentissage qu'elle nous a offert,
-ainsi que pour les moyens mis à notre disposition tout au long de ce parcours
-académique.
 
 Enfin, nous exprimons toute notre reconnaissance à nos familles et à nos amis
 pour leur soutien, leurs encouragements et leur présence constante. Leur confiance
@@ -230,6 +226,34 @@ solution.
 % LISTE DES FIGURES
 %============================================================
 \listoffigures
+\newpage
+
+%============================================================
+% LISTE DES ABRÉVIATIONS
+%============================================================
+\chapter*{Liste des abréviations}
+\phantomsection
+\addcontentsline{toc}{chapter}{Liste des abréviations}
+
+\begin{tabularx}{\textwidth}{>{\bfseries}p{3cm}X}
+2TUP & Two Tracks Unified Process \\
+API & Application Programming Interface \\
+CSS & Cascading Style Sheets \\
+FSTE & Faculté des Sciences et Techniques d'Errachidia \\
+HTML & HyperText Markup Language \\
+HTTP & HyperText Transfer Protocol \\
+ILIA & Ingénierie Logicielle et Intelligence Artificielle \\
+JWT & JSON Web Token \\
+OTP & One-Time Password \\
+PFA & Projet de Fin d'Année \\
+QR & Quick Response \\
+REST & Representational State Transfer \\
+SQL & Structured Query Language \\
+UML & Unified Modeling Language \\
+URL & Uniform Resource Locator \\
+VS Code & Visual Studio Code \\
+\end{tabularx}
+
 \newpage
 
 %============================================================
@@ -504,28 +528,10 @@ temporaire des sièges sélectionnés est mis en place afin d'éviter les double
 réservations.
 
 %------------------------------------------------------------
-\section{Diagrammes UML}
+\section{Suivi des étapes de la méthode 2TUP}
 %------------------------------------------------------------
-
-\subsection{Diagramme de cas d'utilisation}
-
-Le diagramme de cas d'utilisation (Figure~\ref{fig:usecase}) illustre les
-interactions principales entre les trois acteurs du système --- Client, Staff et
-Administrateur --- et les fonctionnalités offertes par la plateforme
-\textbf{CinePass}. Le Client peut s'authentifier, consulter le catalogue, réserver
-des places et effectuer un paiement en ligne. Le Staff valide les entrées via le
-scan d'un QR code ou une saisie manuelle. L'Administrateur gère l'ensemble des
-entités du système depuis son tableau de bord dédié.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.92\textwidth]{images/diagrammes/useCase.png}
-    \caption{Diagramme de cas d'utilisation — CinePass}
-    \label{fig:usecase}
-\end{figure}
-
-%------------------------------------------------------------
-\subsection{Diagrammes d'activité}
+L'application de la méthode 2TUP a permis de structurer les différentes phases de conception du système. Après une analyse approfondie des besoins fonctionnels et non fonctionnels, nous avons défini les cas d'utilisation principaux, élaboré les diagrammes d'activité pour chaque acteur, et modélisé les interactions à travers des diagrammes de séquence. Cette approche a permis d'assurer une cohérence entre les besoins exprimés et la conception technique du système.
+\subsection{Étape 1 : Réalisation des diagrammes d'activité}
 
 Les diagrammes d'activité modélisent le comportement dynamique du système pour
 chacun des acteurs principaux, en décrivant les enchaînements d'actions et les
@@ -585,12 +591,31 @@ validé est immédiatement marqué comme utilisé afin d'empêcher toute réutil
     \label{fig:activity_staff}
 \end{figure}
 
-%------------------------------------------------------------
-\subsection{Diagrammes de séquence}
+\subsection{Étape 2 : Réalisation du diagramme de cas d'utilisation}
 
-Les diagrammes de séquence modélisent les interactions temporelles entre les
-acteurs et les composants du système pour les scénarios clés de réservation,
-de paiement et de validation des entrées par le staff.
+Le diagramme de cas d'utilisation (Figure~\ref{fig:usecase}) illustre les
+interactions principales entre les trois acteurs du système --- Client, Staff et
+Administrateur --- et les fonctionnalités offertes par la plateforme
+\textbf{CinePass}. Le Client peut s'authentifier, consulter le catalogue, réserver
+des places et effectuer un paiement en ligne. Le Staff valide les entrées via le
+scan d'un QR code ou une saisie manuelle. L'Administrateur gère l'ensemble des
+entités du système depuis son tableau de bord dédié.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.92\textwidth]{images/diagrammes/useCase.png}
+    \caption{Diagramme de cas d'utilisation — CinePass}
+    \label{fig:usecase}
+\end{figure}
+
+%------------------------------------------------------------
+\subsection{Étape 3 : Choix des fonctionnalités et scénarios}
+
+Après la réalisation du diagramme de cas d'utilisation, deux fonctionnalités
+principales ont été retenues pour une étude détaillée : la réservation des places
+avec paiement en ligne et la validation d'entrée par le staff. Cette étape permet
+de préciser les scénarios, les diagrammes de séquence, les maquettes et, si
+nécessaire, les diagrammes d'activité associés.
 
 
 \subsubsection{Scénario : Réserver des places}
@@ -639,22 +664,74 @@ de paiement et de validation des entrées par le staff.
         Le système affiche un message : « Temps expiré, veuillez recommencer ».
 \end{itemize}
 
+%------------------------------------------------------------
+\subsection{Étape 4 : Réalisation du diagramme de classes d'analyse et d'états-transitions}
+
+Le diagramme de classes métier (Figure~\ref{fig:class_metier}) présente
+les entités principales du domaine (Utilisateur, Film, Seance, Reservation,
+Paiement, Salle, Cinema, Siege) ainsi que leurs relations. Il sert de base
+conceptuelle pour comprendre la structure des données et les liens entre les
+objets métier de CinePass.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{images/diagrammes/Class Metier (analyse).png}
+    \caption{Diagramme de classes métier — CinePass}
+    \label{fig:class_metier}
+\end{figure}
+
+\subsubsection{Réalisation du diagramme d'états-transitions}
+
+Le diagramme d'etats-transitions (Figure~\ref{fig:reservation_state})
+illustre le cycle de vie d'une reservation : creation, etat en cours,
+paiement valide, validation de l'entree et fin de seance. Il clarifie
+les evenements qui provoquent chaque changement d'etat et les actions
+associees (generation du QR code, liberation des sieges, notifications).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.92\textwidth]{images/diagrammes/reservation state diagramme.png}
+    \caption{Diagramme d'etats-transitions — Reservation}
+    \label{fig:reservation_state}
+\end{figure}
+
+\subsection{Étape 5 : Réalisation du diagramme de navigation}
+
+Le diagramme de navigation (Figure~\ref{fig:navigation}) présente l'enchaînement
+des principales interfaces de CinePass. Il met en évidence les parcours client,
+administrateur et staff, depuis l'authentification jusqu'aux écrans de gestion,
+de réservation, de paiement et de validation des billets.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{images/daigramme/Navigation.jpg}
+    \caption{Diagramme de navigation — CinePass}
+    \label{fig:navigation}
+\end{figure}
+
+\subsection{Étape 6 : Réalisation des diagrammes d'interaction}
+
+Les diagrammes d'interaction, principalement les diagrammes de séquence, modélisent
+les échanges temporels entre les acteurs, l'application et les composants backend
+pour les scénarios clés de réservation, de paiement et de validation des entrées.
+
+\subsubsection{Réserver des places — vues boîte noire et boîte blanche}
+
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\linewidth]{images/daigramme/blanch.png}
-    \caption{Diagramme de séquence : Boite Noir - Réserver des places}
-    \label{fig:placeholder}
+    \caption{Diagramme de séquence : boîte noire — Réserver des places}
+    \label{fig:seq_reservation_noir}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{images/daigramme/noir.png}
-    \caption{Diagramme de séquence : Boite Blanche - Réserver des places}
-    \label{fig:placeholder}
+    \caption{Diagramme de séquence : boîte blanche — Réserver des places}
+    \label{fig:seq_reservation_blanc}
 \end{figure}
 
-%----  Séquence paiement (noire / simplifiée)  ---------------
-\subsubsection{Diagramme de séquence — Processus de paiement (vue simplifiée)}
+\subsubsection{Processus de paiement — vue simplifiée}
 
 Le diagramme de séquence (Figure~\ref{fig:seq_noir}) décrit le scénario de paiement
 du point de vue du client et de l'application. Le client accède à la page de paiement
@@ -671,8 +748,7 @@ selon le résultat, une confirmation avec le QR Code et la référence de réser
     \label{fig:seq_noir}
 \end{figure}
 
-%----  Séquence paiement (blanche / détaillée)  --------------
-\subsubsection{Diagramme de séquence — Processus de paiement (vue détaillée)}
+\subsubsection{Processus de paiement — vue détaillée}
 
 Le diagramme de séquence détaillé (Figure~\ref{fig:seq_blanc}) présente l'ensemble
 des composants impliqués : le Client, le service de paiement frontend, le Payment
@@ -691,8 +767,7 @@ sont libérés et un message d'erreur est retourné au client.
     \label{fig:seq_blanc}
 \end{figure}
 
-%----  Séquence validation staff (blanche / détaillée)  ------
-\subsubsection{Diagramme de séquence — Validation QR code par le staff (vue détaillée)}
+\subsubsection{Validation QR code par le staff — vue détaillée}
 
 Le diagramme de séquence détaillé (Figure~\ref{fig:seq_staff_blanc}) décrit le
 processus de validation d'entrée réalisé par le staff. Après sélection de la
@@ -709,8 +784,7 @@ le système retourne un message d'échec et l'entrée est refusée.
     \label{fig:seq_staff_blanc}
 \end{figure}
 
-%----  Séquence validation staff (noire / simplifiée)  -------
-\subsubsection{Diagramme de séquence — Validation QR code par le staff (vue simplifiée)}
+\subsubsection{Validation QR code par le staff — vue simplifiée}
 
 Le diagramme de séquence simplifié (Figure~\ref{fig:seq_staff_noir}) présente
 la validation d'entrée du point de vue externe. Le staff sélectionne une séance
@@ -726,44 +800,14 @@ résultat d'autorisation ou de refus.
 \end{figure}
 
 %------------------------------------------------------------
-\subsection{Diagramme de classes métier}
-
-Le diagramme de classes métier (Figure~\ref{fig:class_metier}) présente
-les entités principales du domaine (Utilisateur, Film, Seance, Reservation,
-Paiement, Salle, Cinema, Siege) ainsi que leurs relations. Il sert de base
-conceptuelle pour comprendre la structure des données et les liens entre les
-objets métier de CinePass.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{images/diagrammes/Class Metier (analyse).png}
-    \caption{Diagramme de classes métier — CinePass}
-    \label{fig:class_metier}
-\end{figure}
-
-\subsection{Diagramme d'etats-transitions — Reservation}
-
-Le diagramme d'etats-transitions (Figure~\ref{fig:reservation_state})
-illustre le cycle de vie d'une reservation : creation, etat en cours,
-paiement valide, validation de l'entree et fin de seance. Il clarifie
-les evenements qui provoquent chaque changement d'etat et les actions
-associees (generation du QR code, liberation des sieges, notifications).
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.92\textwidth]{images/diagrammes/reservation state diagramme.png}
-    \caption{Diagramme d'etats-transitions — Reservation}
-    \label{fig:reservation_state}
-\end{figure}
-
-%------------------------------------------------------------
-\subsection{Diagramme de classes de conception (CSR)}
+\subsection{Étape 7 : Réalisation du diagramme de classes de conception (CSR)}
 
 Le diagramme de classes de conception (Figure~\ref{fig:class_conception})
 décline la solution en trois couches conformément au pattern CSR de NestJS
 (Controller, Service, Repository). Cette séparation met en évidence le flux
 des requêtes, la logique métier et l'accès aux données, tout en favorisant la
-maintenabilité et l'isolation des responsabilités.
+maintenabilité et l'isolation des responsabilités. Cette étape prépare également
+la structuration des composants logiciels et l'organisation du déploiement.
 
 \begin{figure}[H]
     \centering
@@ -772,77 +816,122 @@ maintenabilité et l'isolation des responsabilités.
     \label{fig:class_conception}
 \end{figure}
 
-%------------------------------------------------------------
-\section{Design patterns utilisés}
-%------------------------------------------------------------
+%---------- Patterns de conception  --------------------------------------------------
+\section{Architecture technique et patterns de conception}
 
-La conception de CinePass s'appuie sur plusieurs design patterns afin de
-structurer le code, réduire le couplage entre les composants et faciliter
-l'évolution de la plateforme.
+La branche technique de la méthode 2TUP a conduit à
+définir l'architecture du système et les patterns de
+conception adoptés. Ces choix constituent la base
+technique sur laquelle repose le diagramme de classes
+de conception présenté dans la section suivante.
 
-\subsection{Pattern Controller--Service--Repository}
+%----  Architecture  -----------------------------------------
+\subsection{Architecture retenue — pattern CSR}
 
-Le backend NestJS adopte principalement le pattern
-\textbf{Controller--Service--Repository}. Le \textbf{Controller} reçoit les
-requêtes HTTP, valide les paramètres d'entrée et retourne les réponses au
-client. Le \textbf{Service} contient la logique métier liée aux cas d'utilisation,
-comme la création d'une réservation, la vérification de disponibilité des sièges
-ou la validation d'un paiement. Le \textbf{Repository} assure l'accès aux données
-via TypeORM et isole les opérations de persistance.
+L'architecture de CinePass repose sur le pattern
+\textbf{CSR (Controller -- Service -- Repository)},
+propre au framework NestJS. Cette architecture sépare
+les responsabilités en trois couches distinctes~:
 
-Ce découpage permet de séparer clairement les responsabilités : les contrôleurs
-ne contiennent pas de règles métier complexes, les services restent indépendants
-du protocole HTTP, et l'accès à la base de données peut évoluer sans modifier
-l'ensemble de l'application.
+\begin{itemize}
+    \item \textbf{Controller} --- reçoit les requêtes HTTP,
+          valide les DTOs et délègue le traitement
+          au Service
+    \item \textbf{Service} --- contient toute la logique
+          métier, orchestre les traitements et appelle
+          les Repositories
+    \item \textbf{Repository} --- accès aux données via
+          TypeORM, isolation totale de la base de données
+          PostgreSQL
+\end{itemize}
+Cette structure permet de maintenir un code propre, modulaire et facilement testable, tout en respectant les principes SOLID.
+%----  Design Patterns  --------------------------------------
+\subsection{Patterns de conception utilisés}
 
-\subsection{Pattern Repository}
+La conception de CinePass mobilise plusieurs patterns
+reconnus qui structurent l'architecture et améliorent
+la maintenabilité du système.
 
-Le pattern \textbf{Repository} est utilisé pour centraliser les opérations liées
-aux entités persistantes telles que \texttt{Film}, \texttt{Seance},
-\texttt{Reservation}, \texttt{Paiement} et \texttt{Utilisateur}. Il fournit une
-interface cohérente pour rechercher, créer, modifier ou supprimer les données,
-tout en masquant les détails techniques de la base PostgreSQL.
+\paragraph{Repository Pattern}
+Le pattern Repository isole l'accès aux données de
+la logique métier. Chaque service accède aux entités
+TypeORM exclusivement via son repository injecté,
+rendant la couche service indépendante de la base de
+données.
 
-Dans CinePass, ce pattern facilite notamment la gestion des réservations et des
-sièges, car les règles de disponibilité peuvent être appliquées au niveau du
-service sans dépendre directement de requêtes SQL dispersées dans le code.
+\paragraph{Strategy Pattern}
+Le pattern Strategy est utilisé via Passport.js pour
+l'authentification. Les stratégies \texttt{JwtStrategy}
+et \texttt{LocalStrategy} sont interchangeables et
+encapsulent chacune un algorithme de vérification distinct,
+sans modifier le code du service d'authentification.
 
-\subsection{Pattern Dependency Injection}
+\paragraph{Decorator Pattern}
+NestJS repose massivement sur les décorateurs
+(\texttt{@Controller}, \texttt{@UseGuards},
+\texttt{@Roles}, \texttt{@Body}...) pour ajouter
+des comportements aux classes et méthodes sans
+modifier leur code source.
 
-NestJS repose sur le pattern \textbf{Dependency Injection}, qui consiste à
-fournir automatiquement aux classes les dépendances dont elles ont besoin. Par
-exemple, un service de réservation peut recevoir le service de paiement, le
-repository des séances et le service de notification sans les instancier
-directement.
+\paragraph{Observer Pattern}
+Le webhook Stripe implémente une variante du pattern
+Observer~: après confirmation du paiement, un événement
+est émis par Stripe et reçu par le backend, déclenchant
+automatiquement la génération du QR Code et l'envoi
+de la notification email au client.
 
-Cette approche améliore la testabilité du système, car il devient possible de
-remplacer une dépendance réelle par une version simulée lors des tests unitaires.
-Elle réduit également le couplage entre les modules et rend l'architecture plus
-souple.
+\paragraph{Singleton Pattern}
+Tous les providers NestJS (services, gateways,
+schedulers) sont des singletons par défaut~:
+une seule instance est créée et partagée par
+l'ensemble de l'application, garantissant la cohérence
+des traitements.
 
-\subsection{Pattern DTO}
+\paragraph{Scheduler Pattern}
+Le pattern Scheduler est utilisé pour l'expiration
+automatique des réservations. Le composant
+\texttt{ExpirationScheduler} s'exécute toutes les
+minutes via \texttt{@Cron(EVERY\_MINUTE)} et met à jour
+le statut des réservations \texttt{EN\_COURS} dépassant
+le délai de dix minutes.
 
-Le pattern \textbf{Data Transfer Object (DTO)} est utilisé pour structurer les
-données échangées entre le frontend et le backend. Les DTO définissent les champs
-attendus pour chaque opération, comme l'inscription d'un utilisateur, la création
-d'une séance ou la confirmation d'une réservation.
-
-Ce pattern permet de valider les données entrantes avant leur traitement, de
-limiter les erreurs de format et de sécuriser les échanges entre les différentes
-couches de l'application.
-
-\subsection{Pattern Component}
-
-Côté frontend, React applique le pattern \textbf{Component}. Les interfaces sont
-découpées en composants réutilisables : formulaires, cartes de films, plan de
-salle, tableau de bord, listes de réservations et éléments de navigation. Chaque
-composant possède une responsabilité précise et peut être composé avec d'autres
-éléments pour construire des pages complètes.
-
-Ce pattern favorise la réutilisation du code, l'homogénéité de l'interface et la
-maintenance progressive de l'application client.
-
-%------------------------------------------------------------
+\begin{table}[H]
+\centering
+\label{tab:patterns}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{|l|l|p{5cm}|}
+\hline
+\rowcolor{gray!20}
+\textbf{Pattern} & \textbf{Catégorie}
+                 & \textbf{Utilisation dans CinePass} \\
+\hline
+Repository    & Structural  &
+    TypeORM Repository --- isolation de la BD \\
+\hline
+Strategy      & Behavioral  &
+    JwtStrategy, LocalStrategy (Passport.js) \\
+\hline
+Decorator     & Structural  &
+    \texttt{@Guard}, \texttt{@Roles}, \texttt{@Body} \\
+\hline
+Observer      & Behavioral  &
+    Stripe Webhook --- confirmation paiement \\
+\hline
+Singleton     & Creational  &
+    Tous les providers NestJS \\
+\hline
+Facade        & Structural  &
+    Service layer --- cache la complexité des repos \\
+\hline
+Scheduler     & Behavioral  &
+    ExpirationScheduler --- expiration 10 min \\
+\hline
+Gateway       & Structural  &
+    StripeGateway --- abstraction API Stripe \\
+\hline
+\end{tabular}
+\caption{Récapitulatif des patterns de conception — CinePass}
+\end{table}
 
 %------------------------------------------------------------
 \section{Choix de conception}
