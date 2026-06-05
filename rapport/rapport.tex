@@ -102,7 +102,7 @@
     \begin{tabularx}{\textwidth}{X X}
         \textbf{Effectué par :} & \textbf{Encadré par :} \\[0.2cm]
         Abdessami Aglagal       & Pr. Jihan Elkhraoui    \\[0.2cm]
-        Yassine El aouni        & Pr. Zakiria Ithroui    \\[0.2cm]
+        Yassine El Aouni        & Pr. Zakiria Ithroui    \\[0.2cm]
         Ayoub Boukili           &                        \\[0.2cm]
         Aymane Alahyane          &                        \\
     \end{tabularx}
@@ -853,47 +853,179 @@ reconnus qui structurent l'architecture et améliorent
 la maintenabilité du système.
 
 \paragraph{Repository Pattern}
-Le pattern Repository isole l'accès aux données de
-la logique métier. Chaque service accède aux entités
-TypeORM exclusivement via son repository injecté,
-rendant la couche service indépendante de la base de
-données.
+Le pattern Repository est appliqué dans CinePass via
+TypeORM. Chaque entité du système possède son propre
+repository injecté dans le service correspondant. Le
+service ne communique jamais directement avec la base
+de données PostgreSQL --- il passe obligatoirement par
+le repository. Ainsi, \texttt{ReservationController}
+appelle \texttt{ReservationService}, qui utilise
+\texttt{ReservationRepository} pour exécuter les
+requêtes SQL. Cette séparation garantit que la logique
+métier reste indépendante de la couche de persistance,
+facilitant la maintenabilité et les tests unitaires.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{images/design patterns/Repository Pattern.png}
+    \caption{Repository Pattern --- séparation service et persistance}
+    \label{fig:pattern_repository}
+\end{figure}
 
 \paragraph{Strategy Pattern}
-Le pattern Strategy est utilisé via Passport.js pour
-l'authentification. Les stratégies \texttt{JwtStrategy}
-et \texttt{LocalStrategy} sont interchangeables et
-encapsulent chacune un algorithme de vérification distinct,
-sans modifier le code du service d'authentification.
+Le pattern Strategy est utilisé dans CinePass via la
+bibliothèque Passport.js pour l'authentification.
+L'interface \texttt{PassportStrategy} définit un contrat
+commun avec la méthode \texttt{validate()}. Deux stratégies
+concrètes l'implémentent : \texttt{JwtStrategy}, qui vérifie
+la validité d'un token JWT et retourne l'utilisateur
+correspondant, et \texttt{LocalStrategy}, qui vérifie les
+identifiants email et mot de passe. Le guard
+\texttt{JwtAuthGuard} utilise la stratégie appropriée selon
+le contexte de la requête. Ce pattern permet de changer ou
+d'ajouter une stratégie d'authentification sans modifier le
+code existant d'\texttt{AuthService}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{images/design patterns/Strategy Pattern.png}
+    \caption{Strategy Pattern --- stratégies Passport.js}
+    \label{fig:pattern_strategy}
+\end{figure}
 
 \paragraph{Decorator Pattern}
-NestJS repose massivement sur les décorateurs
-(\texttt{@Controller}, \texttt{@UseGuards},
-\texttt{@Roles}, \texttt{@Body}...) pour ajouter
-des comportements aux classes et méthodes sans
-modifier leur code source.
+Le pattern Decorator est au coeur de l'architecture
+NestJS. Dans CinePass, chaque contrôleur, méthode et
+paramètre est annoté avec des décorateurs qui ajoutent
+des comportements sans modifier le code source des
+classes. Par exemple, \texttt{@Controller('reservation')}
+définit le préfixe de route, \texttt{@UseGuards(JwtAuthGuard)}
+ajoute la vérification d'authentification,
+\texttt{@Roles(Role.CLIENT)} restreint l'accès selon le rôle,
+\texttt{@Post()} associe la méthode HTTP, et \texttt{@Body()}
+extrait et valide automatiquement le corps de la requête.
+Ces décorateurs s'appliquent de manière transparente en
+pipeline, enrichissant le comportement de la méthode
+\texttt{create()} sans qu'elle ne gère elle-même ces
+préoccupations transversales.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{images/design patterns/Decorator Pattern.png}
+    \caption{Decorator Pattern --- pipeline de décorateurs NestJS}
+    \label{fig:pattern_decorator}
+\end{figure}
 
 \paragraph{Observer Pattern}
-Le webhook Stripe implémente une variante du pattern
-Observer~: après confirmation du paiement, un événement
-est émis par Stripe et reçu par le backend, déclenchant
-automatiquement la génération du QR Code et l'envoi
-de la notification email au client.
+Le pattern Observer est implémenté dans CinePass via le
+mécanisme de webhook Stripe. \texttt{PaiementService} joue
+le rôle de l'observateur abonné aux événements Stripe.
+Lorsqu'un paiement est confirmé, Stripe émet l'événement
+\texttt{checkout.session.completed} qui déclenche
+automatiquement \texttt{handleWebhook()} dans
+\texttt{PaiementService}. Ce dernier notifie alors ses
+dépendants : il appelle \texttt{ReservationService.confirmerPaiement()}
+pour passer la réservation au statut \texttt{PAYEE} et
+générer le QR Code, puis \texttt{EmailProvider.sendTicket()}
+pour envoyer la confirmation au client. Cette architecture
+découple totalement la confirmation du paiement de ses
+conséquences fonctionnelles.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{images/design patterns/Observer Pattern.png}
+    \caption{Observer Pattern --- webhook Stripe et notifications}
+    \label{fig:pattern_observer}
+\end{figure}
 
 \paragraph{Singleton Pattern}
-Tous les providers NestJS (services, gateways,
-schedulers) sont des singletons par défaut~:
-une seule instance est créée et partagée par
-l'ensemble de l'application, garantissant la cohérence
-des traitements.
+Le pattern Singleton est appliqué automatiquement par
+le conteneur d'injection de dépendances de NestJS. Par
+défaut, chaque provider déclaré dans un module NestJS ---
+qu'il s'agisse d'un service, d'un gateway ou d'un provider ---
+est instancié une seule fois pour toute la durée de vie
+de l'application. Ainsi, \texttt{AuthService},
+\texttt{ReservationService}, \texttt{PaiementService} et
+\texttt{EmailProvider} partagent tous une instance unique.
+Concrètement, \texttt{AuthService} et \texttt{PaiementService}
+injectent tous les deux \texttt{EmailProvider} mais reçoivent
+la même instance, garantissant la cohérence des traitements
+et optimisant la consommation mémoire.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{images/design patterns/Singleton Pattern.png}
+    \caption{Singleton Pattern --- instance unique des providers}
+    \label{fig:pattern_singleton}
+\end{figure}
+
+\paragraph{Facade Pattern}
+Le pattern Facade est matérialisé par la couche service
+dans CinePass. \texttt{ReservationController} appelle
+simplement \texttt{ReservationService.create(dto, id\_utilisateur)}
+sans connaître la complexité des opérations sous-jacentes.
+Derrière cette façade simple, \texttt{ReservationService}
+orchestre plusieurs sous-systèmes : il ouvre une transaction
+via \texttt{QueryRunner}, vérifie la séance disponible via
+\texttt{SeanceRepo}, contrôle chaque siège via \texttt{SiegeRepo},
+récupère le tarif correspondant via \texttt{TarifRepo}, crée la
+réservation via \texttt{ReservationRepo}, puis enregistre chaque
+siège réservé via \texttt{ReservationSiegeRepo}. Le contrôleur
+ignore totalement cette complexité --- il reçoit uniquement le
+résultat final.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{images/design patterns/Facade Pattern.png}
+    \caption{Facade Pattern --- orchestration des sous-systèmes}
+    \label{fig:pattern_facade}
+\end{figure}
 
 \paragraph{Scheduler Pattern}
-Le pattern Scheduler est utilisé pour l'expiration
-automatique des réservations. Le composant
-\texttt{ExpirationScheduler} s'exécute toutes les
-minutes via \texttt{@Cron(EVERY\_MINUTE)} et met à jour
-le statut des réservations \texttt{EN\_COURS} dépassant
-le délai de dix minutes.
+Le pattern Scheduler est utilisé dans CinePass pour
+l'expiration automatique des réservations non payées.
+La classe \texttt{ExpirationScheduler} est annotée avec
+\texttt{@Cron(CronExpression.EVERY\_MINUTE)}, ce qui
+déclenche automatiquement la méthode \texttt{handleExpiration()}
+toutes les soixante secondes via le registre
+\texttt{SchedulerRegistry} de NestJS. Cette méthode appelle
+\texttt{ReservationService.expireOldReservations()}, qui
+interroge la base de données pour trouver toutes les
+réservations dont le statut est \texttt{EN\_COURS} et dont la
+date de création dépasse dix minutes. Ces réservations sont
+alors automatiquement mises à jour au statut \texttt{EXPIREE},
+libérant les sièges correspondants sans aucune intervention
+humaine.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{images/design patterns/Scheduler pattern.png}
+    \caption{Scheduler Pattern --- expiration automatique des réservations}
+    \label{fig:pattern_scheduler}
+\end{figure}
+
+\paragraph{Gateway Pattern}
+Le pattern Gateway est appliqué dans CinePass pour
+abstraire la communication avec l'API externe Stripe.
+\texttt{StripeGateway} encapsule l'intégralité du SDK
+Stripe et expose trois méthodes simples à
+\texttt{PaiementService} : \texttt{createCheckoutSession()}
+pour créer une session de paiement, \texttt{verifyWebhook()}
+pour vérifier la signature d'un événement entrant, et
+\texttt{getSession()} pour récupérer l'état d'une session.
+\texttt{PaiementService} ne connaît jamais les détails du
+SDK Stripe --- il appelle uniquement \texttt{StripeGateway}.
+Cette abstraction présente un avantage majeur : si la
+passerelle de paiement devait être remplacée par CMI ou
+PayPal, seule \texttt{StripeGateway} serait modifiée, sans
+aucun impact sur \texttt{PaiementService}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{images/design patterns/Gateway Pattern.png}
+    \caption{Gateway Pattern --- abstraction de l'API Stripe}
+    \label{fig:pattern_gateway}
+\end{figure}
 
 \begin{table}[H]
 \centering
