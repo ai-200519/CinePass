@@ -1,6 +1,6 @@
 \documentclass[12pt]{report}
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
 \usepackage[french]{babel}
 \usepackage{graphicx}
 \usepackage{geometry}
@@ -21,6 +21,8 @@
 \usepackage{array}          % for p{} column type
 \usepackage{booktabs}       % for professional tables
 \usepackage{float}
+\usepackage{amssymb}
+\usepackage{microtype}
 
 \makeatletter
 \providecommand\insert@pcolumn{\insert@column}
@@ -35,7 +37,24 @@
 \titleformat{\chapter}[display]{\bfseries\Huge}{\chaptername\ \thechapter}{12pt}{\Huge}
 \titlespacing*{\chapter}{0pt}{-10pt}{20pt}
 
-
+% imagesplaceholders adrari
+\newcommand{\figureplaceholder}[3]{
+\begin{minipage}[t]{0.15\textwidth}
+\centering
+\IfFileExists{images/#1}{
+	\includegraphics[height=1.15cm,keepaspectratio]{#1}
+}{
+	\fbox{
+		\begin{minipage}[c][1.15cm][c]{1.65cm}
+			\centering
+			\scriptsize Logo\\à ajouter
+		\end{minipage}
+	}
+}\\[0.12cm]
+\textbf{\footnotesize #2}\\
+{\scriptsize #3}
+\end{minipage}
+}
 
 \geometry{
     top=2cm,
@@ -2524,17 +2543,280 @@ quant à lui la documentation fonctionnelle et technique de référence,
 décrivant l'architecture du système, les choix technologiques, l'organisation
 du développement et les fonctionnalités implémentées à travers les quatre
 sprints.
+%------------------------------------------------------------
 \section{Tests et validation}
 %------------------------------------------------------------
 
-La phase de tests constitue une étape essentielle du cycle de développement, permettant de s'assurer que les fonctionnalités implémentées répondent correctement aux spécifications définies en amont. Dans le cadre du projet CinePass, plusieurs niveaux de tests ont été mis en œuvre afin de garantir la qualité et la fiabilité de la solution.
+La phase de tests constitue une étape essentielle du cycle
+de développement de CinePass, garantissant que chaque
+fonctionnalité implémentée répond correctement aux
+spécifications définies dans le Product Backlog. Trois
+niveaux de tests complémentaires ont été mis en \oe{}uvre~:
+les tests unitaires avec Jest, les tests fonctionnels via
+Postman et les tests via Swagger UI.
 
-Les tests unitaires portent sur les composants individuels du backend, notamment les services NestJS responsables de la logique métier. Ces tests vérifient le comportement de chaque fonction de manière isolée, en simulant les dépendances externes telles que la base de données ou les services tiers, grâce au framework Jest intégré à l'écosystème NestJS.
+%------------------------------------------------------------
+\subsection{Tests unitaires avec Jest}
+%------------------------------------------------------------
 
-Les tests d'intégration permettent de valider les interactions entre les différents modules du système. Ils s'assurent notamment que les appels entre le frontend et le backend transitent correctement à travers les endpoints de l'API et que les données sont traitées et stockées de manière cohérente dans la base de données PostgreSQL.
+Les tests unitaires ont été réalisés avec \textbf{Jest},
+le framework de test intégré à l'écosystème NestJS. Ils
+portent sur les composants individuels du backend, en
+particulier les services responsables de la logique métier.
+Chaque service est testé de manière isolée grâce au système
+de mocking de Jest, qui simule les dépendances externes
+telles que les repositories TypeORM, la base de données
+PostgreSQL et les services tiers comme Stripe ou Nodemailer.
 
-Les tests fonctionnels ont été réalisés à l'aide de Postman, en simulant les scénarios d'utilisation complets : inscription d'un utilisateur avec vérification OTP, connexion, consultation du catalogue, réservation d'une séance avec sélection des sièges et consultation de l'historique. Chaque scénario a été vérifié de bout en bout afin de valider le bon enchaînement des opérations et la conformité des réponses de l'API aux attentes spécifiées.
+Les modules couverts par les tests unitaires sont les
+suivants~:
 
+\begin{itemize}
+    \item \textbf{AuthService}~: validation des identifiants,
+          génération du token JWT, vérification du code OTP
+          et réinitialisation du mot de passe
+    \item \textbf{UtilisateurService}~: création de compte,
+          recherche par email et par identifiant, mise à jour
+          du profil et changement de mot de passe
+    \item \textbf{ReservationService}~: création de
+          réservation avec transaction, annulation,
+          historique et expiration automatique
+    \item \textbf{PaiementService}~: initialisation d'une
+          session Stripe, traitement du webhook et
+          consultation du statut
+    \item \textbf{SeanceService}~: disponibilité des sièges
+          par séance et récupération des tarifs
+    \item \textbf{ExpirationScheduler}~: déclenchement de
+          la tâche planifiée et appel à
+          \texttt{expireOldReservations()}
+\end{itemize}
+
+La figure~\ref{fig:jest_results} présente les résultats
+d'exécution de la suite de tests Jest après la commande
+\texttt{npm run test}, affichant le nombre de suites et
+de tests passés ainsi que le temps d'exécution.
+
+\begin{figure}[H]
+    \centering
+    \figureplaceholder%
+        {images/tests/jest_results.png}%
+        {Jest Test Results}%
+        {npm run test --- terminal output}
+    \caption{Résultats des tests unitaires Jest --- CinePass}
+    \label{fig:jest_results}
+\end{figure}
+
+La figure~\ref{fig:jest_coverage} illustre le rapport de
+couverture de code généré après la commande
+\texttt{npm run test:cov}, indiquant le pourcentage de
+lignes, branches et fonctions couvertes par les tests
+pour chaque module du backend.
+
+\begin{figure}[H]
+    \centering
+    \figureplaceholder%
+        {images/tests/jest_coverage.png}%
+        {Jest Coverage Report}%
+        {npm run test:cov --- coverage table}
+    \caption{Rapport de couverture de code --- Tests Jest}
+    \label{fig:jest_coverage}
+\end{figure}
+
+%------------------------------------------------------------
+\subsection{Tests des contrôleurs}
+%------------------------------------------------------------
+
+En complément des tests de services, les contrôleurs NestJS
+ont fait l'objet de tests unitaires dédiés. Ces tests
+vérifient que chaque endpoint appelle correctement le service
+correspondant avec les bons paramètres et retourne la
+réponse attendue. Les guards d'authentification et de rôles
+sont simulés afin de tester le comportement des contrôleurs
+indépendamment du mécanisme de sécurité.
+
+Les contrôleurs testés incluent \texttt{AuthController},
+\texttt{ReservationController}, \texttt{PaiementController}
+et \texttt{AdminController}. La figure~\ref{fig:jest_controller}
+présente les résultats des tests pour le
+\texttt{ReservationController}.
+
+\begin{figure}[H]
+    \centering
+    \figureplaceholder%
+        {images/tests/jest_controller.png}%
+        {Controller Tests}%
+        {npx jest reservation.controller.spec.ts --verbose}
+    \caption{Résultats des tests unitaires ---
+             ReservationController}
+    \label{fig:jest_controller}
+\end{figure}
+
+%------------------------------------------------------------
+\subsection{Tests fonctionnels avec Postman}
+%------------------------------------------------------------
+
+Les tests fonctionnels ont été réalisés à l'aide de
+\textbf{Postman}, en simulant les scénarios d'utilisation
+complets depuis les endpoints de l'API. Une collection
+Postman dédiée au projet CinePass a été constituée,
+regroupant l'ensemble des requêtes organisées par module~:
+authentification, catalogue, réservation, paiement et
+administration.
+
+\subsubsection{Tests d'authentification}
+
+Les tests d'authentification couvrent les scénarios
+nominaux et alternatifs des endpoints d'inscription,
+de connexion, de vérification OTP et de réinitialisation
+du mot de passe.
+
+\begin{figure}[H]
+    \centering
+    \figureplaceholder%
+        {images/tests/postman_register.png}%
+        {Postman Register}%
+        {POST /api/auth/register --- 201 Created}
+    \caption{Test Postman --- POST /api/auth/register}
+    \label{fig:postman_register}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \figureplaceholder%
+        {images/tests/postman_login.png}%
+        {Postman Login}%
+        {POST /api/auth/login --- 200 OK + access\_token}
+    \caption{Test Postman --- POST /api/auth/login}
+    \label{fig:postman_login}
+\end{figure}
+
+\subsubsection{Tests de réservation}
+
+Les tests de réservation valident le scénario complet~:
+création d'une réservation avec sièges sélectionnés,
+vérification de la disponibilité en temps réel et
+annulation d'une réservation en statut \texttt{EN\_COURS}.
+
+\begin{figure}[H]
+    \centering
+    \figureplaceholder%
+        {images/tests/postman_reservation.png}%
+        {Postman Réservation}%
+        {POST /api/reservation --- 201 + reference CP-YYYY-XXXXXX}
+    \caption{Test Postman --- POST /api/reservation}
+    \label{fig:postman_reservation}
+\end{figure}
+
+\subsubsection{Tests du paiement Stripe}
+
+Les tests du module de paiement vérifient l'initialisation
+d'une session Stripe, la réception du webhook et la mise à
+jour du statut de la réservation vers \texttt{PAYEE} après
+confirmation.
+
+\begin{figure}[H]
+    \centering
+    \figureplaceholder%
+        {images/tests/postman_paiement.png}%
+        {Postman Paiement}%
+        {POST /api/paiement/initier --- 201 + Stripe URL}
+    \caption{Test Postman --- POST /api/paiement/initier}
+    \label{fig:postman_paiement}
+\end{figure}
+
+%------------------------------------------------------------
+\subsection{Tests via Swagger UI}
+%------------------------------------------------------------
+
+La documentation interactive \textbf{Swagger UI}, accessible
+à l'adresse \texttt{http://localhost:3000/docs}, a également
+été utilisée comme outil de test des endpoints de l'API.
+Elle permet de tester chaque route directement depuis le
+navigateur en fournissant les paramètres requis et en
+visualisant les réponses retournées par le serveur. Swagger
+a facilité la collaboration avec l'équipe frontend en offrant
+une documentation toujours synchronisée avec le code source.
+
+\begin{figure}[H]
+    \centering
+    \figureplaceholder%
+        {images/tests/swagger_ui.png}%
+        {Swagger UI}%
+        {http://localhost:3000/docs --- liste des endpoints}
+    \caption{Interface Swagger UI --- Documentation et
+             tests de l'API CinePass}
+    \label{fig:swagger_ui}
+\end{figure}
+
+%------------------------------------------------------------
+\subsection{Récapitulatif des tests}
+%------------------------------------------------------------
+
+Le tableau~\ref{tab:tests_recap} présente un récapitulatif
+de la couverture de tests par module et par type de test
+réalisé dans le cadre du projet CinePass.
+
+\begin{table}[H]
+\centering
+\caption{Récapitulatif de la couverture de tests --- CinePass}
+\label{tab:tests_recap}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{|l|c|c|c|}
+\hline
+\rowcolor{gray!20}
+\textbf{Module} &
+\textbf{Tests unitaires} &
+\textbf{Tests Postman} &
+\textbf{Swagger} \\
+\hline
+Auth (register, login, OTP) &
+\textcolor{green!60!black}{\checkmark} &
+\textcolor{green!60!black}{\checkmark} &
+\textcolor{green!60!black}{\checkmark} \\
+\hline
+Utilisateur (profil, password) &
+\textcolor{green!60!black}{\checkmark} &
+\textcolor{green!60!black}{\checkmark} &
+\textcolor{green!60!black}{\checkmark} \\
+\hline
+Film (CRUD) &
+\textcolor{green!60!black}{\checkmark} &
+\textcolor{green!60!black}{\checkmark} &
+\textcolor{green!60!black}{\checkmark} \\
+\hline
+Séance (disponibilité, tarifs) &
+\textcolor{green!60!black}{\checkmark} &
+\textcolor{green!60!black}{\checkmark} &
+\textcolor{green!60!black}{\checkmark} \\
+\hline
+Réservation (créer, annuler) &
+\textcolor{green!60!black}{\checkmark} &
+\textcolor{green!60!black}{\checkmark} &
+\textcolor{green!60!black}{\checkmark} \\
+\hline
+Paiement Stripe (webhook) &
+\textcolor{green!60!black}{\checkmark} &
+\textcolor{green!60!black}{\checkmark} &
+\textcolor{green!60!black}{\checkmark} \\
+\hline
+Admin (stats, réservations) &
+\textcolor{green!60!black}{\checkmark} &
+\textcolor{green!60!black}{\checkmark} &
+\textcolor{green!60!black}{\checkmark} \\
+\hline
+ExpirationScheduler &
+\textcolor{green!60!black}{\checkmark} &
+--- &
+--- \\
+\hline
+\end{tabular}
+\end{table}
+
+L'ensemble des tests réalisés a permis de valider la
+conformité des fonctionnalités implémentées avec les
+critères d'acceptation définis dans le Product Backlog,
+garantissant ainsi la qualité et la fiabilité de la
+solution CinePass avant sa mise en production.
 %------------------------------------------------------------
 \section{Conclusion du chapitre}
 %------------------------------------------------------------
