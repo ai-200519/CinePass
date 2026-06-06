@@ -279,41 +279,84 @@ L’objectif principal de ce projet est de proposer une solution numérique capa
 
 Pour assurer la réussite du projet, une méthodologie structurée a été adoptée, combinant des approches d’analyse, de conception et de développement logiciel. Plusieurs outils et technologies ont été mobilisés afin d’assurer un suivi rigoureux du projet, une bonne collaboration entre les différentes phases de développement et une implémentation cohérente de la solution.
 
-Ce rapport est structuré en plusieurs chapitres. Le premier chapitre présente le cadre méthodologique adopté ainsi que l’organisation du projet. Le deuxième chapitre est consacré à l’analyse et à la spécification des besoins fonctionnels et non fonctionnels. Le troisième chapitre décrit la conception du système à travers les différents modèles et diagrammes UML. Enfin, le dernier chapitre détaille la réalisation technique, les fonctionnalités développées ainsi que les tests effectués pour valider la solution proposée.
+Ce rapport est structuré en plusieurs chapitres. Le premier chapitre présente le
+cadre méthodologique adopté ainsi que l’organisation du projet. Le deuxième
+chapitre est consacré à l’analyse et à la spécification des besoins fonctionnels
+et non fonctionnels. Le troisième chapitre décrit la conception du système à
+travers les différents modèles et diagrammes UML. Le quatrième chapitre présente
+la gestion du projet et la collaboration au sein de l’équipe. Enfin, le dernier
+chapitre détaille la réalisation technique, les fonctionnalités développées ainsi
+que les tests effectués pour valider la solution proposée.
 %============================================================
 \chapter{Cadre méthodologique et organisation du projet}
 
 \section{Introduction}
 
-La réalisation d’un projet informatique nécessite une organisation rigoureuse, une méthodologie adaptée ainsi qu’un suivi structuré des différentes étapes de développement. En effet, le succès d’un système logiciel ne dépend pas uniquement de ses fonctionnalités, mais également de la manière dont le projet est planifié, conçu et implémenté.
+La réalisation d’un projet informatique nécessite une organisation rigoureuse,
+une méthodologie adaptée ainsi qu’un suivi structuré des différentes étapes de
+développement. En effet, le succès d’un système logiciel ne dépend pas
+uniquement de ses fonctionnalités, mais également de la manière dont le projet
+est analysé, planifié, conçu, implémenté et validé.
 
-
-Dans le cadre du projet \textbf{CinePass}, une approche méthodologique claire a été adoptée afin de garantir une bonne gestion des besoins, une meilleure coordination du développement et une évolution progressive de la solution proposée. Ce chapitre présente les méthodologies choisies, les outils utilisés pour la gestion du projet, le cycle de développement adopté ainsi que les moyens de collaboration et d’organisation mis en place.
+Dans le cadre du projet \textbf{CinePass}, une approche méthodologique claire a
+été adoptée afin de garantir une bonne gestion des besoins, une meilleure
+coordination du développement et une évolution progressive de la solution
+proposée. Ce chapitre présente les méthodes choisies, leur complémentarité, le
+cycle de développement adopté ainsi que l’organisation générale du travail au
+sein de l’équipe.
 
 \section{Présentation de la méthodologie adoptée}
 
-Afin d’assurer une bonne organisation du projet, une combinaison de méthodes complémentaires a été retenue. La méthodologie \textbf{2TUP} a été utilisée pour structurer les phases d’analyse et de conception du système, tandis que la méthode agile \textbf{Scrum} a permis d’encadrer le développement progressif du projet.
+Afin d’assurer une bonne organisation du projet, une combinaison de méthodes
+complémentaires a été retenue. La méthode \textbf{2TUP} a été utilisée pour
+structurer l’analyse et la conception du système, tandis que la méthode agile
+\textbf{Scrum} a permis d’encadrer la planification et le développement
+progressif des fonctionnalités.
 
-Cette combinaison a permis d’allier une vision structurée du système à une approche flexible facilitant les adaptations et les améliorations tout au long du développement.
+Cette combinaison a permis d’allier une vision structurée du système à une
+approche flexible, facilitant les adaptations et les améliorations tout au long
+du développement.
 
 \section{Justification du choix méthodologique}
 
-Le choix des méthodologies utilisées dans ce projet n’a pas été effectué au hasard. Il répond principalement aux besoins organisationnels et techniques du système à développer.
+Le choix des méthodologies utilisées dans ce projet n’a pas été effectué au
+hasard. Il répond principalement aux besoins organisationnels et techniques du
+système à développer.
 
-La méthode \textbf{2TUP} a été retenue car elle facilite la séparation entre les besoins fonctionnels du métier et les contraintes techniques de l’application. Cette approche permet d’obtenir une meilleure compréhension du système avant la phase d’implémentation.
+La méthode \textbf{2TUP} a été retenue car elle facilite la séparation entre les
+besoins fonctionnels du métier et les contraintes techniques de l’application.
+Cette approche permet d’étudier le système selon deux points de vue
+complémentaires avant de les réunir dans une conception cohérente.
 
-D’autre part, \textbf{Scrum} a été choisie afin d’adopter une méthode de travail agile favorisant l’évolution progressive du projet. Grâce à cette approche, il a été possible de développer les fonctionnalités de manière incrémentale, tout en assurant un suivi régulier de l’avancement et une adaptation rapide aux nouvelles exigences.
+D’autre part, \textbf{Scrum} a été choisie afin d’adopter une méthode de travail
+agile favorisant l’évolution progressive du projet. Grâce à cette approche, il a
+été possible de développer les fonctionnalités de manière incrémentale, tout en
+assurant un suivi régulier de l’avancement et une adaptation rapide aux nouvelles
+exigences.
 
 \section{Présentation de la méthodologie 2TUP}
 
-La méthode \textbf{2TUP (Two Tracks Unified Process)} est une méthodologie de développement logiciel dérivée du processus unifié. Elle repose sur la séparation entre deux axes principaux :
+La méthode \textbf{2TUP (Two Tracks Unified Process)} est une méthodologie de
+développement logiciel dérivée du processus unifié. Elle est souvent représentée
+sous la forme d’un cycle en Y, car elle distingue d’abord deux branches
+complémentaires avant de les réunir dans une phase de conception et de
+réalisation :
 
 \begin{itemize}
-    \item le processus fonctionnel, centré sur les besoins des utilisateurs ;
-    \item le processus technique, orienté vers les choix technologiques et architecturaux.
+    \item la \textbf{branche fonctionnelle}, centrée sur les besoins des
+          utilisateurs, les acteurs, les cas d’utilisation et les scénarios ;
+    \item la \textbf{branche technique}, orientée vers les contraintes
+          technologiques, l’architecture, la sécurité, la base de données et les
+          choix d’implémentation ;
+    \item la \textbf{branche de réalisation}, qui réunit les résultats des deux
+          branches précédentes pour produire la conception détaillée,
+          l’implémentation et les tests.
 \end{itemize}
 
-L’objectif principal de cette méthode est de permettre une évolution parallèle entre les besoins métier et les contraintes techniques du projet.
+L’objectif principal de cette méthode est de faire évoluer en parallèle la
+compréhension métier et la réflexion technique, afin d’éviter qu’une contrainte
+fonctionnelle ou architecturale importante ne soit découverte trop tard dans le
+projet.
 
 Dans le cadre de \textbf{CinePass}, cette méthodologie a permis :
 
@@ -326,21 +369,38 @@ Dans le cadre de \textbf{CinePass}, cette méthodologie a permis :
 
 \subsection{Cycle de la méthode 2TUP}
 
-La méthode 2TUP est généralement organisée autour de plusieurs étapes :
+Dans le cadre de \textbf{CinePass}, le cycle 2TUP a été interprété selon les
+étapes suivantes :
 
 \begin{enumerate}
-    \item Analyse des besoins ;
-    \item Étude technique ;
-    \item Conception du système ;
-    \item Développement ;
-    \item Validation et tests.
+    \item \textbf{Capture des besoins fonctionnels} : identification des acteurs,
+          des besoins, des cas d’utilisation et des scénarios métier.
+    \item \textbf{Analyse du domaine} : modélisation des processus, des entités
+          métier et du cycle de vie des objets importants, notamment la
+          réservation.
+    \item \textbf{Capture des besoins techniques} : définition des contraintes
+          liées à l’architecture web, à la sécurité, à la persistance des
+          données, au paiement et à la validation par QR code.
+    \item \textbf{Conception générale} : choix de l’architecture globale, des
+          couches applicatives et des principaux composants du système.
+    \item \textbf{Conception détaillée et réalisation} : production des
+          diagrammes de séquence, du diagramme de navigation, du diagramme de
+          classes de conception, puis implémentation progressive.
+    \item \textbf{Tests et validation} : vérification des fonctionnalités
+          développées et validation de la cohérence entre les besoins exprimés et
+          la solution réalisée.
 \end{enumerate}
 
-Ces étapes ont servi de référence pour structurer les différentes phases du projet.
+Ces étapes ont servi de référence pour organiser la conception présentée dans le
+chapitre dédié, tout en laissant Scrum piloter la réalisation incrémentale des
+fonctionnalités.
 
 \section{Présentation de la méthodologie Scrum}
 
-La méthode \textbf{Scrum} est une approche agile basée sur un développement itératif et incrémental. Elle permet de diviser le projet en cycles courts appelés \textit{Sprints}, chacun aboutissant à une version améliorée du produit.
+La méthode \textbf{Scrum} est une approche agile basée sur un développement
+itératif et incrémental. Elle permet de diviser le projet en cycles courts
+appelés \textit{sprints}, chacun visant à livrer un ensemble cohérent de
+fonctionnalités ou d’améliorations du produit.
 
 L’adoption de Scrum dans le cadre du projet \textbf{CinePass} a permis :
 
@@ -353,7 +413,8 @@ L’adoption de Scrum dans le cadre du projet \textbf{CinePass} a permis :
 
 \subsection{Les rôles Scrum}
 
-Même dans un projet académique, certains rôles inspirés de Scrum ont été adoptés :
+Même dans un projet académique, certains rôles inspirés de Scrum ont été adoptés
+afin de clarifier les responsabilités :
 
 \begin{itemize}
     \item \textbf{Product Owner :} responsable de la définition des besoins fonctionnels ;
@@ -372,10 +433,18 @@ Afin d’assurer une progression cohérente du projet, les tâches ont été ré
     \item développement du backend ;
     \item développement du frontend ;
     \item intégration des services ;
-    \item phase de tests et validation.
+    \item phase de test et de validation.
 \end{itemize}
 
 Cette organisation a permis une meilleure maîtrise du déroulement du projet et une gestion progressive des priorités.
+
+\section{Outils de suivi et de collaboration}
+
+Pour accompagner cette organisation, plusieurs outils ont été utilisés. Jira a
+servi au suivi des tâches, des user stories et des sprints. Git et GitHub ont
+permis la gestion du code source, le travail sur des branches séparées et la
+centralisation des contributions de l’équipe. Ces outils sont présentés plus en
+détail dans le chapitre consacré à la gestion du projet et à la collaboration.
 
 
 \section{Difficultés rencontrées et solutions apportées}
@@ -391,11 +460,19 @@ Parmi les principaux défis :
     \item la gestion des conflits de versions du code.
 \end{itemize}
 
-Ces difficultés ont été surmontées grâce à une meilleure planification des tâches, des tests réguliers ainsi qu’à l’utilisation d’outils de collaboration adaptés.
+Ces difficultés ont été surmontées grâce à une meilleure planification des
+tâches, à des tests réguliers ainsi qu’à l’utilisation d’outils de collaboration
+adaptés.
 
 \section{Conclusion du chapitre}
 
-Dans ce chapitre, nous avons présenté le cadre méthodologique adopté pour le développement du projet \textbf{CinePass}. La combinaison des approches \textbf{2TUP} et \textbf{Scrum} a permis d’assurer une organisation structurée et flexible du projet. De plus, l’utilisation d’outils tels que Jira, Git et GitHub a facilité le suivi des tâches, la gestion des versions ainsi que la collaboration durant le processus de développement. Le chapitre suivant sera consacré à l’analyse détaillée des besoins du système.
+Dans ce chapitre, nous avons présenté le cadre méthodologique adopté pour le
+développement du projet \textbf{CinePass}. La combinaison de \textbf{2TUP} et de
+\textbf{Scrum} a permis d’assurer à la fois une conception structurée et une
+réalisation progressive du produit. De plus, l’utilisation d’outils tels que
+Jira, Git et GitHub a facilité le suivi des tâches, la gestion des versions ainsi
+que la collaboration durant le processus de développement. Le chapitre suivant
+sera consacré à l’analyse détaillée des besoins du système.
 %============================================================
 \chapter{Analyse et spécification des besoins}
 
@@ -530,23 +607,27 @@ réservations.
 %------------------------------------------------------------
 \section{Suivi des étapes de la méthode 2TUP}
 %------------------------------------------------------------
-L'application de la méthode 2TUP a permis de structurer les différentes phases de conception du système. Après une analyse approfondie des besoins fonctionnels et non fonctionnels, nous avons défini les cas d'utilisation principaux, élaboré les diagrammes d'activité pour chaque acteur, et modélisé les interactions à travers des diagrammes de séquence. Cette approche a permis d'assurer une cohérence entre les besoins exprimés et la conception technique du système.
-\subsection{Étape 1 : Réalisation des diagrammes d'activité}
+L'application de la méthode 2TUP a permis d'organiser la conception de CinePass
+en deux branches complémentaires. La branche métier rassemble l'analyse des besoins,
+les cas d'utilisation et les scénarios fonctionnels. La branche technique transforme
+ensuite ces besoins en modèles de conception, diagrammes de séquence, architecture
+et patterns de mise en oeuvre. L'ordre retenu ci-dessous suit cette progression :
+on part du comportement observable par les acteurs, puis on descend vers la
+structure logique et enfin vers la réalisation technique.
 
-Les diagrammes d'activité modélisent le comportement dynamique du système pour
-chacun des acteurs principaux, en décrivant les enchaînements d'actions et les
-points de décision.
+\subsection{Étape 1 : Modélisation métier par les diagrammes d'activité}
 
-%----  Activité Admin  ---------------------------------------
+Les diagrammes d'activité décrivent les enchaînements d'actions pour chaque acteur
+principal. Ils servent à visualiser le comportement global du système avant de
+passer à la définition des cas d'utilisation.
+
 \subsubsection{Diagramme d'activité — Administrateur}
 
-Le diagramme d'activité de l'administrateur (Figure~\ref{fig:activity_admin}) décrit
-le flux d'actions disponibles après authentification : gestion des films (ajout,
-modification, suppression), gestion des salles, planification des séances, consultation
-des réservations, configuration de la tarification, consultation des analytics et
-gestion des paramètres système. Chaque action administrative déclenche une validation
-des données côté système avant enregistrement, avec retour d'une erreur en cas de
-données invalides.
+Le diagramme d'activité de l'administrateur (Figure~\ref{fig:activity_admin})
+illustre les opérations de gestion disponibles après authentification : gestion
+des films, des salles, des séances, des réservations, de la tarification, des
+analytics et des paramètres système. Il met en évidence les points de décision,
+les contrôles de validation et les retours en cas d'erreur.
 
 \begin{figure}[H]
     \centering
@@ -555,16 +636,14 @@ données invalides.
     \label{fig:activity_admin}
 \end{figure}
 
-%----  Activité Client  --------------------------------------
 \subsubsection{Diagramme d'activité — Client}
 
 Le diagramme d'activité du client (Figure~\ref{fig:activity_client}) représente
-le parcours complet d'un spectateur sur la plateforme : accès à l'application,
-authentification (optionnelle pour la consultation du catalogue), recherche et
-sélection d'un film, choix d'une séance, sélection des sièges disponibles,
-paiement en ligne et téléchargement du billet numérique. Les branches
-conditionnelles modélisent les cas où l'utilisateur n'est pas connecté, où
-aucun film n'est trouvé, ou encore où le paiement est refusé.
+le parcours utilisateur complet : consultation du catalogue, sélection d'un film,
+choix d'une séance, sélection des sièges, paiement en ligne et téléchargement du
+billet numérique. Lorsque l'utilisateur n'est pas connecté, lorsqu'aucun film
+n'est trouvé ou lorsqu'un paiement échoue, le diagramme montre les branches
+alternatives correspondantes.
 
 \begin{figure}[H]
     \centering
@@ -573,16 +652,13 @@ aucun film n'est trouvé, ou encore où le paiement est refusé.
     \label{fig:activity_client}
 \end{figure}
 
-%----  Activité Staff  ---------------------------------------
 \subsubsection{Diagramme d'activité — Staff}
 
-Le diagramme d'activité du staff (Figure~\ref{fig:activity_staff}) décrit le
-processus de validation d'entrée en salle. Après authentification sur l'application
-mobile CinePass Staff, l'agent choisit entre le scan du QR Code et la saisie
-manuelle de la référence. Le système vérifie la validité du billet en base de
-données (statut payé, non utilisé, séance correspondante) et retourne un retour
-visuel vert (entrée autorisée) ou rouge (entrée refusée avec motif). Le billet
-validé est immédiatement marqué comme utilisé afin d'empêcher toute réutilisation.
+Le diagramme d'activité du staff (Figure~\ref{fig:activity_staff}) décrit la
+validation d'entrée en salle. Après authentification sur l'application mobile,
+l'agent choisit entre le scan du QR code et la saisie manuelle d'une référence.
+Le système vérifie alors la validité du billet, puis autorise ou refuse l'entrée
+en fonction de son état.
 
 \begin{figure}[H]
     \centering
@@ -591,15 +667,12 @@ validé est immédiatement marqué comme utilisé afin d'empêcher toute réutil
     \label{fig:activity_staff}
 \end{figure}
 
-\subsection{Étape 2 : Réalisation du diagramme de cas d'utilisation}
+\subsection{Étape 2 : Cas d'utilisation}
 
-Le diagramme de cas d'utilisation (Figure~\ref{fig:usecase}) illustre les
-interactions principales entre les trois acteurs du système --- Client, Staff et
-Administrateur --- et les fonctionnalités offertes par la plateforme
-\textbf{CinePass}. Le Client peut s'authentifier, consulter le catalogue, réserver
-des places et effectuer un paiement en ligne. Le Staff valide les entrées via le
-scan d'un QR code ou une saisie manuelle. L'Administrateur gère l'ensemble des
-entités du système depuis son tableau de bord dédié.
+Le diagramme de cas d'utilisation (Figure~\ref{fig:usecase}) synthétise les
+fonctionnalités exposées par CinePass et les relations entre les trois acteurs
+du système : Client, Staff et Administrateur. Il constitue le point de passage
+entre l'analyse métier et la description détaillée des scénarios.
 
 \begin{figure}[H]
     \centering
@@ -608,15 +681,15 @@ entités du système depuis son tableau de bord dédié.
     \label{fig:usecase}
 \end{figure}
 
-%------------------------------------------------------------
-\subsection{Étape 3 : Choix des fonctionnalités et scénarios}
+\subsection{Étape 3 : Scénarios fonctionnels et vue boîte noire}
 
-Après la réalisation du diagramme de cas d'utilisation, deux fonctionnalités
-principales ont été retenues pour une étude détaillée : la réservation des places
-avec paiement en ligne et la validation d'entrée par le staff. Cette étape permet
-de préciser les scénarios, les diagrammes de séquence, les maquettes et, si
-nécessaire, les diagrammes d'activité associés.
-
+Après l'identification des cas d'utilisation principaux, les fonctionnalités de
+réservation, de paiement et de validation des billets ont été détaillées à travers
+des scénarios nominaux et des scénarios alternatifs. Cette étape décrit le
+fonctionnement attendu du point de vue externe, sans détailler encore les
+composants internes. La vue boîte noire correspond à cette logique : elle montre
+les entrées, les sorties et les interactions visibles par les acteurs, sans
+exposer le mécanisme technique interne.
 
 \subsubsection{Scénario : Réserver des places}
 
@@ -664,12 +737,143 @@ nécessaire, les diagrammes d'activité associés.
         Le système affiche un message : « Temps expiré, veuillez recommencer ».
 \end{itemize}
 
-%------------------------------------------------------------
-\subsection{Étape 4 : Réalisation du diagramme de classes d'analyse et d'états-transitions}
+\subsubsection{Vue boîte noire de la réservation}
 
-Le diagramme de classes métier (Figure~\ref{fig:class_metier}) présente
-les entités principales du domaine (Utilisateur, Film, Seance, Reservation,
-Paiement, Salle, Cinema, Siege) ainsi que leurs relations. Il sert de base
+La vue boîte noire (Figure~\ref{fig:seq_reservation_noir}) résume la fonctionnalité
+de réservation du point de vue externe. Elle met en évidence les principales
+étapes visibles pour le client : consulter les films, choisir une séance,
+sélectionner des sièges, confirmer le paiement et recevoir le billet final.
+Cette représentation est utile pour comprendre le service rendu sans entrer dans
+les détails d'implémentation.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{images/daigramme/blanch.png}
+    \caption{Diagramme de séquence : boîte noire — Réserver des places}
+    \label{fig:seq_reservation_noir}
+\end{figure}
+
+\subsubsection{Scénario : Processus de paiement}
+
+\textbf{Nom :} Effectuer le paiement d'une réservation \\
+\textbf{Acteur :} Client (principal), Passerelle de paiement (secondaire) \\
+\textbf{Données d'entrée :} Réservation en attente de paiement, montant total,
+référence de réservation et informations de paiement saisies par le client.
+
+\paragraph{Scénario nominal — Paiement accepté}
+\begin{enumerate}
+    \item Le client consulte le récapitulatif de sa réservation.
+    \item Il confirme son intention de payer.
+    \item Le système affiche l'interface de paiement sécurisée.
+    \item Le client saisit les informations de sa carte bancaire.
+    \item Le client valide le paiement.
+    \item Le système transmet la demande à la passerelle de paiement.
+    \item La passerelle confirme la transaction.
+    \item Le système met à jour la réservation avec le statut payé.
+    \item Le système génère le billet numérique et le QR code associé.
+    \item Le client reçoit une confirmation de paiement avec accès au billet.
+\end{enumerate}
+
+\paragraph{Scénarios alternatifs}
+\begin{itemize}
+    \item[\textbf{A.}] \textbf{Paiement refusé} \\
+        La passerelle de paiement refuse la transaction. \\
+        Le système conserve la réservation en attente et affiche un message
+        d'erreur. \\
+        Le client peut corriger les informations de paiement ou abandonner
+        l'opération.
+
+    \item[\textbf{B.}] \textbf{Session de paiement expirée} \\
+        Le client dépasse le délai autorisé pour finaliser le paiement. \\
+        Le système annule la tentative, libère les sièges temporairement bloqués
+        et invite le client à recommencer la réservation.
+
+    \item[\textbf{C.}] \textbf{Erreur de communication avec la passerelle} \\
+        La demande de paiement ne peut pas être confirmée immédiatement. \\
+        Le système affiche un message d'indisponibilité temporaire et évite de
+        générer le billet tant que le paiement n'est pas confirmé.
+\end{itemize}
+
+\subsubsection{Vue boîte noire du processus de paiement}
+
+Le diagramme de séquence simplifié (Figure~\ref{fig:seq_noir}) décrit le scénario
+de paiement du point de vue du client et de l'application. Le client saisit ses
+informations, soumet le paiement et reçoit, selon le résultat, soit une
+confirmation avec QR code, soit un message d'erreur.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.88\textwidth]{images/daigramme/sequenceNoirePaiement}
+    \caption{Diagramme de séquence — Processus de paiement (vue boîte noire)}
+    \label{fig:seq_noir}
+\end{figure}
+
+\subsubsection{Scénario : Validation QR code par le staff}
+
+\textbf{Nom :} Valider l'entrée d'un spectateur \\
+\textbf{Acteur :} Staff (principal), Client (secondaire) \\
+\textbf{Données d'entrée :} QR code du billet ou référence de réservation,
+séance sélectionnée par l'agent et date de contrôle.
+
+\paragraph{Scénario nominal — Entrée validée}
+\begin{enumerate}
+    \item Le staff s'authentifie sur l'application de validation.
+    \item Il sélectionne la séance concernée.
+    \item Le client présente son billet numérique.
+    \item Le staff scanne le QR code du billet.
+    \item Le système vérifie la référence, la séance et le statut du billet.
+    \item Le billet est reconnu comme payé, valide et non encore utilisé.
+    \item Le système valide l'entrée et met à jour l'état de la réservation.
+    \item L'application affiche un message d'entrée autorisée.
+\end{enumerate}
+
+\paragraph{Scénarios alternatifs}
+\begin{itemize}
+    \item[\textbf{A.}] \textbf{Saisie manuelle de la référence} \\
+        Si le QR code est illisible, le staff saisit manuellement la référence
+        du billet. \\
+        Le système effectue les mêmes contrôles et retourne le résultat de
+        validation.
+
+    \item[\textbf{B.}] \textbf{Billet déjà utilisé} \\
+        Le système détecte que l'entrée a déjà été validée. \\
+        L'application refuse l'accès et affiche un message indiquant que le
+        billet a déjà été consommé.
+
+    \item[\textbf{C.}] \textbf{Billet invalide ou mauvaise séance} \\
+        La référence n'existe pas, le paiement n'est pas confirmé ou le billet
+        ne correspond pas à la séance sélectionnée. \\
+        Le système refuse l'entrée et demande au staff de vérifier les
+        informations avec le client.
+\end{itemize}
+
+\subsubsection{Vue boîte noire de la validation QR code}
+
+Le diagramme de séquence simplifié (Figure~\ref{fig:seq_staff_noir}) présente la
+validation d'entrée du point de vue externe. Le staff choisit entre le scan du
+QR code et la saisie de la référence, puis l'application retourne un résultat
+d'autorisation ou de refus.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.92\textwidth]{images/daigramme/staff boite noire.png}
+    \caption{Diagramme de séquence — Validation QR code par le staff (vue boîte noire)}
+    \label{fig:seq_staff_noir}
+\end{figure}
+
+\subsection{Étape 4 : Modélisation métier et états de la réservation}
+
+Cette étape formalise la structure interne du domaine métier. Le diagramme de
+classes d'analyse présente les entités essentielles et leurs relations, tandis
+que le diagramme d'états-transitions décrit le cycle de vie d'une réservation.
+Ces deux vues complètent la compréhension fonctionnelle du système avant le
+passage à l'architecture technique.
+
+\subsubsection{Diagramme de classes métier}
+
+Le diagramme de classes métier (Figure~\ref{fig:class_metier}) présente les
+entités principales du domaine --- Utilisateur, Film, Séance, Réservation,
+Paiement, Salle, Cinéma et Siège --- ainsi que leurs relations. Il sert de base
 conceptuelle pour comprendre la structure des données et les liens entre les
 objets métier de CinePass.
 
@@ -680,49 +884,30 @@ objets métier de CinePass.
     \label{fig:class_metier}
 \end{figure}
 
-\subsubsection{Réalisation du diagramme d'états-transitions}
+\subsubsection{Diagramme d'états-transitions de la réservation}
 
-Le diagramme d'etats-transitions (Figure~\ref{fig:reservation_state})
-illustre le cycle de vie d'une reservation : creation, etat en cours,
-paiement valide, validation de l'entree et fin de seance. Il clarifie
-les evenements qui provoquent chaque changement d'etat et les actions
-associees (generation du QR code, liberation des sieges, notifications).
+Le diagramme d'états-transitions (Figure~\ref{fig:reservation_state}) illustre
+le cycle de vie d'une réservation : création, état en cours, paiement validé,
+validation de l'entrée, annulation ou expiration. Il précise les événements qui
+provoquent les changements d'état et les actions associées, comme la génération
+du QR code, la libération des sièges et l'envoi des notifications.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.92\textwidth]{images/diagrammes/reservation state diagramme.png}
-    \caption{Diagramme d'etats-transitions — Reservation}
+    \caption{Diagramme d'états-transitions — Réservation}
     \label{fig:reservation_state}
 \end{figure}
 
-\subsection{Étape 5 : Réalisation du diagramme de navigation}
+\subsection{Étape 5 : Vue boîte blanche et diagrammes d'interaction}
 
-Le diagramme de navigation (Figure~\ref{fig:navigation}) présente l'enchaînement
-des principales interfaces de CinePass. Il met en évidence les parcours client,
-administrateur et staff, depuis l'authentification jusqu'aux écrans de gestion,
-de réservation, de paiement et de validation des billets.
+La vue boîte blanche complète la vue externe précédente en détaillant les objets
+internes impliqués dans le traitement. Dans CinePass, elle est principalement
+illustrée par les diagrammes de séquence, qui montrent le dialogue entre le
+client, l'application et les composants backend lors de la réservation, du
+paiement et de la validation d'entrée.
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{images/daigramme/Navigation.jpg}
-    \caption{Diagramme de navigation — CinePass}
-    \label{fig:navigation}
-\end{figure}
-
-\subsection{Étape 6 : Réalisation des diagrammes d'interaction}
-
-Les diagrammes d'interaction, principalement les diagrammes de séquence, modélisent
-les échanges temporels entre les acteurs, l'application et les composants backend
-pour les scénarios clés de réservation, de paiement et de validation des entrées.
-
-\subsubsection{Réserver des places — vues boîte noire et boîte blanche}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\linewidth]{images/daigramme/blanch.png}
-    \caption{Diagramme de séquence : boîte noire — Réserver des places}
-    \label{fig:seq_reservation_noir}
-\end{figure}
+\subsubsection{Réserver des places — vue boîte blanche}
 
 \begin{figure}[H]
     \centering
@@ -731,34 +916,14 @@ pour les scénarios clés de réservation, de paiement et de validation des entr
     \label{fig:seq_reservation_blanc}
 \end{figure}
 
-\subsubsection{Processus de paiement — vue simplifiée}
-
-Le diagramme de séquence (Figure~\ref{fig:seq_noir}) décrit le scénario de paiement
-du point de vue du client et de l'application. Le client accède à la page de paiement
-avec les identifiants de séance et de sièges, saisit ses informations personnelles
-et bancaires, puis soumet le paiement. L'application traite la transaction et retourne,
-selon le résultat, une confirmation avec le QR Code et la référence de réservation
-(\textit{paiement accepté}), ou un message d'erreur avec possibilité de réessayer
-(\textit{paiement refusé}).
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.88\textwidth]{images/daigramme/sequenceNoirePaiement}
-    \caption{Diagramme de séquence — Processus de paiement (vue simplifiée)}
-    \label{fig:seq_noir}
-\end{figure}
-
 \subsubsection{Processus de paiement — vue détaillée}
 
-Le diagramme de séquence détaillé (Figure~\ref{fig:seq_blanc}) présente l'ensemble
-des composants impliqués : le Client, le service de paiement frontend, le Payment
-Controller, et les entités \texttt{Paiement}, \texttt{Réservation} et \texttt{Siège}.
-Le flux distingue la phase de blocage temporaire des sièges, la validation du
-formulaire, la soumission via l'API \texttt{POST /api/payment}, l'initiation de
-la transaction auprès de la passerelle de paiement, puis les deux branches
-alternatives~: en cas d'acceptation, la réservation est créée, le QR Code est
-généré et les sièges sont marqués comme réservés~; en cas de refus, les sièges
-sont libérés et un message d'erreur est retourné au client.
+Le diagramme de séquence détaillé (Figure~\ref{fig:seq_blanc}) présente les
+composants internes impliqués : le client, le service de paiement frontend, le
+contrôleur de paiement et les entités liées à la réservation. Le flux met en
+évidence le blocage temporaire des sièges, l'appel à la passerelle de paiement,
+la création de la réservation en cas de succès et la libération des sièges en
+cas d'échec.
 
 \begin{figure}[H]
     \centering
@@ -771,11 +936,9 @@ sont libérés et un message d'erreur est retourné au client.
 
 Le diagramme de séquence détaillé (Figure~\ref{fig:seq_staff_blanc}) décrit le
 processus de validation d'entrée réalisé par le staff. Après sélection de la
-séance, l'agent peut lancer le scan du QR code ou saisir manuellement une
-référence. L'application transmet la demande au contrôleur de réservation, qui
-recherche la réservation correspondante, vérifie son état puis met à jour le
-statut de la séance lorsque l'entrée est autorisée. En cas de QR code non valide,
-le système retourne un message d'échec et l'entrée est refusée.
+séance, l'agent peut scanner le QR code ou saisir une référence. L'application
+interroge alors le contrôleur de réservation, qui vérifie l'état du billet avant
+de valider ou de refuser l'accès.
 
 \begin{figure}[H]
     \centering
@@ -784,30 +947,27 @@ le système retourne un message d'échec et l'entrée est refusée.
     \label{fig:seq_staff_blanc}
 \end{figure}
 
-\subsubsection{Validation QR code par le staff — vue simplifiée}
+\subsection{Étape 6 : Réalisation du diagramme de navigation}
 
-Le diagramme de séquence simplifié (Figure~\ref{fig:seq_staff_noir}) présente
-la validation d'entrée du point de vue externe. Le staff sélectionne une séance
-dans l'application, puis choisit soit le scan du QR code, soit la saisie de la
-référence. L'application vérifie la validité de la réservation et retourne un
-résultat d'autorisation ou de refus.
+Le diagramme de navigation (Figure~\ref{fig:navigation}) présente l'enchaînement
+des principales interfaces de CinePass. Il relie les écrans du client, de
+l'administrateur et du staff, depuis l'authentification jusqu'aux pages de
+gestion, de réservation, de paiement et de validation des billets.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.92\textwidth]{images/daigramme/staff boite noire.png}
-    \caption{Diagramme de séquence — Validation QR code par le staff (vue simplifiée)}
-    \label{fig:seq_staff_noir}
+    \includegraphics[width=0.95\textwidth]{images/daigramme/Navigation.jpg}
+    \caption{Diagramme de navigation — CinePass}
+    \label{fig:navigation}
 \end{figure}
 
-%------------------------------------------------------------
 \subsection{Étape 7 : Réalisation du diagramme de classes de conception (CSR)}
 
 Le diagramme de classes de conception (Figure~\ref{fig:class_conception})
 décline la solution en trois couches conformément au pattern CSR de NestJS
-(Controller, Service, Repository). Cette séparation met en évidence le flux
-des requêtes, la logique métier et l'accès aux données, tout en favorisant la
-maintenabilité et l'isolation des responsabilités. Cette étape prépare également
-la structuration des composants logiciels et l'organisation du déploiement.
+(Controller, Service, Repository). Cette étape correspond à la transformation
+finale des besoins métiers en architecture logicielle concrète, en mettant en
+évidence le flux des requêtes, la logique métier et l'accès aux données.
 
 \begin{figure}[H]
     \centering
@@ -867,7 +1027,7 @@ facilitant la maintenabilité et les tests unitaires.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\textwidth]{images/design patterns/Repository Pattern.png}
+    \includegraphics[width=0.4\textwidth]{images/design patterns/Repository Pattern.png}
     \caption{Repository Pattern --- séparation service et persistance}
     \label{fig:pattern_repository}
 \end{figure}
@@ -888,7 +1048,7 @@ code existant d'\texttt{AuthService}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\textwidth]{images/design patterns/Strategy Pattern.png}
+    \includegraphics[width=0.8\textwidth]{images/design patterns/Strategy Pattern.png}
     \caption{Strategy Pattern --- stratégies Passport.js}
     \label{fig:pattern_strategy}
 \end{figure}
@@ -911,7 +1071,7 @@ préoccupations transversales.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.75\textwidth]{images/design patterns/Decorator Pattern.png}
+    \includegraphics[width=0.4\textwidth]{images/design patterns/Decorator Pattern.png}
     \caption{Decorator Pattern --- pipeline de décorateurs NestJS}
     \label{fig:pattern_decorator}
 \end{figure}
@@ -976,7 +1136,7 @@ résultat final.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\textwidth]{images/design patterns/Facade Pattern.png}
+    \includegraphics[width=1.1\textwidth]{images/design patterns/Facade Pattern.png}
     \caption{Facade Pattern --- orchestration des sous-systèmes}
     \label{fig:pattern_facade}
 \end{figure}
@@ -999,7 +1159,7 @@ humaine.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\textwidth]{images/design patterns/Scheduler pattern.png}
+    \includegraphics[width=0.65\textwidth]{images/design patterns/Scheduler pattern.png}
     \caption{Scheduler Pattern --- expiration automatique des réservations}
     \label{fig:pattern_scheduler}
 \end{figure}
@@ -1022,10 +1182,12 @@ aucun impact sur \texttt{PaiementService}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\textwidth]{images/design patterns/Gateway Pattern.png}
+    \includegraphics[width=0.55\textwidth]{images/design patterns/Gateway Pattern.png}
     \caption{Gateway Pattern --- abstraction de l'API Stripe}
     \label{fig:pattern_gateway}
 \end{figure}
+
+Le tableau suivant récapitule les patterns de conception utilisés dans CinePass, leur catégorie et leur utilisation spécifique dans l'architecture du système.
 
 \begin{table}[H]
 \centering
