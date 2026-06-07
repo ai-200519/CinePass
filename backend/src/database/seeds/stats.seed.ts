@@ -311,6 +311,64 @@ function addDays(date: Date, days: number): Date {
   return d;
 }
 
+function startOfWeekMonday(date: Date): Date {
+  const d = startOfDay(date);
+  const daysSinceMonday = (d.getDay() + 6) % 7;
+  d.setDate(d.getDate() - daysSinceMonday);
+  return d;
+}
+
+function buildSeanceDates(
+  today: Date,
+  filmIndex: number,
+  cityIndex: number,
+  statut: StatutFilm,
+): Date[] {
+  if (statut === StatutFilm.A_VENIR) {
+    return [addDays(today, 7 + cityIndex), addDays(today, 14 + filmIndex)];
+  }
+
+  const dates: Date[] = [];
+
+  // Eight films receive one historical screening per completed month.
+  if (filmIndex < 8) {
+    for (let month = 0; month < today.getMonth(); month += 1) {
+      const day = 5 + ((filmIndex * 3 + cityIndex * 4 + month * 5) % 20);
+      dates.push(new Date(today.getFullYear(), month, day));
+    }
+  }
+
+  // Every active film appears in the current week so dashboard charts stay rich.
+  const weekStart = startOfWeekMonday(today);
+  dates.push(addDays(weekStart, (filmIndex + cityIndex) % 7));
+
+  // Keep a future screening available for the booking flow.
+  dates.push(addDays(today, 3 + ((filmIndex + cityIndex) % 5)));
+
+  const uniqueDates = new Map<string, Date>();
+  for (const date of dates) {
+    uniqueDates.set(toYyyyMmDd(date), date);
+  }
+  return Array.from(uniqueDates.values()).sort(
+    (a, b) => a.getTime() - b.getTime(),
+  );
+}
+
+function reservationTarget(
+  seanceDate: Date,
+  capacity: number,
+  filmIndex: number,
+  cityIndex: number,
+): number {
+  const variation =
+    (filmIndex * 7 +
+      cityIndex * 5 +
+      seanceDate.getMonth() * 3 +
+      seanceDate.getDate()) %
+    18;
+  return Math.min(capacity, 12 + variation);
+}
+
 function toYyyyMmDd(date: Date): string {
   const yyyy = String(date.getFullYear());
   const mm = String(date.getMonth() + 1).padStart(2, '0');
@@ -350,6 +408,32 @@ async function cleanupStatsSeed(dataSource: DataSource): Promise<void> {
       SELECT s.id_seance
       FROM seance s
       JOIN film f ON f.id = s.id_film
+      WHERE (
+        f.title LIKE '% - Errachidia'
+        OR f.title LIKE '% - Casablanca'
+        OR f.title LIKE '% - Rabat'
+        OR f.title LIKE '% - Marrakech'
+        OR LOWER(f.title) IN ('sex with love', 'fatal conspiracy')
+        OR f.title IN (
+          'Dune: Deuxieme Partie',
+          'Oppenheimer',
+          'Spider-Man: Across the Spider-Verse',
+          'The Batman',
+          'Inside Out 2',
+          'Mission: Impossible - Dead Reckoning',
+          'Wonka',
+          'Avatar: La Voie de l Eau'
+        )
+      )
+      AND NOT EXISTS (
+        SELECT 1 FROM reservation r WHERE r.id_seance = s.id_seance
+      )
+    );
+
+    DELETE FROM seance s
+    WHERE s.id_film IN (
+      SELECT f.id
+      FROM film f
       WHERE f.title LIKE '% - Errachidia'
          OR f.title LIKE '% - Casablanca'
          OR f.title LIKE '% - Rabat'
@@ -365,36 +449,19 @@ async function cleanupStatsSeed(dataSource: DataSource): Promise<void> {
           'Wonka',
           'Avatar: La Voie de l Eau'
         )
+    )
+    AND NOT EXISTS (
+      SELECT 1 FROM reservation r WHERE r.id_seance = s.id_seance
     );
 
-    DELETE FROM seance
-    WHERE id_film IN (
-      SELECT id
-      FROM film
-      WHERE title LIKE '% - Errachidia'
-         OR title LIKE '% - Casablanca'
-         OR title LIKE '% - Rabat'
-         OR title LIKE '% - Marrakech'
-         OR LOWER(title) IN ('sex with love', 'fatal conspiracy')
-         OR title IN (
-          'Dune: Deuxieme Partie',
-          'Oppenheimer',
-          'Spider-Man: Across the Spider-Verse',
-          'The Batman',
-          'Inside Out 2',
-          'Mission: Impossible - Dead Reckoning',
-          'Wonka',
-          'Avatar: La Voie de l Eau'
-        )
-    );
-
-    DELETE FROM film
-    WHERE title LIKE '% - Errachidia'
-       OR title LIKE '% - Casablanca'
-       OR title LIKE '% - Rabat'
-       OR title LIKE '% - Marrakech'
-       OR LOWER(title) IN ('sex with love', 'fatal conspiracy')
-       OR title IN (
+    DELETE FROM film f
+    WHERE (
+      f.title LIKE '% - Errachidia'
+      OR f.title LIKE '% - Casablanca'
+      OR f.title LIKE '% - Rabat'
+      OR f.title LIKE '% - Marrakech'
+      OR LOWER(f.title) IN ('sex with love', 'fatal conspiracy')
+      OR f.title IN (
         'Dune: Deuxieme Partie',
         'Oppenheimer',
         'Spider-Man: Across the Spider-Verse',
@@ -410,7 +477,11 @@ async function cleanupStatsSeed(dataSource: DataSource): Promise<void> {
         'Coco',
         'The Jungle Book',
         'Raya and the Last Dragon'
-      );
+      )
+    )
+    AND NOT EXISTS (
+      SELECT 1 FROM seance s WHERE s.id_film = f.id
+    );
   `);
 }
 
@@ -438,8 +509,6 @@ export async function seedStats(dataSource: DataSource): Promise<void> {
       { hour: 17, minute: 45 },
       { hour: 20, minute: 30 },
     ];
-    const plannedOffsets = [0, 3, 7];
-    const upcomingOffsets = [7, 14];
     let reservationIndex = 1;
 
     for (let cityIndex = 0; cityIndex < citySeeds.length; cityIndex += 1) {
@@ -447,24 +516,7 @@ export async function seedStats(dataSource: DataSource): Promise<void> {
       const cinema = await ensureCinema(cinemaRepo, citySeed);
       const salles = await ensureSallesAndSeats(salleRepo, siegeRepo, cinema);
 
-      const films = await filmRepo.save(
-        filmRepo.create(
-          baseFilmSeeds.map((filmSeed) => ({
-            title: `${filmSeed.title} - ${citySeed.ville}`,
-            description: `${filmSeed.description} Disponible a ${citySeed.ville}.`,
-            duration: filmSeed.duration,
-            releaseDate: addDays(today, filmSeed.releaseOffsetDays),
-            director: filmSeed.director,
-            actors: filmSeed.actors,
-            genre: filmSeed.genre,
-            poster: filmSeed.poster,
-            trailer: filmSeed.trailer,
-            note: filmSeed.note,
-            isShowing: filmSeed.statut === StatutFilm.EN_COURS,
-            statut: filmSeed.statut,
-          })),
-        ),
-      );
+      const films = await ensureFilms(filmRepo, citySeed, today);
 
       const siegesBySalleId = new Map<number, Siege[]>();
       for (const salle of salles) {
@@ -477,17 +529,21 @@ export async function seedStats(dataSource: DataSource): Promise<void> {
 
       for (let filmIndex = 0; filmIndex < films.length; filmIndex += 1) {
         const film = films[filmIndex];
-        const offsets =
-          film.statut === StatutFilm.A_VENIR ? upcomingOffsets : plannedOffsets;
+        const seanceDates = buildSeanceDates(
+          today,
+          filmIndex,
+          cityIndex,
+          film.statut,
+        );
 
-        for (let i = 0; i < offsets.length; i += 1) {
+        for (let i = 0; i < seanceDates.length; i += 1) {
           const salle = salles[(filmIndex + i) % salles.length];
           const time =
             seanceTimes[(cityIndex + filmIndex + i) % seanceTimes.length];
           const dateHeure = new Date(
-            today.getFullYear(),
-            today.getMonth(),
-            today.getDate() + offsets[i],
+            seanceDates[i].getFullYear(),
+            seanceDates[i].getMonth(),
+            seanceDates[i].getDate(),
             time.hour,
             time.minute,
             0,
@@ -525,6 +581,12 @@ export async function seedStats(dataSource: DataSource): Promise<void> {
             seance,
             reservationIndex,
             now,
+            reservationTarget(
+              dateHeure,
+              salle.capaciteTotale,
+              filmIndex,
+              cityIndex,
+            ),
           );
         }
       }
@@ -532,7 +594,7 @@ export async function seedStats(dataSource: DataSource): Promise<void> {
   });
 
   console.log(
-    'Stats seeded: 4 villes, 60 non-adult films, salles, sieges, seances, tarifs, reservations and payments.',
+    'Stats seeded: 4 cities, 60 family-friendly films, one year of screenings, reservations and payments.',
   );
 }
 
@@ -543,6 +605,42 @@ async function ensureCinema(repo: any, citySeed: CitySeed): Promise<Cinema> {
     return repo.save(existing);
   }
   return repo.save(repo.create(citySeed));
+}
+
+async function ensureFilms(
+  repo: any,
+  citySeed: CitySeed,
+  today: Date,
+): Promise<Film[]> {
+  const films: Film[] = [];
+
+  for (const filmSeed of baseFilmSeeds) {
+    const title = `${filmSeed.title} - ${citySeed.ville}`;
+    const values = {
+      title,
+      description: `${filmSeed.description} Disponible a ${citySeed.ville}.`,
+      duration: filmSeed.duration,
+      releaseDate: addDays(today, filmSeed.releaseOffsetDays),
+      director: filmSeed.director,
+      actors: filmSeed.actors,
+      genre: filmSeed.genre,
+      poster: filmSeed.poster,
+      trailer: filmSeed.trailer,
+      note: filmSeed.note,
+      isShowing: filmSeed.statut === StatutFilm.EN_COURS,
+      statut: filmSeed.statut,
+    };
+    const existing = await repo.findOne({ where: { title } });
+
+    if (existing) {
+      repo.merge(existing, values);
+      films.push(await repo.save(existing));
+    } else {
+      films.push(await repo.save(repo.create(values)));
+    }
+  }
+
+  return films;
 }
 
 async function ensureSallesAndSeats(
@@ -679,6 +777,7 @@ async function createReservations(
   seance: Seance,
   startIndex: number,
   now: Date,
+  targetCount: number,
 ): Promise<number> {
   if (sieges.length === 0) return startIndex;
 
@@ -687,52 +786,95 @@ async function createReservations(
     [CategorieSiege.VIP]: 90,
   };
   let reservationIndex = startIndex;
-  const paidReservationCount = 1;
+  const reservationCount = Math.min(targetCount, sieges.length);
+  const reservations: Reservation[] = [];
 
-  for (let r = 0; r < paidReservationCount; r += 1) {
+  for (let r = 0; r < reservationCount; r += 1) {
     const reservationRef = makeRef('SEED', seance.dateHeure, reservationIndex);
     reservationIndex += 1;
-    const reservedSeats = [
-      sieges[(r * 2) % sieges.length],
-      sieges[(r * 2 + 1) % sieges.length],
-    ];
+    const reservedSeat = sieges[r];
     const reservationTime = new Date(seance.dateHeure);
-    reservationTime.setHours(reservationTime.getHours() - 2 - r);
+    reservationTime.setDate(
+      reservationTime.getDate() - ((r * 3 + seance.id_seance) % 6),
+    );
+    reservationTime.setHours(9 + (r % 11), (r * 13) % 60, 0, 0);
+    if (reservationTime > now) {
+      reservationTime.setTime(now.getTime());
+      reservationTime.setDate(
+        reservationTime.getDate() - ((r + seance.id_seance) % 7),
+      );
+      reservationTime.setHours(8 + (r % 10), (r * 13) % 60, 0, 0);
+      if (reservationTime > now) {
+        reservationTime.setDate(reservationTime.getDate() - 1);
+      }
+    }
 
-    const savedReservation = await reservationRepo.save(
+    const statusBucket =
+      (r * 17 + seance.id_seance * 7 + reservationTime.getDate()) % 100;
+    const isPast = seance.dateHeure < now;
+    const statut = isPast
+      ? statusBucket < 82
+        ? StatutReservation.UTILISEE
+        : statusBucket < 88
+          ? StatutReservation.VALIDEE
+          : statusBucket < 94
+            ? StatutReservation.ANNULEE
+            : StatutReservation.EXPIREE
+      : statusBucket < 78
+        ? StatutReservation.PAYEE
+        : statusBucket < 86
+          ? StatutReservation.VALIDEE
+          : statusBucket < 92
+            ? StatutReservation.ANNULEE
+            : statusBucket < 97
+              ? StatutReservation.EN_COURS
+              : StatutReservation.EXPIREE;
+
+    reservations.push(
       reservationRepo.create({
         reference: reservationRef,
         dateReservation: reservationTime,
-        statut:
-          seance.dateHeure < now
-            ? StatutReservation.UTILISEE
-            : StatutReservation.PAYEE,
+        statut,
         utilisateur: clients[(reservationIndex + r) % clients.length],
         seance,
-        reservationSieges: reservedSeats.map((siege) =>
+        reservationSieges: [
           reservationSiegeRepo.create({
-            siege,
-            categorie: siege.categorie,
-            prixUnitaire: priceForCategory[siege.categorie],
+            siege: reservedSeat,
+            categorie: reservedSeat.categorie,
+            prixUnitaire: priceForCategory[reservedSeat.categorie],
           }),
-        ),
+        ],
       }),
     );
+  }
 
-    await paiementRepo.save(
+  const savedReservations = await reservationRepo.save(reservations);
+  const paidStatuses = new Set([
+    StatutReservation.PAYEE,
+    StatutReservation.VALIDEE,
+    StatutReservation.UTILISEE,
+  ]);
+  const payments = savedReservations
+    .filter((reservation) => paidStatuses.has(reservation.statut))
+    .map((reservation, index) =>
       paiementRepo.create({
-        reservation: savedReservation,
-        montantTotal: reservedSeats.reduce(
-          (total, siege) => total + priceForCategory[siege.categorie],
+        reservation,
+        montantTotal: reservation.reservationSieges.reduce(
+          (total, reservationSeat) =>
+            total + Number(reservationSeat.prixUnitaire),
           0,
         ),
         devise: 'MAD',
-        methode: r % 2 === 0 ? MethodePaiement.STRIPE : MethodePaiement.PAYPAL,
+        methode:
+          index % 3 === 0 ? MethodePaiement.PAYPAL : MethodePaiement.STRIPE,
         statut: StatutPaiement.ACCEPTE,
-        referenceTransaction: `SEED-TXN-${reservationRef}-${r}`,
-        datePaiement: reservationTime,
+        referenceTransaction: `SEED-TXN-${reservation.reference}`,
+        datePaiement: reservation.dateReservation,
       }),
     );
+
+  if (payments.length > 0) {
+    await paiementRepo.save(payments);
   }
 
   return reservationIndex;
