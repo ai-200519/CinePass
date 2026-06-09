@@ -9,6 +9,7 @@ import {
 import { Repository } from 'typeorm';
 import { UtilisateurService } from '../utilisateur.service';
 import { Utilisateur } from '../entities/utilisateur.entity';
+import { Cinema } from '../../cinema/entities/cinema.entity';
 import { Role } from '../../common/enums/role.enum';
 import { StatutUtilisateur } from '../../common/enums/statut-utilisateur.enum';
 import * as bcrypt from 'bcrypt';
@@ -49,6 +50,10 @@ const mockRepository = {
   createQueryBuilder: jest.fn(),
 };
 
+const mockCinemaRepository = {
+  findOne: jest.fn(),
+};
+
 describe('UtilisateurService', () => {
   let service: UtilisateurService;
   let repo: Repository<Utilisateur>;
@@ -60,6 +65,10 @@ describe('UtilisateurService', () => {
         {
           provide: getRepositoryToken(Utilisateur),
           useValue: mockRepository,
+        },
+        {
+          provide: getRepositoryToken(Cinema),
+          useValue: mockCinemaRepository,
         },
       ],
     }).compile();
@@ -349,7 +358,10 @@ describe('UtilisateurService', () => {
 
       await service.changerRole(1, Role.ADMIN);
 
-      expect(service.update).toHaveBeenCalledWith(1, { role: Role.ADMIN });
+      expect(service.update).toHaveBeenCalledWith(1, {
+        role: Role.ADMIN,
+        id_cinema: undefined,
+      });
     });
   });
 
@@ -405,19 +417,23 @@ describe('UtilisateurService', () => {
   // ── changePassword ──────────────────────────────────────────────────────
   describe('changePassword()', () => {
     it('should change password when current password is valid', async () => {
-      const user = { ...mockUtilisateur } as any;
+      const user = {
+        ...mockUtilisateur,
+        motDePasse: await bcrypt.hash('old', 4),
+      } as any;
       mockRepository.findOne.mockResolvedValue(user);
       mockRepository.update.mockResolvedValue({ affected: 1 });
-      jest.spyOn(bcrypt, 'compare').mockImplementation(async () => true);
-      jest.spyOn(bcrypt, 'hash').mockImplementation(async () => 'hashed');
 
       const result = await service.changePassword(1, 'old', 'new');
 
       expect(result).toHaveProperty('message');
       expect(mockRepository.update).toHaveBeenCalledWith(
         { id_utilisateur: 1 },
-        { motDePasse: 'hashed' },
+        { motDePasse: expect.any(String) },
       );
+      const updatedPassword =
+        mockRepository.update.mock.calls[0][1].motDePasse;
+      await expect(bcrypt.compare('new', updatedPassword)).resolves.toBe(true);
     });
 
     it('should throw NotFoundException when user not found', async () => {
@@ -429,9 +445,11 @@ describe('UtilisateurService', () => {
     });
 
     it('should throw BadRequestException when current password is wrong', async () => {
-      const user = { ...mockUtilisateur } as any;
+      const user = {
+        ...mockUtilisateur,
+        motDePasse: await bcrypt.hash('different-password', 4),
+      } as any;
       mockRepository.findOne.mockResolvedValue(user);
-      jest.spyOn(bcrypt, 'compare').mockImplementation(async () => false);
 
       await expect(service.changePassword(1, 'old', 'new')).rejects.toThrow(
         BadRequestException,

@@ -26,6 +26,7 @@ describe('PaiementService', () => {
 
   const mockStripeGateway = {
     createCheckoutSession: jest.fn(),
+    getPaymentIntent: jest.fn(),
     verifyWebhook: jest.fn(),
   };
 
@@ -102,18 +103,25 @@ describe('PaiementService', () => {
           statut: StatutPaiement.EN_ATTENTE,
         },
       } as any);
+      mockStripeGateway.getPaymentIntent.mockResolvedValue({
+        id: 'pi_test_123',
+        client_secret: 'pi_test_123_secret_456',
+      });
 
       const result = await service.initier({ id_reservation: 1 } as any, 7);
 
       expect(result).toEqual({
         id_paiement: 11,
-        stripeSessionId: 'cs_test_123',
-        url: 'https://checkout.stripe.com/pay/cs_test_123',
+        paymentIntentId: 'pi_test_123',
+        clientSecret: 'pi_test_123_secret_456',
         montantTotal: 120,
         devise: 'MAD',
         statut: StatutPaiement.EN_ATTENTE,
-        message: 'Session de paiement existante',
+        message: 'PaymentIntent existant',
       });
+      expect(mockStripeGateway.getPaymentIntent).toHaveBeenCalledWith(
+        'cs_test_123',
+      );
     });
 
     it('should create paiement and return session data', async () => {
@@ -159,7 +167,7 @@ describe('PaiementService', () => {
       );
       expect(result).toMatchObject({
         id_paiement: 99,
-        stripeSessionId: 'cs_test_999',
+        sessionId: 'cs_test_999',
         montantTotal: 120,
         devise: 'MAD',
         statut: StatutPaiement.EN_ATTENTE,
