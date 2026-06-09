@@ -51,7 +51,7 @@ describe('FilmController', () => {
         mockFilmService.search.mockReturnValue(films);
 
         expect(controller.search(searchDto)).toEqual(films);
-        expect(service.search).toHaveBeenCalledWith(searchDto.q, searchDto);
+        expect(service.search).toHaveBeenCalledWith(searchDto);
     });
 
     it('should return one film', () => {

@@ -106,11 +106,16 @@ describe('UtilisateurController', () => {
 	});
 
 	it('should change role', async () => {
+		const body = { role: Role.ADMIN };
 		const result = { role: Role.ADMIN };
 		mockUtilisateurService.changerRole.mockResolvedValue(result);
 
-		await expect(controller.changerRole(1, Role.ADMIN)).resolves.toEqual(result);
-		expect(mockUtilisateurService.changerRole).toHaveBeenCalledWith(1, Role.ADMIN);
+		await expect(controller.changerRole(1, body)).resolves.toEqual(result);
+		expect(mockUtilisateurService.changerRole).toHaveBeenCalledWith(
+			1,
+			Role.ADMIN,
+			undefined,
+		);
 	});
 
 	it('should remove a user', async () => {
