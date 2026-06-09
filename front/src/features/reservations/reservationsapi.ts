@@ -1,6 +1,12 @@
 import { http } from '../../services/http';
 
-export type StatutReservation = 'EN_COURS' | 'PAYEE' | 'ANNULEE' | 'EXPIREE';
+export type StatutReservation =
+  | 'EN_COURS'
+  | 'PAYEE'
+  | 'VALIDEE'
+  | 'UTILISEE'
+  | 'ANNULEE'
+  | 'EXPIREE';
 export type TypePublic = 'NORMAL' | 'ETUDIANT' | 'ENFANT' | 'SENIOR' | 'GROUPE';
 
 export type ReservationSummary = {
@@ -55,6 +61,7 @@ export type ReservationDetail = {
   qrCode: string | null;
   montant: number;
   devise: string;
+  cinema?: string;
   film: {
     title: string;
     poster?: string;
@@ -128,6 +135,11 @@ export const reservationsApi = {
     return res.data;
   },
 
+  async getByReference(reference: string) {
+    const res = await http.get<ReservationDetail>(`/reservation/by-reference/${encodeURIComponent(reference)}`);
+    return res.data;
+  },
+
   async cancel(id: number) {
     const res = await http.delete<{ message: string; reference: string; statut: StatutReservation }>(
       `/reservation/${id}`,
@@ -140,8 +152,54 @@ export const reservationsApi = {
   },
 
   async getAll(_filters: FilterReservationDto = {}) {
-    const data = await reservationsApi.getMine();
-    return data.reservations;
+    const res = await http.get<{ total: number; reservations: any[] }>('/admin/reservations', {
+      params: _filters,
+    });
+
+    const list = Array.isArray(res.data?.reservations) ? res.data.reservations : [];
+
+    const allowedStatuts: StatutReservation[] = ['EN_COURS', 'PAYEE', 'VALIDEE', 'UTILISEE', 'ANNULEE', 'EXPIREE'];
+    const normalizeStatut = (value: any): StatutReservation => {
+      return allowedStatuts.includes(value) ? value : 'EN_COURS';
+    };
+
+    // Normalize admin response to client ReservationSummary shape
+    const normalized: ReservationSummary[] = list.map((r) => {
+      const utilisateur = r.utilisateur ?? r.client ?? r.clientUser ?? null;
+
+      const seance = r.seance ?? (r.dateSeance ? {
+        id_seance: r.id_seance ?? r.idSeance ?? undefined,
+        dateHeure: r.dateSeance,
+        film: r.film && typeof r.film === 'object' ? r.film : { id: r.id_film ?? undefined, title: r.film ?? r.title ?? '', poster: r.poster ?? undefined },
+        salle: r.salle ? (typeof r.salle === 'object' ? r.salle : { nom: r.salle, numero: r.salleNumero ?? r.numero ?? null }) : undefined,
+      } : undefined);
+
+      return {
+        id_reservation: r.id_reservation ?? r.id ?? r.idReservation,
+        reference: r.reference ?? r.ref ?? '',
+        statut: normalizeStatut(r.statut ?? r.status),
+        dateReservation: r.dateReservation ?? r.createdAt ?? r.date ?? '',
+        montant: r.montant ?? r.montantTotal ?? 0,
+        film: (r.seance?.film?.title) ?? (typeof r.film === 'string' ? r.film : r.film?.title) ?? '',
+        poster: r.seance?.film?.poster ?? r.poster ?? undefined,
+        dateSeance: seance?.dateHeure ?? '',
+        technologie: seance?.technologie ?? r.technologie ?? '',
+        salle: seance?.salle?.nom ?? (r.salle ?? ''),
+        nbSieges: r.nbSieges ?? r.siegesCount ?? (r.reservationSieges ? r.reservationSieges.length : 0),
+        utilisateur: utilisateur
+          ? {
+              id_utilisateur: utilisateur.id_utilisateur ?? utilisateur.id ?? 0,
+              nom: utilisateur.nom ?? utilisateur.lastName ?? '',
+              prenom: utilisateur.prenom ?? utilisateur.firstName ?? '',
+              email: utilisateur.email ?? '',
+            }
+          : { id_utilisateur: 0, nom: '', prenom: '', email: '' },
+        seance: seance ?? (r.seance ?? null),
+        reservationSieges: r.reservationSieges ?? r.sieges ?? [],
+      } as ReservationSummary;
+    });
+
+    return normalized;
   },
 
   async updateStatut(_id: number, _dto: UpdateReservationDto) {

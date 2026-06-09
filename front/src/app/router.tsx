@@ -18,6 +18,8 @@ import ResetPasswordPage from '../pages/auth/ResetPasswordPage';
 import BookingHistoryPage from '../pages/BookingHistoryPage';
 import FilmDetailPage from '../pages/FilmDetailPage';
 import HomePage from '../pages/HomePage';
+import PaiementPage from '../pages/PaiementPage';
+import PaiementSuccess from '../pages/PaiementSuccess';
 import ReservationsPage from '../pages/ReservationsPage';
 import SeatSelectionPage from '../pages/SeatSelectionPage';
 import TicketPage from '../pages/TicketPage';
@@ -32,6 +34,8 @@ export const router = createBrowserRouter([
       { path: 'films/:id', element: <FilmDetailPage /> },
       { path: 'seances/:id/seats', element: <SeatSelectionPage /> },
       { path: 'reservations', element: <ReservationsPage /> },
+      { path: 'paiement/:id', element: <PaiementPage /> },
+      { path: 'paiement/succes', element: <PaiementSuccess /> },
       { path: 'historique', element: <BookingHistoryPage /> },
       { path: 'reservations/:id/ticket', element: <TicketPage /> },
       { path: 'profil', element: <UserProfilePage /> },

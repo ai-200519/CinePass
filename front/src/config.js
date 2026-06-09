@@ -1,6 +1,7 @@
 // Strings only: paths/links used by the frontend
 
 export const API_BASE_URL = '/api';
+export const STRIPE_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '';
 
 export const AUTH_LOGIN_PATH = '/auth/login';
 export const AUTH_REGISTER_PATH = '/auth/register';

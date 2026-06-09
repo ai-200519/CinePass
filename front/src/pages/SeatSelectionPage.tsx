@@ -105,14 +105,24 @@ function buildSeatMatrix(seed: number) {
 }
 
 function buildSeatMatrixFromApi(sieges: ApiSiege[]) {
+  if (sieges.length === 0) return [];
+
   const seatMap = new Map<string, ApiSiege>();
+  const rowSet = new Set<string>();
+  let maxCol = 0;
 
   for (const siege of sieges) {
     seatMap.set(`${siege.rangee}${siege.numero}`, siege);
+    rowSet.add(siege.rangee);
+    maxCol = Math.max(maxCol, siege.numero);
   }
 
-  return ROWS.map((rowLabel) =>
-    COLS.map((colNum) => {
+  // Sort rows alphabetically (A, B, C, ...)
+  const rows = Array.from(rowSet).sort();
+  const cols = Array.from({ length: maxCol }, (_, i) => i + 1);
+
+  return rows.map((rowLabel) =>
+    cols.map((colNum) => {
       const siege = seatMap.get(`${rowLabel}${colNum}`);
       if (!siege) return null;
 
@@ -121,7 +131,7 @@ function buildSeatMatrixFromApi(sieges: ApiSiege[]) {
         row: siege.rangee,
         col: siege.numero,
         kind:
-          siege.statut === 'BLOQUE'
+          siege.statut === 'BLOQUE' || siege.reserved
             ? 'occupied'
             : siege.categorie === 'VIP'
               ? 'vip'
@@ -178,7 +188,7 @@ export default function SeatSelectionPage() {
         });
         const idSalle = fetchedSeance.salle?.id_salle;
         if (idSalle) {
-          setApiSeats(await siegesApi.getBySalle(idSalle));
+          setApiSeats(await siegesApi.getBySalle(idSalle, fetchedSeance.id_seance));
         }
         setError(null);
       } catch (e: any) {
@@ -239,7 +249,7 @@ export default function SeatSelectionPage() {
         })),
       });
       setToast(`Reservation ${reservation.reference} creee.`);
-      window.setTimeout(() => navigate('/reservations'), 700);
+      window.setTimeout(() => navigate(`/paiement/${reservation.id_reservation}`), 700);
     } catch (e: any) {
       setToast(e?.response?.data?.message || e?.message || 'Reservation impossible.');
     } finally {
@@ -335,82 +345,90 @@ export default function SeatSelectionPage() {
               <div className="mt-2 text-center text-xs font-black tracking-[0.2em] text-zinc-400">ÉCRAN</div>
             </div>
 
-            <div className="overflow-x-auto">
-              <div className="min-w-[560px]">
+            <div className="overflow-x-auto flex justify-center">
+              <div className="w-fit">
                 <div className="space-y-3">
-                  {ROWS.map((rowLabel, rowIdx) => (
-                    <div key={rowLabel} className="grid grid-cols-[22px_1fr] items-center gap-4">
-                      <div className="text-xs font-black text-zinc-500">{rowLabel}</div>
-                      <div className="grid grid-cols-12 gap-2">
-                        {COLS.map((colNum, colIdx) => {
-                          const seat = seatMatrix[rowIdx]?.[colIdx] ?? null;
-                          if (!seat) {
-                            return <div key={`${rowLabel}${colNum}`} className="h-9 w-9" />;
-                          }
+                  {seatMatrix.map((rowSeats, rowIdx) => {
+                    const firstSeat = rowSeats.find((s) => s !== null) ?? null;
+                    const rowLabel = firstSeat?.row ?? String.fromCharCode('A'.charCodeAt(0) + rowIdx);
+                    const colCount = rowSeats.length;
 
-                          const key = seatKey(seat);
-                          const isSelected = selectedKeys.has(key);
-                          const isOccupied = seat.kind === 'occupied';
-                          const isVip = seat.kind === 'vip';
+                    return (
+                      <div key={rowLabel} className="grid grid-cols-[22px_1fr] items-center gap-4">
+                        <div className="text-xs font-black text-zinc-500">{rowLabel}</div>
+                        <div
+                          className="grid gap-2"
+                          style={{ gridTemplateColumns: `repeat(${colCount}, 2.25rem)` }}
+                        >
+                          {rowSeats.map((seat, colIdx) => {
+                            if (!seat) {
+                              return <div key={`empty-${rowLabel}-${colIdx}`} className="h-9 w-9" />;
+                            }
 
-                          const baseClasses =
-                            'h-9 w-9 rounded-lg border text-xs font-black outline-none transition-[transform,background-color,border-color,box-shadow] duration-150 ease-out';
+                            const key = seatKey(seat);
+                            const isSelected = selectedKeys.has(key);
+                            const isOccupied = seat.kind === 'occupied';
+                            const isVip = seat.kind === 'vip';
 
-                          const kindClasses = isSelected
-                            ? 'bg-[#E50914] border-[#E50914] shadow-[0_0_0_0_rgba(0,0,0,0)]'
-                            : isOccupied
-                              ? 'bg-[#1a1a1a] border-[#2a2a2a] opacity-70 cursor-not-allowed'
-                              : isVip
-                                ? 'bg-[#1f1f1f] border-[#f5c542]'
-                                : 'bg-[#1f1f1f] border-[#2f2f2f]';
+                            const baseClasses =
+                              'h-9 w-9 rounded-lg border text-xs font-black outline-none transition-[transform,background-color,border-color,box-shadow] duration-150 ease-out';
 
-                          const hoverClasses = !isOccupied
-                            ? 'hover:scale-[1.04] active:scale-[0.97]'
-                            : '';
+                            const kindClasses = isSelected
+                              ? 'bg-[#E50914] border-[#E50914] shadow-[0_0_0_0_rgba(0,0,0,0)]'
+                              : isOccupied
+                                ? 'bg-[#1a1a1a] border-[#2a2a2a] opacity-70 cursor-not-allowed'
+                                : isVip
+                                  ? 'bg-[#1f1f1f] border-[#f5c542]'
+                                  : 'bg-[#1f1f1f] border-[#2f2f2f]';
 
-                          const tooltip = `${rowLabel}${colNum}${isVip ? ' - VIP' : ''}`;
+                            const hoverClasses = !isOccupied ? 'hover:scale-[1.04] active:scale-[0.97]' : '';
+                            const tooltip = `${seat.row}${seat.col}${isVip ? ' - VIP' : ''}`;
 
-                          return (
-                            <button
-                              key={key}
-                              type="button"
-                              title={tooltip}
-                              disabled={isOccupied}
-                              onClick={() => {
-                                if (isOccupied) return;
+                            return (
+                              <button
+                                key={key}
+                                type="button"
+                                title={tooltip}
+                                disabled={isOccupied}
+                                onClick={() => {
+                                  if (isOccupied) return;
 
-                                setSelectedKeys((prev) => {
-                                  const next = new Set(prev);
-                                  if (next.has(key)) {
-                                    next.delete(key);
+                                  setSelectedKeys((prev) => {
+                                    const next = new Set(prev);
+                                    if (next.has(key)) {
+                                      next.delete(key);
+                                      return next;
+                                    }
+
+                                    if (next.size >= MAX_SELECTION) {
+                                      setToast(`Maximum ${MAX_SELECTION} sièges.`);
+                                      return prev;
+                                    }
+
+                                    next.add(key);
                                     return next;
-                                  }
-
-                                  if (next.size >= MAX_SELECTION) {
-                                    setToast(`Maximum ${MAX_SELECTION} sièges.`);
-                                    return prev;
-                                  }
-
-                                  next.add(key);
-                                  return next;
-                                });
-                              }}
-                              className={`${baseClasses} ${kindClasses} ${hoverClasses} animate-seat-in`}
-                              style={{ animationDelay: `${rowIdx * 40 + colIdx * 12}ms` }}
-                              aria-label={tooltip}
-                            >
-                              {isSelected ? (
-                                <span className="flex h-full w-full flex-col items-center justify-center leading-none">
-                                  <Armchair className="h-4 w-4 text-white" aria-hidden="true" />
-                                  <span className="mt-0.5 text-[9px] font-black text-white/95">{rowLabel}{colNum}</span>
-                                </span>
-                              ) : null}
-                            </button>
-                          );
-                        })}
+                                  });
+                                }}
+                                className={`${baseClasses} ${kindClasses} ${hoverClasses} animate-seat-in`}
+                                style={{ animationDelay: `${rowIdx * 40 + colIdx * 12}ms` }}
+                                aria-label={tooltip}
+                              >
+                                {isSelected ? (
+                                  <span className="flex h-full w-full flex-col items-center justify-center leading-none">
+                                    <Armchair className="h-4 w-4 text-white" aria-hidden="true" />
+                                    <span className="mt-0.5 text-[9px] font-black text-white/95">
+                                      {rowLabel}
+                                      {seat.col}
+                                    </span>
+                                  </span>
+                                ) : null}
+                              </button>
+                            );
+                          })}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             </div>

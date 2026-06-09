@@ -1,10 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { StatutReservation } from '../common/enums/statut-reservation.enum';
+import { ReservationSiege } from '../reservation/entities/reservation-siege.entity';
+import { Salle } from '../salle/entities/salle.entity';
 import { CreateSiegeDto } from './dto/create-siege.dto';
 import { UpdateSiegeDto } from './dto/update-siege.dto';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Siege } from './entities/siege.entity';
-import { Repository } from 'typeorm';
-import { Salle } from '../salle/entities/salle.entity';
 
 @Injectable()
 export class SiegeService {
@@ -13,6 +15,8 @@ export class SiegeService {
     private readonly siegeRepository: Repository<Siege>,
     @InjectRepository(Salle)
     private readonly salleRepository: Repository<Salle>,
+    @InjectRepository(ReservationSiege)
+    private readonly reservationSiegeRepository: Repository<ReservationSiege>,
   ) { }
 
   async create(createSiegeDto: CreateSiegeDto) {
@@ -30,12 +34,42 @@ export class SiegeService {
     return this.siegeRepository.save(siege);
   }
 
-  async findAll(idSalle?: number) {
-    return this.siegeRepository.find({
+  async findAll(idSalle?: number, idSeance?: number) {
+    const sieges = await this.siegeRepository.find({
       where: idSalle ? { salle: { id_salle: idSalle } } : undefined,
       relations: ['salle'],
       order: { rangee: 'ASC', numero: 'ASC' },
     });
+
+    if (!idSeance) return sieges;
+
+    const statuts = [
+      StatutReservation.EN_COURS,
+      StatutReservation.PAYEE,
+      StatutReservation.VALIDEE,
+      StatutReservation.UTILISEE,
+    ];
+
+    const qb = this.reservationSiegeRepository
+      .createQueryBuilder('rs')
+      .select('siege.id_siege', 'id_siege')
+      .innerJoin('rs.reservation', 'r')
+      .innerJoin('rs.siege', 'siege')
+      .innerJoin('siege.salle', 'salle')
+      .where('r.seance = :id_seance', { id_seance: idSeance })
+      .andWhere('r.statut IN (:...statuts)', { statuts });
+
+    if (idSalle) {
+      qb.andWhere('salle.id_salle = :id_salle', { id_salle: idSalle });
+    }
+
+    const reservedRows = await qb.getRawMany<{ id_siege: string }>();
+    const reservedSet = new Set(reservedRows.map((row) => Number(row.id_siege)));
+
+    return sieges.map((siege) => ({
+      ...siege,
+      reserved: reservedSet.has(siege.id_siege),
+    }));
   }
 
   async findOne(id: number) {

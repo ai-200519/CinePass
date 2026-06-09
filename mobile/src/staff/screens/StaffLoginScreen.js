@@ -1,5 +1,15 @@
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useState } from 'react';
-import { Alert, Image, KeyboardAvoidingView, Platform, Text, TextInput, View } from 'react-native';
+import {
+  Alert,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import Card from '../components/Card';
 import PrimaryButton from '../components/PrimaryButton';
@@ -12,6 +22,7 @@ export default function StaffLoginScreen({ navigation }) {
 
   const [email, setEmail] = useState('staff@cinepass.com');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async () => {
     const normalizedEmail = email.trim().toLowerCase();
@@ -83,22 +94,46 @@ export default function StaffLoginScreen({ navigation }) {
               >
                 Mot de passe
               </Text>
-              <TextInput
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-                placeholder="••••••••"
-                placeholderTextColor={staffTheme.colors.textSecondary}
-                style={{
-                  height: 48,
-                  borderRadius: 12,
-                  borderWidth: 1,
-                  borderColor: staffTheme.colors.border,
-                  paddingHorizontal: 14,
-                  color: staffTheme.colors.text,
-                  backgroundColor: staffTheme.colors.card,
-                }}
-              />
+              <View style={{ position: 'relative', justifyContent: 'center' }}>
+                <TextInput
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry={!showPassword}
+                  placeholder="••••••••"
+                  placeholderTextColor={staffTheme.colors.textSecondary}
+                  style={{
+                    height: 48,
+                    borderRadius: 12,
+                    borderWidth: 1,
+                    borderColor: staffTheme.colors.border,
+                    paddingLeft: 14,
+                    paddingRight: 44,
+                    color: staffTheme.colors.text,
+                    backgroundColor: staffTheme.colors.card,
+                  }}
+                />
+
+                <Pressable
+                  onPress={() => setShowPassword((prev) => !prev)}
+                  hitSlop={10}
+                  accessibilityRole="button"
+                  accessibilityLabel={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+                  style={{
+                    position: 'absolute',
+                    right: 12,
+                    height: 48,
+                    width: 32,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <MaterialCommunityIcons
+                    name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+                    size={20}
+                    color={staffTheme.colors.textSecondary}
+                  />
+                </Pressable>
+              </View>
 
               <View style={{ marginTop: 18 }}>
                 <PrimaryButton

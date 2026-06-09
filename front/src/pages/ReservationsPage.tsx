@@ -1,12 +1,12 @@
-import { Calendar, DoorOpen, Eye, Trash2 } from 'lucide-react';
+import { Calendar, CreditCard, DoorOpen, Eye, Trash2 } from 'lucide-react';
 import QRCode from 'qrcode';
 import { useEffect, useState } from 'react';
 import Footer from '../components/Footer';
 import Navbar from '../components/Navbar';
 import {
-  reservationsApi,
-  type ReservationDetail,
-  type ReservationSummary,
+    reservationsApi,
+    type ReservationDetail,
+    type ReservationSummary,
 } from '../features/reservations/reservationsapi';
 
 const formatDateTime = (iso: string) =>
@@ -48,7 +48,8 @@ export default function ReservationsPage() {
       return;
     }
 
-    const payload = selected.qrCode || JSON.stringify({ reference: selected.reference });
+    // Keep QR content minimal: only the reservation reference (e.g., CP-2026-R5BZEX)
+    const payload = selected.reference;
     void QRCode.toDataURL(payload, {
       margin: 2,
       width: 220,
@@ -143,8 +144,18 @@ export default function ReservationsPage() {
                   {reservation.statut === 'EN_COURS' && (
                     <button
                       type="button"
-                      onClick={() => cancelReservation(reservation.id_reservation)}
+                      onClick={() => window.location.assign(`/paiement/${reservation.id_reservation}`)}
                       className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-red-600 px-4 text-sm font-black text-white hover:bg-red-500"
+                    >
+                      <CreditCard className="h-4 w-4" />
+                      Payer
+                    </button>
+                  )}
+                  {reservation.statut === 'EN_COURS' && (
+                    <button
+                      type="button"
+                      onClick={() => cancelReservation(reservation.id_reservation)}
+                      className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-white/10 px-4 text-sm font-black text-zinc-200 hover:bg-white/10"
                     >
                       <Trash2 className="h-4 w-4" />
                       Annuler
@@ -198,7 +209,7 @@ export default function ReservationsPage() {
                   {selected.devise}
                 </p>
                 <p className="rounded-xl border border-white/10 bg-white/5 p-3 text-xs text-zinc-400">
-                  A scanner par le staff: {selected.qrCode || JSON.stringify({ reference: selected.reference })}
+                  QR prêt pour le staff.
                 </p>
               </div>
             </div>
