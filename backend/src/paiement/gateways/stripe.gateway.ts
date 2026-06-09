@@ -1,5 +1,9 @@
 // src/paiement/gateways/stripe.gateway.ts
-import { Injectable, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  ServiceUnavailableException,
+} from '@nestjs/common';
 import { ConfigService }      from '@nestjs/config';
 import Stripe                 from 'stripe';
 
@@ -11,14 +15,28 @@ type StripePaymentIntent = Awaited<ReturnType<StripeClient['paymentIntents']['re
 @Injectable()
 export class StripeGateway {
 
-  private readonly stripe: StripeClient;
+  private stripe?: StripeClient;
   private readonly logger = new Logger(StripeGateway.name);
 
-  constructor(private readonly config: ConfigService) {
-    this.stripe = new Stripe(
-      this.config.get<string>('STRIPE_SECRET_KEY'),
-      { apiVersion: '2026-04-22.dahlia' },
-    );
+  constructor(private readonly config: ConfigService) {}
+
+  private getStripe(): StripeClient {
+    if (this.stripe) {
+      return this.stripe;
+    }
+
+    const secretKey = this.config.get<string>('STRIPE_SECRET_KEY');
+    if (!secretKey) {
+      throw new ServiceUnavailableException(
+        'Stripe is not configured. Set STRIPE_SECRET_KEY in backend/.env.',
+      );
+    }
+
+    this.stripe = new Stripe(secretKey, {
+      apiVersion: '2026-04-22.dahlia',
+    });
+
+    return this.stripe;
   }
 
   // ── Create checkout session ─────────────────────────────────────────────
@@ -30,7 +48,7 @@ export class StripeGateway {
     filmTitle:    string,
   ): Promise<{ sessionId: string; url: string }> {
 
-    const session = await this.stripe.checkout.sessions.create({
+    const session = await this.getStripe().checkout.sessions.create({
       payment_method_types: ['card'],
       mode:                 'payment',
       line_items: [
@@ -69,7 +87,7 @@ export class StripeGateway {
     id_paiement: number,
     filmTitle: string,
   ): Promise<{ paymentIntentId: string; clientSecret: string }> {
-    const intent = await this.stripe.paymentIntents.create({
+    const intent = await this.getStripe().paymentIntents.create({
       amount: Math.round(montant * 100),
       currency: devise.toLowerCase(),
       automatic_payment_methods: { enabled: true },
@@ -89,7 +107,7 @@ export class StripeGateway {
   }
 
   async getPaymentIntent(paymentIntentId: string): Promise<StripePaymentIntent> {
-    return this.stripe.paymentIntents.retrieve(paymentIntentId);
+    return this.getStripe().paymentIntents.retrieve(paymentIntentId);
   }
 
   // ── Verify webhook signature ────────────────────────────────────────────
@@ -97,15 +115,22 @@ export class StripeGateway {
     payload:   Buffer,
     signature: string,
   ): StripeEvent {
-    return this.stripe.webhooks.constructEvent(
+    const webhookSecret = this.config.get<string>('STRIPE_WEBHOOK_SECRET');
+    if (!webhookSecret) {
+      throw new ServiceUnavailableException(
+        'Stripe webhooks are not configured. Set STRIPE_WEBHOOK_SECRET in backend/.env.',
+      );
+    }
+
+    return this.getStripe().webhooks.constructEvent(
       payload,
       signature,
-      process.env.STRIPE_WEBHOOK_SECRET,
+      webhookSecret,
     );
   }
 
   // ── Retrieve session ────────────────────────────────────────────────────
   async getSession(sessionId: string): Promise<StripeSession> {
-    return this.stripe.checkout.sessions.retrieve(sessionId);
+    return this.getStripe().checkout.sessions.retrieve(sessionId);
   }
 }
