@@ -271,7 +271,7 @@ export default function AdminRapportsPage() {
   const [preset, setPreset] = useState<DatePreset>('week');
   const [customFrom, setCustomFrom] = useState('');
   const [customTo, setCustomTo] = useState('');
-  const [revGranularity, setRevGranularity] = useState<RevenueGranularity>('year');
+  const [revGranularity, setRevGranularity] = useState<RevenueGranularity>('week');
 
   const [revenus, setRevenus] = useState<Awaited<ReturnType<typeof adminStatsApi.revenus>> | null>(null);
   const [films, setFilms] = useState<Awaited<ReturnType<typeof adminStatsApi.films>> | null>(null);
@@ -514,7 +514,13 @@ export default function AdminRapportsPage() {
             <Calendar className="h-4 w-4 text-zinc-400" aria-hidden="true" />
             <select
               value={preset}
-              onChange={(e) => setPreset(e.target.value as DatePreset)}
+              onChange={(e) => {
+                const nextPreset = e.target.value as DatePreset;
+                setPreset(nextPreset);
+                if (nextPreset !== 'custom') {
+                  setRevGranularity(nextPreset);
+                }
+              }}
               className="bg-transparent text-sm font-semibold text-zinc-200 outline-none"
               aria-label="Période"
             >
@@ -581,7 +587,10 @@ export default function AdminRapportsPage() {
                   <button
                     key={t.key}
                     type="button"
-                    onClick={() => setRevGranularity(t.key)}
+                    onClick={() => {
+                      setRevGranularity(t.key);
+                      setPreset(t.key);
+                    }}
                     className={`h-9 rounded-lg px-3 text-sm font-black transition ${
                       active ? 'bg-[#E50914] text-white' : 'text-zinc-300 hover:bg-white/5'
                     }`}

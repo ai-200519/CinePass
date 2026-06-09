@@ -69,7 +69,16 @@ export class AdminService {
   }
 
   // ── Helper — taux moyen ───────────────────────────────────────────────────
-  private async getTauxMoyen(id_cinema?: number): Promise<string> {
+  private async getTauxMoyen(
+    id_cinema?: number,
+    dateDebut?: string,
+    dateFin?: string,
+  ): Promise<string> {
+    const { condition, params } = this.getDateCondition(
+      's.dateHeure',
+      dateDebut,
+      dateFin,
+    );
     let query = this.seanceRepo
       .createQueryBuilder('s')
       .leftJoin('s.salle', 'sa')
@@ -78,11 +87,12 @@ export class AdminService {
       })
       .select('sa.capaciteTotale', 'capacite')
       .addSelect('COUNT(r.id_reservation)', 'nbReservations')
+      .where(condition, params)
       .groupBy('s.id_seance')
       .addGroupBy('sa.capaciteTotale');
 
     if (id_cinema) {
-      query.where('sa.id_cinema = :id_cinema', { id_cinema });
+      query.andWhere('sa.id_cinema = :id_cinema', { id_cinema });
     }
 
     const data = await query.getRawMany();
@@ -171,7 +181,11 @@ export class AdminService {
         totalReservations,
         chiffreAffaires: Math.round(chiffreAffaires * 100) / 100,
         devise: 'MAD',
-        tauxRemplissageMoyen: await this.getTauxMoyen(filter.id_cinema),
+        tauxRemplissageMoyen: await this.getTauxMoyen(
+          filter.id_cinema,
+          filter.dateDebut,
+          filter.dateFin,
+        ),
         tauxAnnulation: `${tauxAnnulation}%`,
       },
     };
