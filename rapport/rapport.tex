@@ -774,7 +774,7 @@ les détails d'implémentation.
 
 \subsubsection{Scénario : Processus de paiement}
 
-\textbf{Nom :} Effectuer le paiement d'une réservation \\
+\textbf{Nom :} Effectuer le paiement en ligne \\
 \textbf{Acteur :} Client (principal), Passerelle de paiement (secondaire) \\
 \textbf{Données d'entrée :} Réservation en attente de paiement, montant total,
 référence de réservation et informations de paiement saisies par le client.
@@ -2288,7 +2288,7 @@ La figure \ref{fig:detailfilm} présente la page de détail du film, affichant l
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.88\textwidth]{images/client/detailfilm1}
+    \includegraphics[width=0.8\textwidth]{images/client/detailfilm1}
     \caption{Page de détail d'un film — Vue de la bande-annonce}
     \label{fig:detailfilm1}
 \end{figure}
@@ -2598,10 +2598,8 @@ de tests passés ainsi que le temps d'exécution.
 
 \begin{figure}[H]
     \centering
-    \figureplaceholder%
-        {images/tests/jest_results.png}%
-        {Jest Test Results}%
-        {npm run test --- terminal output}
+    \includegraphics[width=0.92\textwidth]
+        {images/tests/jest_results.png}
     \caption{Résultats des tests unitaires Jest --- CinePass}
     \label{fig:jest_results}
 \end{figure}
@@ -2614,10 +2612,8 @@ pour chaque module du backend.
 
 \begin{figure}[H]
     \centering
-    \figureplaceholder%
-        {images/tests/jest_coverage.png}%
-        {Jest Coverage Report}%
-        {npm run test:cov --- coverage table}
+    \includegraphics[width=0.92\textwidth]
+        {images/tests/jest_coverage.jpeg}
     \caption{Rapport de couverture de code --- Tests Jest}
     \label{fig:jest_coverage}
 \end{figure}
@@ -2642,10 +2638,8 @@ présente les résultats des tests pour le
 
 \begin{figure}[H]
     \centering
-    \figureplaceholder%
-        {images/tests/jest_controller.png}%
-        {Controller Tests}%
-        {npx jest reservation.controller.spec.ts --verbose}
+    \includegraphics[width=0.88\textwidth]
+        {images/tests/jest_controller.png}
     \caption{Résultats des tests unitaires ---
              ReservationController}
     \label{fig:jest_controller}
@@ -2672,20 +2666,16 @@ du mot de passe.
 
 \begin{figure}[H]
     \centering
-    \figureplaceholder%
-        {images/tests/postman_register.png}%
-        {Postman Register}%
-        {POST /api/auth/register --- 201 Created}
+    \includegraphics[width=0.92\textwidth]
+        {images/tests/postman_register.png}
     \caption{Test Postman --- POST /api/auth/register}
     \label{fig:postman_register}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \figureplaceholder%
-        {images/tests/postman_login.png}%
-        {Postman Login}%
-        {POST /api/auth/login --- 200 OK + access\_token}
+    \includegraphics[width=0.92\textwidth]
+        {images/tests/postman_login.png}
     \caption{Test Postman --- POST /api/auth/login}
     \label{fig:postman_login}
 \end{figure}
@@ -2699,10 +2689,8 @@ annulation d'une réservation en statut \texttt{EN\_COURS}.
 
 \begin{figure}[H]
     \centering
-    \figureplaceholder%
-        {images/tests/postman_reservation.png}%
-        {Postman Réservation}%
-        {POST /api/reservation --- 201 + reference CP-YYYY-XXXXXX}
+    \includegraphics[width=0.92\textwidth]
+        {images/tests/postman_reservation.png}
     \caption{Test Postman --- POST /api/reservation}
     \label{fig:postman_reservation}
 \end{figure}
@@ -2710,16 +2698,14 @@ annulation d'une réservation en statut \texttt{EN\_COURS}.
 \subsubsection{Tests du paiement Stripe}
 
 Les tests du module de paiement vérifient l'initialisation
-d'une session Stripe, la réception du webhook et la mise à
+d'une session Stripe (durant 10 minutes) , la réception du webhook et la mise à
 jour du statut de la réservation vers \texttt{PAYEE} après
 confirmation.
 
 \begin{figure}[H]
     \centering
-    \figureplaceholder%
-        {images/tests/postman_paiement.png}%
-        {Postman Paiement}%
-        {POST /api/paiement/initier --- 201 + Stripe URL}
+    \includegraphics[width=0.92\textwidth]
+        {images/tests/postman_paiement.png}
     \caption{Test Postman --- POST /api/paiement/initier}
     \label{fig:postman_paiement}
 \end{figure}
@@ -2739,10 +2725,8 @@ une documentation toujours synchronisée avec le code source.
 
 \begin{figure}[H]
     \centering
-    \figureplaceholder%
-        {images/tests/swagger_ui.png}%
-        {Swagger UI}%
-        {http://localhost:3000/docs --- liste des endpoints}
+    \includegraphics[width=0.95\textwidth]
+        {images/tests/swagger_ui.png}
     \caption{Interface Swagger UI --- Documentation et
              tests de l'API CinePass}
     \label{fig:swagger_ui}
